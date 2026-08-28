@@ -1,0 +1,2168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+  >
+
+  <meta name="theme-color" content="#ffffff">
+
+  <title>Image Crop & Resize | InstaPic</title>
+
+  <!-- Telegram Mini App -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Cropper.js -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css"
+  >
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"
+  ></script>
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  >
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+
+      background: #ffffff;
+
+      font-family:
+        Inter,
+        Roboto,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      color: #172033;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+
+      overflow-x: hidden;
+    }
+
+    button,
+    input {
+      font-family: inherit;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 620px;
+
+      margin: 0 auto;
+
+      padding:
+        calc(20px + env(safe-area-inset-top))
+        18px
+        calc(100px + env(safe-area-inset-bottom));
+    }
+
+    /* ============================================
+       HEADER
+    ============================================ */
+
+    .brand {
+      display: flex;
+      align-items: center;
+
+      gap: 12px;
+
+      margin-bottom: 28px;
+    }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+
+      flex: 0 0 46px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 13px;
+
+      background: #eaf4ff;
+
+      color: #1d7edb;
+
+      font-size: 20px;
+    }
+
+    .brand-title {
+      margin: 0;
+
+      color: #1d7edb;
+
+      font-size: 21px;
+      line-height: 1.2;
+
+      font-weight: 750;
+
+      letter-spacing: -0.3px;
+    }
+
+    .brand-subtitle {
+      margin: 4px 0 0;
+
+      color: #8b95a3;
+
+      font-size: 12.5px;
+    }
+
+    /* ============================================
+       SELECT BUTTON
+    ============================================ */
+
+    .select-btn {
+      width: 100%;
+      min-height: 55px;
+
+      border: none;
+      border-radius: 13px;
+
+      background: #1d7edb;
+      color: #ffffff;
+
+      font-size: 16px;
+      font-weight: 700;
+
+      cursor: pointer;
+
+      box-shadow:
+        0 6px 18px rgba(29, 126, 219, 0.18);
+
+      transition:
+        transform 0.12s ease,
+        background 0.15s ease;
+    }
+
+    .select-btn:hover {
+      background: #176fbf;
+    }
+
+    .select-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* ============================================
+       CROP CONTAINER
+    ============================================ */
+
+    .crop-wrapper {
+      width: 100%;
+
+      overflow: hidden;
+
+      border-radius: 14px;
+
+      background: #111827;
+
+      border: 1px solid #e3e7eb;
+
+      touch-action: none;
+    }
+
+    .crop-area {
+      width: 100%;
+
+      /*
+       * A controlled height is important inside Telegram
+       * WebView so the cropper doesn't make the page
+       * unnecessarily huge.
+       */
+      height: min(72vw, 430px);
+
+      min-height: 260px;
+
+      max-height: 430px;
+    }
+
+    .crop-area img {
+      display: block;
+
+      max-width: 100%;
+    }
+
+    /*
+     * Cropper's canvas/selection interaction should remain
+     * responsive to touch.
+     */
+    .cropper-container,
+    .cropper-wrap-box,
+    .cropper-drag-box,
+    .cropper-canvas {
+      touch-action: none;
+    }
+
+    .cropper-view-box {
+      outline: 2px solid #ffffff;
+      outline-color: rgba(255, 255, 255, 0.95);
+    }
+
+    .cropper-modal {
+      background-color: #000000;
+      opacity: 0.55;
+    }
+
+    /* ============================================
+       SECTION TITLE
+    ============================================ */
+
+    .section-title {
+      color: #303846;
+
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    /* ============================================
+       RATIO BUTTONS
+    ============================================ */
+
+    .ratio-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+      gap: 8px;
+
+      margin-top: 10px;
+    }
+
+    .ratio-btn {
+      min-height: 45px;
+
+      border-radius: 10px;
+
+      border: 1px solid #dfe4ea;
+
+      background: #ffffff;
+
+      color: #5d6877;
+
+      font-size: 12px;
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+      transition:
+        all 0.15s ease;
+    }
+
+    .ratio-btn:active {
+      transform: scale(0.97);
+    }
+
+    .ratio-btn.active {
+      background: #edf7ff;
+
+      color: #1d7edb;
+
+      border-color: #1d7edb;
+
+      box-shadow:
+        0 0 0 1px
+        rgba(29, 126, 219, 0.08);
+    }
+
+    /* ============================================
+       DIMENSION INPUTS
+    ============================================ */
+
+    .dimension-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+      gap: 10px;
+
+      margin-top: 18px;
+    }
+
+    .input-label {
+      display: block;
+
+      margin-bottom: 6px;
+
+      color: #687384;
+
+      font-size: 12px;
+
+      font-weight: 600;
+    }
+
+    .dimension-input {
+      width: 100%;
+
+      height: 47px;
+
+      padding: 0 12px;
+
+      border-radius: 10px;
+
+      border: 1px solid #dfe4ea;
+
+      background: #ffffff;
+
+      color: #202938;
+
+      font-size: 14px;
+
+      outline: none;
+
+      transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+    }
+
+    .dimension-input:focus {
+      border-color: #1d7edb;
+
+      box-shadow:
+        0 0 0 3px
+        rgba(29, 126, 219, 0.09);
+    }
+
+    /* ============================================
+       ASPECT CHECKBOX
+    ============================================ */
+
+    .aspect-row {
+      display: flex;
+
+      align-items: center;
+
+      gap: 9px;
+
+      margin-top: 13px;
+
+      color: #687384;
+
+      font-size: 12.5px;
+
+      cursor: pointer;
+
+      user-select: none;
+    }
+
+    .aspect-row input {
+      width: 17px;
+      height: 17px;
+
+      accent-color: #1d7edb;
+
+      cursor: pointer;
+    }
+
+    /* ============================================
+       DOWNLOAD BUTTON
+    ============================================ */
+
+    .apply-btn {
+      width: 100%;
+
+      min-height: 53px;
+
+      margin-top: 19px;
+
+      border: none;
+
+      border-radius: 12px;
+
+      background: #10b981;
+
+      color: #ffffff;
+
+      font-size: 15px;
+
+      font-weight: 750;
+
+      cursor: pointer;
+
+      box-shadow:
+        0 6px 18px
+        rgba(16, 185, 129, 0.16);
+
+      transition:
+        transform 0.12s ease,
+        opacity 0.15s ease;
+    }
+
+    .apply-btn:active {
+      transform: scale(0.98);
+    }
+
+    .apply-btn:disabled {
+      opacity: 0.65;
+
+      cursor: not-allowed;
+    }
+
+    /* ============================================
+       INFO
+    ============================================ */
+
+    .info-box {
+      margin-top: 12px;
+
+      padding: 11px 12px;
+
+      border-radius: 10px;
+
+      border: 1px solid #e4f0fb;
+
+      background: #f7fbff;
+
+      color: #738091;
+
+      font-size: 12px;
+
+      line-height: 1.5;
+    }
+
+    /* ============================================
+       SPINNER
+    ============================================ */
+
+    .spinner {
+      display: inline-block;
+
+      width: 18px;
+      height: 18px;
+
+      margin-right: 7px;
+
+      vertical-align: -4px;
+
+      border:
+        2px solid
+        rgba(255, 255, 255, 0.4);
+
+      border-top-color: #ffffff;
+
+      border-radius: 50%;
+
+      animation:
+        spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+
+      to {
+        transform: rotate(360deg);
+      }
+
+    }
+
+    /* ============================================
+       EMPTY STATE
+    ============================================ */
+
+    .empty-state {
+      margin-top: 20px;
+
+      padding: 28px 15px;
+
+      border: 1px dashed #dfe5eb;
+
+      border-radius: 13px;
+
+      text-align: center;
+
+      color: #9aa3af;
+
+      font-size: 13px;
+
+      line-height: 1.5;
+    }
+
+    .empty-state i {
+      display: block;
+
+      margin-bottom: 9px;
+
+      color: #b8c1cb;
+
+      font-size: 27px;
+    }
+
+    /* ============================================
+       BOTTOM SAFE SPACE
+    ============================================ */
+
+    .bottom-space {
+      height: 96px;
+    }
+
+    /* ============================================
+       SMALL DEVICES
+    ============================================ */
+
+    @media (max-width: 380px) {
+
+      .app {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .brand-title {
+        font-size: 19px;
+      }
+
+      .crop-area {
+        min-height: 230px;
+      }
+
+      .ratio-grid {
+        gap: 7px;
+      }
+
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="app">
+
+    <!-- ==========================================
+         HEADER
+    =========================================== -->
+
+    <header class="brand">
+
+      <div class="logo">
+        <i class="fa-solid fa-crop-simple"></i>
+      </div>
+
+      <div>
+
+        <h1 class="brand-title">
+          Image Crop &amp; Resize
+        </h1>
+
+        <p class="brand-subtitle">
+          Fast, Simple &amp; 100% Client-Side
+        </p>
+
+      </div>
+
+    </header>
+
+
+    <!-- ==========================================
+         FILE INPUT
+    =========================================== -->
+
+    <input
+      id="imageInput"
+      type="file"
+      accept="image/jpeg,image/png,image/webp"
+      hidden
+    >
+
+
+    <!-- ==========================================
+         SELECT BUTTON
+    =========================================== -->
+
+    <button
+      id="selectBtn"
+      class="select-btn"
+      type="button"
+    >
+      <i class="fa-solid fa-folder-open mr-2"></i>
+      Select Photo
+    </button>
+
+
+    <!-- ==========================================
+         EMPTY STATE
+    =========================================== -->
+
+    <div
+      id="emptyState"
+      class="empty-state"
+    >
+
+      <i class="fa-regular fa-image"></i>
+
+      Select a photo to crop and resize it.
+
+    </div>
+
+
+    <!-- ==========================================
+         TOOL
+    =========================================== -->
+
+    <section
+      id="toolSection"
+      class="hidden mt-5"
+    >
+
+      <!-- ========================================
+           CROPPER
+      ========================================= -->
+
+      <div class="crop-wrapper">
+
+        <div class="crop-area">
+
+          <img
+            id="cropImage"
+            alt="Image to crop"
+          >
+
+        </div>
+
+      </div>
+
+
+      <!-- ========================================
+           ASPECT RATIO
+      ========================================= -->
+
+      <div class="mt-5">
+
+        <div class="section-title">
+          Crop Ratio
+        </div>
+
+
+        <div
+          id="ratioGrid"
+          class="ratio-grid"
+        >
+
+          <button
+            type="button"
+            class="ratio-btn active"
+            data-ratio="free"
+          >
+            Free Crop
+          </button>
+
+
+          <button
+            type="button"
+            class="ratio-btn"
+            data-ratio="1"
+          >
+            1:1 Square
+          </button>
+
+
+          <button
+            type="button"
+            class="ratio-btn"
+            data-ratio="1.7777777778"
+          >
+            16:9 Landscape
+          </button>
+
+
+          <button
+            type="button"
+            class="ratio-btn"
+            data-ratio="1.3333333333"
+          >
+            4:3 Standard
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- ========================================
+           DIMENSIONS
+      ========================================= -->
+
+      <div class="dimension-grid">
+
+        <div>
+
+          <label
+            class="input-label"
+            for="widthInput"
+          >
+            Width (px)
+          </label>
+
+
+          <input
+            id="widthInput"
+            class="dimension-input"
+            type="number"
+            min="1"
+            max="16000"
+            inputmode="numeric"
+            placeholder="Width"
+          >
+
+        </div>
+
+
+        <div>
+
+          <label
+            class="input-label"
+            for="heightInput"
+          >
+            Height (px)
+          </label>
+
+
+          <input
+            id="heightInput"
+            class="dimension-input"
+            type="number"
+            min="1"
+            max="16000"
+            inputmode="numeric"
+            placeholder="Height"
+          >
+
+        </div>
+
+      </div>
+
+
+      <!-- ========================================
+           MAINTAIN ASPECT RATIO
+      ========================================= -->
+
+      <label
+        class="aspect-row"
+        for="aspectRatio"
+      >
+
+        <input
+          id="aspectRatio"
+          type="checkbox"
+          checked
+        >
+
+        <span>
+          Maintain Aspect Ratio
+        </span>
+
+      </label>
+
+
+      <!-- ========================================
+           APPLY
+      ========================================= -->
+
+      <button
+        id="applyBtn"
+        class="apply-btn"
+        type="button"
+      >
+
+        <i class="fa-solid fa-download mr-2"></i>
+
+        Apply &amp; Download
+
+      </button>
+
+
+      <!-- ========================================
+           INFO
+      ========================================= -->
+
+      <div class="info-box">
+
+        <i class="fa-solid fa-shield-halved mr-1"></i>
+
+        Cropping and resizing happen entirely on your
+        device. Your photo is never uploaded.
+
+      </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         TELEGRAM BOTTOM SAFE SPACE
+    =========================================== -->
+
+    <div class="bottom-space"></div>
+
+  </main>
+
+
+  <!-- ==============================================
+       JAVASCRIPT
+  =============================================== -->
+
+  <script>
+    (() => {
+
+      "use strict";
+
+
+      /* =================================================
+         TELEGRAM WEB APP
+      ================================================= */
+
+      const tg =
+        window.Telegram &&
+        window.Telegram.WebApp;
+
+
+      if (tg) {
+
+        try {
+
+          tg.ready();
+
+          tg.expand();
+
+
+          if (tg.setHeaderColor) {
+
+            tg.setHeaderColor(
+              "#ffffff"
+            );
+
+          }
+
+
+          if (tg.setBackgroundColor) {
+
+            tg.setBackgroundColor(
+              "#ffffff"
+            );
+
+          }
+
+
+          if (tg.setBottomBarColor) {
+
+            tg.setBottomBarColor(
+              "#ffffff"
+            );
+
+          }
+
+        } catch (error) {
+
+          console.warn(
+            "Telegram WebApp setup error:",
+            error
+          );
+
+        }
+
+      }
+
+
+      /* =================================================
+         DOM
+      ================================================= */
+
+      const imageInput =
+        document.getElementById(
+          "imageInput"
+        );
+
+
+      const selectBtn =
+        document.getElementById(
+          "selectBtn"
+        );
+
+
+      const emptyState =
+        document.getElementById(
+          "emptyState"
+        );
+
+
+      const toolSection =
+        document.getElementById(
+          "toolSection"
+        );
+
+
+      const cropImage =
+        document.getElementById(
+          "cropImage"
+        );
+
+
+      const ratioGrid =
+        document.getElementById(
+          "ratioGrid"
+        );
+
+
+      const widthInput =
+        document.getElementById(
+          "widthInput"
+        );
+
+
+      const heightInput =
+        document.getElementById(
+          "heightInput"
+        );
+
+
+      const aspectRatio =
+        document.getElementById(
+          "aspectRatio"
+        );
+
+
+      const applyBtn =
+        document.getElementById(
+          "applyBtn"
+        );
+
+
+      /* =================================================
+         STATE
+      ================================================= */
+
+      let selectedFile = null;
+
+      let cropper = null;
+
+      let imageObjectURL = null;
+
+      let originalAspectRatio = 1;
+
+
+      /*
+       * Maximum output canvas dimension.
+       *
+       * This protects mobile Telegram WebViews from
+       * accidentally creating enormous canvases.
+       */
+      const MAX_OUTPUT_DIMENSION =
+        16000;
+
+
+      /*
+       * Maximum working crop dimension.
+       *
+       * Cropper itself works with the source image,
+       * while the final output is constrained below.
+       */
+      const MAX_CROP_DIMENSION =
+        16000;
+
+
+      /* =================================================
+         SELECT PHOTO
+      ================================================= */
+
+      selectBtn.addEventListener(
+        "click",
+        () => {
+
+          /*
+           * Reset value so selecting the same image
+           * again fires the change event.
+           */
+          imageInput.value = "";
+
+          imageInput.click();
+
+        }
+      );
+
+
+      /* =================================================
+         FILE SELECTED
+      ================================================= */
+
+      imageInput.addEventListener(
+        "change",
+        event => {
+
+          const file =
+            event.target.files &&
+            event.target.files[0];
+
+
+          if (!file) {
+            return;
+          }
+
+
+          if (
+            !file.type.startsWith(
+              "image/"
+            )
+          ) {
+
+            alert(
+              "Please select a valid image."
+            );
+
+            return;
+
+          }
+
+
+          selectedFile =
+            file;
+
+
+          /*
+           * Release previous object URL.
+           */
+          if (imageObjectURL) {
+
+            URL.revokeObjectURL(
+              imageObjectURL
+            );
+
+          }
+
+
+          imageObjectURL =
+            URL.createObjectURL(
+              file
+            );
+
+
+          /*
+           * Destroy previous Cropper instance.
+           */
+          if (cropper) {
+
+            cropper.destroy();
+
+            cropper =
+              null;
+
+          }
+
+
+          cropImage.onload =
+            () => {
+
+              originalAspectRatio =
+                cropImage.naturalWidth /
+                cropImage.naturalHeight;
+
+
+              /*
+               * Start Cropper.
+               */
+              initializeCropper();
+
+
+              /*
+               * Set initial dimensions based on
+               * current image dimensions.
+               */
+              widthInput.value =
+                Math.round(
+                  cropImage.naturalWidth
+                );
+
+
+              heightInput.value =
+                Math.round(
+                  cropImage.naturalHeight
+                );
+
+            };
+
+
+          cropImage.src =
+            imageObjectURL;
+
+
+          emptyState.classList.add(
+            "hidden"
+          );
+
+
+          toolSection.classList.remove(
+            "hidden"
+          );
+
+        }
+      );
+
+
+      /* =================================================
+         INITIALIZE CROPPER
+      ================================================= */
+
+      function initializeCropper() {
+
+        /*
+         * Make sure Cropper.js is actually loaded.
+         */
+        if (
+          typeof Cropper ===
+          "undefined"
+        ) {
+
+          alert(
+            "Cropper library could not load. Please check your connection and try again."
+          );
+
+          return;
+
+        }
+
+
+        cropper =
+          new Cropper(
+            cropImage,
+            {
+
+              /*
+               * Free crop initially.
+               */
+              aspectRatio:
+                NaN,
+
+
+              viewMode:
+                1,
+
+
+              /*
+               * Allow crop box to move/resize.
+               */
+              dragMode:
+                "crop",
+
+
+              /*
+               * Keep crop box within image.
+               */
+              responsive:
+                true,
+
+
+              restore:
+                true,
+
+
+              checkCrossOrigin:
+                false,
+
+
+              checkOrientation:
+                true,
+
+
+              /*
+               * Enable touch gestures.
+               */
+              zoomable:
+                true,
+
+
+              zoomOnTouch:
+                true,
+
+
+              zoomOnWheel:
+                true,
+
+
+              movable:
+                true,
+
+
+              rotatable:
+                false,
+
+
+              scalable:
+                false,
+
+
+              guides:
+                true,
+
+
+              center:
+                true,
+
+
+              highlight:
+                true,
+
+
+              background:
+                false,
+
+
+              autoCrop:
+                true,
+
+
+              autoCropArea:
+                0.9,
+
+
+              cropBoxMovable:
+                true,
+
+
+              cropBoxResizable:
+                true,
+
+
+              toggleDragModeOnDblclick:
+                false
+
+            }
+          );
+
+      }
+
+
+      /* =================================================
+         RATIO BUTTONS
+      ================================================= */
+
+      ratioGrid.addEventListener(
+        "click",
+        event => {
+
+          const button =
+            event.target.closest(
+              ".ratio-btn"
+            );
+
+
+          if (!button) {
+            return;
+          }
+
+
+          const ratio =
+            button.dataset.ratio;
+
+
+          /*
+           * Update visual selection.
+           */
+          ratioGrid
+            .querySelectorAll(
+              ".ratio-btn"
+            )
+            .forEach(
+              item => {
+
+                item.classList.toggle(
+                  "active",
+                  item === button
+                );
+
+              }
+            );
+
+
+          if (!cropper) {
+            return;
+          }
+
+
+          if (ratio === "free") {
+
+            cropper.setAspectRatio(
+              NaN
+            );
+
+          } else {
+
+            cropper.setAspectRatio(
+              Number(ratio)
+            );
+
+          }
+
+
+          /*
+           * Give cropper time to update its crop box.
+           */
+          setTimeout(
+            updateDimensionInputsFromCrop,
+            50
+          );
+
+        }
+      );
+
+
+      /* =================================================
+         UPDATE DIMENSIONS FROM CROP BOX
+      ================================================= */
+
+      function updateDimensionInputsFromCrop() {
+
+        if (!cropper) {
+          return;
+        }
+
+
+        const data =
+          cropper.getData();
+
+
+        if (
+          data &&
+          Number.isFinite(
+            data.width
+          ) &&
+          Number.isFinite(
+            data.height
+          )
+        ) {
+
+          widthInput.value =
+            Math.round(
+              data.width
+            );
+
+
+          heightInput.value =
+            Math.round(
+              data.height
+            );
+
+        }
+
+      }
+
+
+      /* =================================================
+         WIDTH INPUT
+      ================================================= */
+
+      widthInput.addEventListener(
+        "input",
+        () => {
+
+          if (!cropper) {
+            return;
+          }
+
+
+          let width =
+            Number(
+              widthInput.value
+            );
+
+
+          if (
+            !Number.isFinite(
+              width
+            ) ||
+            width <= 0
+          ) {
+
+            return;
+
+          }
+
+
+          width =
+            Math.min(
+              width,
+              MAX_OUTPUT_DIMENSION
+            );
+
+
+          /*
+           * If aspect ratio lock is active,
+           * calculate proportional height.
+           */
+          if (
+            aspectRatio.checked
+          ) {
+
+            const currentData =
+              cropper.getData();
+
+
+            const ratio =
+              currentData.height > 0
+                ? currentData.width /
+                  currentData.height
+                : originalAspectRatio;
+
+
+            const height =
+              Math.round(
+                width / ratio
+              );
+
+
+            heightInput.value =
+              Math.min(
+                height,
+                MAX_OUTPUT_DIMENSION
+              );
+
+          }
+
+        }
+      );
+
+
+      /* =================================================
+         HEIGHT INPUT
+      ================================================= */
+
+      heightInput.addEventListener(
+        "input",
+        () => {
+
+          if (!cropper) {
+            return;
+          }
+
+
+          let height =
+            Number(
+              heightInput.value
+            );
+
+
+          if (
+            !Number.isFinite(
+              height
+            ) ||
+            height <= 0
+          ) {
+
+            return;
+
+          }
+
+
+          height =
+            Math.min(
+              height,
+              MAX_OUTPUT_DIMENSION
+            );
+
+
+          /*
+           * Maintain aspect ratio when enabled.
+           */
+          if (
+            aspectRatio.checked
+          ) {
+
+            const currentData =
+              cropper.getData();
+
+
+            const ratio =
+              currentData.height > 0
+                ? currentData.width /
+                  currentData.height
+                : originalAspectRatio;
+
+
+            const width =
+              Math.round(
+                height * ratio
+              );
+
+
+            widthInput.value =
+              Math.min(
+                width,
+                MAX_OUTPUT_DIMENSION
+              );
+
+          }
+
+        }
+      );
+
+
+      /* =================================================
+         ASPECT RATIO TOGGLE
+      ================================================= */
+
+      aspectRatio.addEventListener(
+        "change",
+        () => {
+
+          if (
+            aspectRatio.checked &&
+            cropper
+          ) {
+
+            const data =
+              cropper.getData();
+
+
+            if (
+              data.width > 0 &&
+              data.height > 0
+            ) {
+
+              originalAspectRatio =
+                data.width /
+                data.height;
+
+            }
+
+          }
+
+        }
+      );
+
+
+      /* =================================================
+         GET SAFE OUTPUT DIMENSIONS
+      ================================================= */
+
+      function getOutputDimensions() {
+
+        let width =
+          parseInt(
+            widthInput.value,
+            10
+          );
+
+
+        let height =
+          parseInt(
+            heightInput.value,
+            10
+          );
+
+
+        /*
+         * If dimensions are invalid, use crop size.
+         */
+        if (
+          !Number.isFinite(width) ||
+          width <= 0
+        ) {
+
+          width =
+            Math.round(
+              cropper.getData().width
+            );
+
+        }
+
+
+        if (
+          !Number.isFinite(height) ||
+          height <= 0
+        ) {
+
+          height =
+            Math.round(
+              cropper.getData().height
+            );
+
+        }
+
+
+        width =
+          Math.max(
+            1,
+            Math.min(
+              width,
+              MAX_OUTPUT_DIMENSION
+            )
+          );
+
+
+        height =
+          Math.max(
+            1,
+            Math.min(
+              height,
+              MAX_OUTPUT_DIMENSION
+            )
+          );
+
+
+        /*
+         * If aspect ratio is locked, enforce it one final
+         * time before rendering.
+         */
+        if (
+          aspectRatio.checked
+        ) {
+
+          const cropData =
+            cropper.getData();
+
+
+          const ratio =
+            cropData.height > 0
+              ? cropData.width /
+                cropData.height
+              : originalAspectRatio;
+
+
+          /*
+           * Keep the user's changed dimension as the
+           * controlling dimension.
+           */
+          const requestedWidth =
+            parseInt(
+              widthInput.value,
+              10
+            );
+
+
+          const requestedHeight =
+            parseInt(
+              heightInput.value,
+              10
+            );
+
+
+          if (
+            Number.isFinite(
+              requestedWidth
+            )
+          ) {
+
+            width =
+              Math.max(
+                1,
+                Math.min(
+                  requestedWidth,
+                  MAX_OUTPUT_DIMENSION
+                )
+              );
+
+
+            height =
+              Math.round(
+                width / ratio
+              );
+
+          } else {
+
+            height =
+              Math.max(
+                1,
+                Math.min(
+                  requestedHeight,
+                  MAX_OUTPUT_DIMENSION
+                )
+              );
+
+
+            width =
+              Math.round(
+                height * ratio
+              );
+
+          }
+
+
+          /*
+           * Final safety cap.
+           */
+          if (
+            height >
+            MAX_OUTPUT_DIMENSION
+          ) {
+
+            height =
+              MAX_OUTPUT_DIMENSION;
+
+
+            width =
+              Math.round(
+                height * ratio
+              );
+
+          }
+
+
+          if (
+            width >
+            MAX_OUTPUT_DIMENSION
+          ) {
+
+            width =
+              MAX_OUTPUT_DIMENSION;
+
+
+            height =
+              Math.round(
+                width / ratio
+              );
+
+          }
+
+        }
+
+
+        return {
+          width,
+          height
+        };
+
+      }
+
+
+      /* =================================================
+         CANVAS TO BLOB
+      ================================================= */
+
+      function canvasToBlob(
+        canvas,
+        type,
+        quality
+      ) {
+
+        return new Promise(
+          (resolve, reject) => {
+
+            canvas.toBlob(
+              blob => {
+
+                if (!blob) {
+
+                  reject(
+                    new Error(
+                      "Canvas could not create image."
+                    )
+                  );
+
+                  return;
+
+                }
+
+
+                resolve(blob);
+
+              },
+
+              type,
+
+              quality
+
+            );
+
+          }
+        );
+
+      }
+
+
+      /* =================================================
+         APPLY CROP + RESIZE
+      ================================================= */
+
+      async function createOutput() {
+
+        if (!cropper) {
+
+          throw new Error(
+            "Cropper is not initialized."
+          );
+
+        }
+
+
+        const {
+          width,
+          height
+        } =
+          getOutputDimensions();
+
+
+        /*
+         * Cropper generates the selected crop region
+         * directly onto a Canvas at the requested output
+         * dimensions.
+         */
+        const canvas =
+          cropper.getCroppedCanvas({
+
+            width:
+              width,
+
+            height:
+              height,
+
+            minWidth:
+              1,
+
+            minHeight:
+              1,
+
+            maxWidth:
+              MAX_OUTPUT_DIMENSION,
+
+            maxHeight:
+              MAX_OUTPUT_DIMENSION,
+
+            fillColor:
+              "#ffffff",
+
+            imageSmoothingEnabled:
+              true,
+
+            imageSmoothingQuality:
+              "high"
+
+          });
+
+
+        if (!canvas) {
+
+          throw new Error(
+            "Unable to create cropped canvas."
+          );
+
+        }
+
+
+        /*
+         * Final JPEG output.
+         *
+         * 0.92 provides high-quality output while keeping
+         * file size reasonable.
+         */
+        const blob =
+          await canvasToBlob(
+            canvas,
+            "image/jpeg",
+            0.92
+          );
+
+
+        return blob;
+
+      }
+
+
+      /* =================================================
+         DOWNLOAD
+      ================================================= */
+
+      function downloadBlob(
+        blob
+      ) {
+
+        const url =
+          URL.createObjectURL(
+            blob
+          );
+
+
+        const link =
+          document.createElement(
+            "a"
+          );
+
+
+        link.href =
+          url;
+
+
+        link.download =
+          "instapic_resized.jpg";
+
+
+        document.body.appendChild(
+          link
+        );
+
+
+        link.click();
+
+
+        link.remove();
+
+
+        /*
+         * Release object URL after the browser has
+         * received the download instruction.
+         */
+        setTimeout(
+          () => {
+
+            URL.revokeObjectURL(
+              url
+            );
+
+          },
+          1500
+        );
+
+      }
+
+
+      /* =================================================
+         APPLY & DOWNLOAD
+      ================================================= */
+
+      applyBtn.addEventListener(
+        "click",
+        async () => {
+
+          if (!selectedFile) {
+
+            alert(
+              "Please select a photo first."
+            );
+
+            return;
+
+          }
+
+
+          if (!cropper) {
+
+            alert(
+              "The crop editor is not ready yet."
+            );
+
+            return;
+
+          }
+
+
+          const originalHTML =
+            applyBtn.innerHTML;
+
+
+          applyBtn.disabled =
+            true;
+
+
+          applyBtn.innerHTML =
+            '<span class="spinner"></span>' +
+            'Processing...';
+
+
+          try {
+
+            /*
+             * Let Telegram WebView render the loading state
+             * before Canvas processing begins.
+             */
+            await new Promise(
+              resolve =>
+                requestAnimationFrame(
+                  resolve
+                )
+            );
+
+
+            const blob =
+              await createOutput();
+
+
+            /*
+             * Trigger native download.
+             */
+            downloadBlob(
+              blob
+            );
+
+
+            /*
+             * Small delay allows download to start before
+             * cleaning up the cropper.
+             */
+            setTimeout(
+              () => {
+
+                resetTool();
+
+              },
+              300
+            );
+
+
+          } catch (error) {
+
+            console.error(
+              "Crop/resize error:",
+              error
+            );
+
+
+            alert(
+              "Could not process this image. Please try another photo or smaller dimensions."
+            );
+
+
+          } finally {
+
+            applyBtn.disabled =
+              false;
+
+
+            applyBtn.innerHTML =
+              originalHTML;
+
+          }
+
+        }
+      );
+
+
+      /* =================================================
+         RESET TOOL
+      ================================================= */
+
+      function resetTool() {
+
+        selectedFile =
+          null;
+
+
+        if (cropper) {
+
+          cropper.destroy();
+
+          cropper =
+            null;
+
+        }
+
+
+        if (imageObjectURL) {
+
+          URL.revokeObjectURL(
+            imageObjectURL
+          );
+
+          imageObjectURL =
+            null;
+
+        }
+
+
+        cropImage.removeAttribute(
+          "src"
+        );
+
+
+        widthInput.value =
+          "";
+
+
+        heightInput.value =
+          "";
+
+
+        imageInput.value =
+          "";
+
+
+        toolSection.classList.add(
+          "hidden"
+        );
+
+
+        emptyState.classList.remove(
+          "hidden"
+        );
+
+
+        /*
+         * Reset ratio selection.
+         */
+        ratioGrid
+          .querySelectorAll(
+            ".ratio-btn"
+          )
+          .forEach(
+            (button, index) => {
+
+              button.classList.toggle(
+                "active",
+                index === 0
+              );
+
+            }
+          );
+
+
+        aspectRatio.checked =
+          true;
+
+      }
+
+
+      /* =================================================
+         CLEANUP
+      ================================================= */
+
+      window.addEventListener(
+        "beforeunload",
+        () => {
+
+          if (cropper) {
+
+            cropper.destroy();
+
+          }
+
+
+          if (imageObjectURL) {
+
+            URL.revokeObjectURL(
+              imageObjectURL
+            );
+
+          }
+
+        }
+      );
+
+
+    })();
+  </script>
+
+</body>
+</html>
