@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+  >
+
+  <meta name="theme-color" content="#ffffff">
+
+  <title>Image Format Converter | InstaPic</title>
+
+  <!-- Telegram Mini App -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  >
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      background: #ffffff;
+
+      font-family:
+        Inter,
+        Roboto,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      color: #172033;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    button,
+    input {
+      font-family: inherit;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+
+      padding:
+        calc(20px + env(safe-area-inset-top))
+        18px
+        calc(100px + env(safe-area-inset-bottom));
+    }
+
+    /* ============================================
+       HEADER
+    ============================================ */
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+      flex-shrink: 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 13px;
+
+      background: #eaf4ff;
+      color: #1d7edb;
+
+      font-size: 21px;
+    }
+
+    .brand-title {
+      margin: 0;
+
+      color: #1d7edb;
+
+      font-size: 21px;
+      line-height: 1.2;
+
+      font-weight: 750;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-subtitle {
+      margin: 4px 0 0;
+
+      color: #8b95a3;
+
+      font-size: 12.5px;
+    }
+
+    /* ============================================
+       SELECT BUTTON
+    ============================================ */
+
+    .select-btn {
+      width: 100%;
+      min-height: 55px;
+
+      border: none;
+      border-radius: 13px;
+
+      background: #1d7edb;
+      color: #ffffff;
+
+      font-size: 16px;
+      font-weight: 700;
+
+      cursor: pointer;
+
+      box-shadow:
+        0 6px 18px rgba(29, 126, 219, 0.18);
+
+      transition:
+        transform 0.12s ease,
+        background 0.15s ease;
+    }
+
+    .select-btn:active {
+      transform: scale(0.98);
+    }
+
+    .select-btn:hover {
+      background: #176fbf;
+    }
+
+    /* ============================================
+       IMAGE CARD
+    ============================================ */
+
+    .preview-card {
+      overflow: hidden;
+
+      border-radius: 15px;
+
+      border: 1px solid #e7ebef;
+
+      background: #ffffff;
+    }
+
+    .preview-area {
+      padding: 10px;
+
+      background: #f7f9fb;
+    }
+
+    .preview-image {
+      display: block;
+
+      width: 100%;
+      height: auto;
+
+      max-height: 420px;
+
+      object-fit: contain;
+
+      border-radius: 10px;
+
+      background: #ffffff;
+    }
+
+    .image-details {
+      padding: 13px 14px;
+    }
+
+    .format-badge {
+      display: inline-flex;
+      align-items: center;
+
+      padding: 5px 9px;
+
+      border-radius: 20px;
+
+      background: #edf7ff;
+
+      color: #1d7edb;
+
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    .file-name {
+      margin-top: 7px;
+
+      color: #697586;
+
+      font-size: 12px;
+
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .file-size {
+      color: #9aa3af;
+      font-size: 11px;
+      margin-top: 3px;
+    }
+
+    /* ============================================
+       SECTION TITLE
+    ============================================ */
+
+    .section-title {
+      color: #303846;
+
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    /* ============================================
+       FORMAT CHIPS
+    ============================================ */
+
+    .format-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(3, 1fr);
+
+      gap: 9px;
+
+      margin-top: 11px;
+    }
+
+    .format-chip {
+      min-height: 48px;
+
+      border-radius: 11px;
+
+      border: 1px solid #dfe4ea;
+
+      background: #ffffff;
+
+      color: #5d6877;
+
+      font-size: 13px;
+      font-weight: 700;
+
+      cursor: pointer;
+
+      transition:
+        border-color 0.15s ease,
+        background 0.15s ease,
+        color 0.15s ease,
+        transform 0.12s ease;
+    }
+
+    .format-chip:active {
+      transform: scale(0.97);
+    }
+
+    .format-chip.selected {
+      background: #edf7ff;
+
+      border-color: #1d7edb;
+
+      color: #1d7edb;
+
+      box-shadow:
+        0 0 0 1px rgba(29, 126, 219, 0.08);
+    }
+
+    /* ============================================
+       CONVERT BUTTON
+    ============================================ */
+
+    .convert-btn {
+      width: 100%;
+
+      min-height: 53px;
+
+      margin-top: 18px;
+
+      border: none;
+      border-radius: 12px;
+
+      background: #10b981;
+
+      color: #ffffff;
+
+      font-size: 15px;
+      font-weight: 750;
+
+      cursor: pointer;
+
+      box-shadow:
+        0 6px 18px rgba(16, 185, 129, 0.16);
+
+      transition:
+        transform 0.12s ease,
+        opacity 0.15s ease;
+    }
+
+    .convert-btn:active {
+      transform: scale(0.98);
+    }
+
+    .convert-btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    /* ============================================
+       INFO
+    ============================================ */
+
+    .info-box {
+      margin-top: 12px;
+
+      padding: 11px 12px;
+
+      border-radius: 10px;
+
+      border: 1px solid #e4f0fb;
+
+      background: #f7fbff;
+
+      color: #738091;
+
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    /* ============================================
+       EMPTY STATE
+    ============================================ */
+
+    .empty-state {
+      margin-top: 20px;
+
+      padding: 28px 15px;
+
+      border: 1px dashed #dfe5eb;
+
+      border-radius: 13px;
+
+      text-align: center;
+
+      color: #9aa3af;
+
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .empty-state i {
+      display: block;
+
+      margin-bottom: 9px;
+
+      color: #b8c1cb;
+
+      font-size: 27px;
+    }
+
+    /* ============================================
+       SPINNER
+    ============================================ */
+
+    .spinner {
+      display: inline-block;
+
+      width: 18px;
+      height: 18px;
+
+      margin-right: 7px;
+
+      vertical-align: -4px;
+
+      border:
+        2px solid rgba(255,255,255,0.4);
+
+      border-top-color: #ffffff;
+
+      border-radius: 50%;
+
+      animation:
+        spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ============================================
+       BOTTOM SAFE SPACE
+    ============================================ */
+
+    .bottom-space {
+      height: 96px;
+    }
+
+    /* ============================================
+       SMALL DEVICES
+    ============================================ */
+
+    @media (max-width: 380px) {
+
+      .app {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .brand-title {
+        font-size: 19px;
+      }
+
+      .format-grid {
+        gap: 7px;
+      }
+
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="app">
+
+    <!-- ==========================================
+         HEADER
+    =========================================== -->
+
+    <header class="brand">
+
+      <div class="logo">
+        <i class="fa-solid fa-arrows-rotate"></i>
+      </div>
+
+      <div>
+
+        <h1 class="brand-title">
+          Image Format Converter
+        </h1>
+
+        <p class="brand-subtitle">
+          Fast, Simple &amp; 100% Client-Side
+        </p>
+
+      </div>
+
+    </header>
+
+
+    <!-- ==========================================
+         FILE INPUT
+    =========================================== -->
+
+    <input
+      id="imageInput"
+      type="file"
+      accept="image/jpeg,image/png,image/webp"
+      hidden
+    >
+
+
+    <!-- ==========================================
+         SELECT PHOTO
+    =========================================== -->
+
+    <button
+      id="selectBtn"
+      class="select-btn"
+      type="button"
+    >
+      <i class="fa-solid fa-folder-open mr-2"></i>
+      Select Photo
+    </button>
+
+
+    <!-- ==========================================
+         EMPTY STATE
+    =========================================== -->
+
+    <div
+      id="emptyState"
+      class="empty-state"
+    >
+
+      <i class="fa-regular fa-image"></i>
+
+      Select a JPG, PNG or WebP image
+      to convert its format.
+
+    </div>
+
+
+    <!-- ==========================================
+         TOOL CONTENT
+    =========================================== -->
+
+    <section
+      id="toolSection"
+      class="hidden mt-5"
+    >
+
+      <!-- IMAGE PREVIEW -->
+
+      <div class="preview-card">
+
+        <div class="preview-area">
+
+          <img
+            id="originalPreview"
+            class="preview-image"
+            alt="Selected image preview"
+          >
+
+        </div>
+
+
+        <div class="image-details">
+
+          <span
+            id="currentFormat"
+            class="format-badge"
+          >
+            FORMAT
+          </span>
+
+
+          <div
+            id="fileName"
+            class="file-name"
+          >
+          </div>
+
+
+          <div
+            id="fileSize"
+            class="file-size"
+          >
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- FORMAT PICKER -->
+
+      <div class="mt-5">
+
+        <div class="section-title">
+          Convert to Format:
+        </div>
+
+
+        <div
+          id="formatGrid"
+          class="format-grid"
+        >
+
+          <button
+            class="format-chip"
+            data-format="jpg"
+            type="button"
+          >
+            JPG
+          </button>
+
+
+          <button
+            class="format-chip"
+            data-format="png"
+            type="button"
+          >
+            PNG
+          </button>
+
+
+          <button
+            class="format-chip"
+            data-format="webp"
+            type="button"
+          >
+            WebP
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- CONVERT BUTTON -->
+
+      <button
+        id="convertBtn"
+        class="convert-btn"
+        type="button"
+      >
+
+        <i class="fa-solid fa-download mr-2"></i>
+
+        Convert &amp; Download
+
+      </button>
+
+
+      <!-- INFO -->
+
+      <div class="info-box">
+
+        <i class="fa-solid fa-shield-halved mr-1"></i>
+
+        Your image stays on this device.
+        No image is uploaded to any server.
+
+      </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         EXTRA TELEGRAM SAFE SPACE
+    =========================================== -->
+
+    <div class="bottom-space"></div>
+
+  </main>
+
+
+  <!-- ==========================================
+       JAVASCRIPT
+  =========================================== -->
+
+  <script>
+    (() => {
+
+      "use strict";
+
+
+      /* =====================================================
+         TELEGRAM MINI APP
+      ===================================================== */
+
+      const tg =
+        window.Telegram &&
+        window.Telegram.WebApp;
+
+
+      if (tg) {
+
+        try {
+
+          tg.ready();
+
+          tg.expand();
+
+
+          if (tg.setHeaderColor) {
+            tg.setHeaderColor("#ffffff");
+          }
+
+
+          if (tg.setBackgroundColor) {
+            tg.setBackgroundColor("#ffffff");
+          }
+
+
+          if (tg.setBottomBarColor) {
+            tg.setBottomBarColor("#ffffff");
+          }
+
+        } catch (error) {
+
+          console.warn(
+            "Telegram WebApp setup failed:",
+            error
+          );
+
+        }
+
+      }
+
+
+      /* =====================================================
+         DOM
+      ===================================================== */
+
+      const imageInput =
+        document.getElementById(
+          "imageInput"
+        );
+
+
+      const selectBtn =
+        document.getElementById(
+          "selectBtn"
+        );
+
+
+      const emptyState =
+        document.getElementById(
+          "emptyState"
+        );
+
+
+      const toolSection =
+        document.getElementById(
+          "toolSection"
+        );
+
+
+      const originalPreview =
+        document.getElementById(
+          "originalPreview"
+        );
+
+
+      const currentFormat =
+        document.getElementById(
+          "currentFormat"
+        );
+
+
+      const fileName =
+        document.getElementById(
+          "fileName"
+        );
+
+
+      const fileSize =
+        document.getElementById(
+          "fileSize"
+        );
+
+
+      const formatGrid =
+        document.getElementById(
+          "formatGrid"
+        );
+
+
+      const convertBtn =
+        document.getElementById(
+          "convertBtn"
+        );
+
+
+      /* =====================================================
+         STATE
+      ===================================================== */
+
+      let selectedFile = null;
+
+      let selectedFormat = "jpg";
+
+      let originalObjectURL = null;
+
+
+      /* =====================================================
+         CONFIG
+      ===================================================== */
+
+      /*
+       * Maximum canvas dimension.
+       *
+       * This protects older phones and Telegram WebViews
+       * from enormous canvas memory allocations.
+       */
+      const MAX_DIMENSION = 1600;
+
+
+      /*
+       * Requested quality for lossy formats.
+       *
+       * 0.9 = 90%.
+       */
+      const OUTPUT_QUALITY = 0.90;
+
+
+      /* =====================================================
+         HELPERS
+      ===================================================== */
+
+      function formatBytes(bytes) {
+
+        if (!bytes || bytes <= 0) {
+          return "0 KB";
+        }
+
+
+        const kb =
+          bytes / 1024;
+
+
+        if (kb < 1024) {
+
+          return (
+            kb.toFixed(
+              kb < 10 ? 2 : 1
+            ) +
+            " KB"
+          );
+
+        }
+
+
+        return (
+          kb / 1024
+        ).toFixed(2) +
+        " MB";
+
+      }
+
+
+      function detectFormat(file) {
+
+        const type =
+          file.type.toLowerCase();
+
+
+        if (
+          type === "image/jpeg" ||
+          type === "image/jpg"
+        ) {
+
+          return "JPEG";
+
+        }
+
+
+        if (
+          type === "image/png"
+        ) {
+
+          return "PNG";
+
+        }
+
+
+        if (
+          type === "image/webp"
+        ) {
+
+          return "WEBP";
+
+        }
+
+
+        /*
+         * Fallback based on filename.
+         */
+        const extension =
+          file.name
+            .split(".")
+            .pop()
+            .toLowerCase();
+
+
+        if (
+          extension === "jpg" ||
+          extension === "jpeg"
+        ) {
+
+          return "JPEG";
+
+        }
+
+
+        if (
+          extension === "png"
+        ) {
+
+          return "PNG";
+
+        }
+
+
+        if (
+          extension === "webp"
+        ) {
+
+          return "WEBP";
+
+        }
+
+
+        return "UNKNOWN";
+
+      }
+
+
+      /* =====================================================
+         SELECT PHOTO
+      ===================================================== */
+
+      selectBtn.addEventListener(
+        "click",
+        () => {
+
+          /*
+           * Allows the same image to be selected again.
+           */
+          imageInput.value = "";
+
+          imageInput.click();
+
+        }
+      );
+
+
+      /* =====================================================
+         FILE CHANGE
+      ===================================================== */
+
+      imageInput.addEventListener(
+        "change",
+        event => {
+
+          const file =
+            event.target.files &&
+            event.target.files[0];
+
+
+          if (!file) {
+            return;
+          }
+
+
+          if (
+            !file.type.startsWith(
+              "image/"
+            )
+          ) {
+
+            alert(
+              "Please select a valid image."
+            );
+
+            imageInput.value = "";
+
+            return;
+          }
+
+
+          selectedFile =
+            file;
+
+
+          /*
+           * Release previous preview URL.
+           */
+          if (originalObjectURL) {
+
+            URL.revokeObjectURL(
+              originalObjectURL
+            );
+
+          }
+
+
+          originalObjectURL =
+            URL.createObjectURL(
+              file
+            );
+
+
+          originalPreview.src =
+            originalObjectURL;
+
+
+          /*
+           * Display information.
+           */
+          currentFormat.textContent =
+            detectFormat(file);
+
+
+          fileName.textContent =
+            file.name;
+
+
+          fileSize.textContent =
+            formatBytes(
+              file.size
+            );
+
+
+          /*
+           * Default target format.
+           *
+           * If original is JPG, default to PNG.
+           * Otherwise default to JPG.
+           */
+          const original =
+            detectFormat(file);
+
+
+          if (original === "JPEG") {
+
+            selectedFormat =
+              "png";
+
+          } else {
+
+            selectedFormat =
+              "jpg";
+
+          }
+
+
+          updateFormatButtons();
+
+
+          emptyState.classList.add(
+            "hidden"
+          );
+
+
+          toolSection.classList.remove(
+            "hidden"
+          );
+
+        }
+      );
+
+
+      /* =====================================================
+         FORMAT BUTTONS
+      ===================================================== */
+
+      formatGrid.addEventListener(
+        "click",
+        event => {
+
+          const button =
+            event.target.closest(
+              ".format-chip"
+            );
+
+
+          if (!button) {
+            return;
+          }
+
+
+          selectedFormat =
+            button.dataset.format;
+
+
+          updateFormatButtons();
+
+        }
+      );
+
+
+      function updateFormatButtons() {
+
+        const buttons =
+          formatGrid.querySelectorAll(
+            ".format-chip"
+          );
+
+
+        buttons.forEach(
+          button => {
+
+            const isSelected =
+              button.dataset.format ===
+              selectedFormat;
+
+
+            button.classList.toggle(
+              "selected",
+              isSelected
+            );
+
+          }
+        );
+
+      }
+
+
+      /* =====================================================
+         LOAD IMAGE
+      ===================================================== */
+
+      function loadImage(
+        file
+      ) {
+
+        return new Promise(
+          (resolve, reject) => {
+
+            const url =
+              URL.createObjectURL(
+                file
+              );
+
+
+            const img =
+              new Image();
+
+
+            img.onload = () => {
+
+              URL.revokeObjectURL(
+                url
+              );
+
+              resolve(img);
+
+            };
+
+
+            img.onerror = () => {
+
+              URL.revokeObjectURL(
+                url
+              );
+
+              reject(
+                new Error(
+                  "Image could not be decoded."
+                )
+              );
+
+            };
+
+
+            img.src =
+              url;
+
+          }
+        );
+
+      }
+
+
+      /* =====================================================
+         CALCULATE SAFE DIMENSIONS
+      ===================================================== */
+
+      function getSafeDimensions(
+        img
+      ) {
+
+        let width =
+          img.naturalWidth;
+
+
+        let height =
+          img.naturalHeight;
+
+
+        const largest =
+          Math.max(
+            width,
+            height
+          );
+
+
+        /*
+         * Cap the largest side at 1600px.
+         */
+        if (
+          largest >
+          MAX_DIMENSION
+        ) {
+
+          const scale =
+            MAX_DIMENSION /
+            largest;
+
+
+          width =
+            Math.round(
+              width * scale
+            );
+
+
+          height =
+            Math.round(
+              height * scale
+            );
+
+        }
+
+
+        return {
+          width: Math.max(
+            1,
+            width
+          ),
+
+          height: Math.max(
+            1,
+            height
+          )
+        };
+
+      }
+
+
+      /* =====================================================
+         CANVAS → BLOB
+      ===================================================== */
+
+      function canvasToBlob(
+        canvas,
+        mimeType,
+        quality
+      ) {
+
+        return new Promise(
+          (resolve, reject) => {
+
+            canvas.toBlob(
+              blob => {
+
+                if (!blob) {
+
+                  reject(
+                    new Error(
+                      "Browser failed to create output image."
+                    )
+                  );
+
+                  return;
+                }
+
+
+                resolve(blob);
+
+              },
+
+              mimeType,
+
+              quality
+
+            );
+
+          }
+        );
+
+      }
+
+
+      /* =====================================================
+         CONVERT IMAGE
+      ===================================================== */
+
+      async function convertImage() {
+
+        if (!selectedFile) {
+
+          throw new Error(
+            "No image selected."
+          );
+
+        }
+
+
+        const img =
+          await loadImage(
+            selectedFile
+          );
+
+
+        const {
+          width,
+          height
+        } =
+          getSafeDimensions(
+            img
+          );
+
+
+        const canvas =
+          document.createElement(
+            "canvas"
+          );
+
+
+        canvas.width =
+          width;
+
+
+        canvas.height =
+          height;
+
+
+        const ctx =
+          canvas.getContext(
+            "2d",
+            {
+              alpha: true
+            }
+          );
+
+
+        if (!ctx) {
+
+          throw new Error(
+            "Canvas is not supported."
+          );
+
+        }
+
+
+        ctx.imageSmoothingEnabled =
+          true;
+
+
+        ctx.imageSmoothingQuality =
+          "high";
+
+
+        /*
+         * JPG does not support transparency.
+         *
+         * Put a white background behind transparent
+         * PNG/WebP images.
+         */
+        if (
+          selectedFormat === "jpg"
+        ) {
+
+          ctx.fillStyle =
+            "#ffffff";
+
+
+          ctx.fillRect(
+            0,
+            0,
+            width,
+            height
+          );
+
+        }
+
+
+        ctx.drawImage(
+          img,
+          0,
+          0,
+          width,
+          height
+        );
+
+
+        let mimeType;
+
+
+        let extension;
+
+
+        switch (
+          selectedFormat
+        ) {
+
+          case "png":
+
+            mimeType =
+              "image/png";
+
+            extension =
+              "png";
+
+            break;
+
+
+          case "webp":
+
+            mimeType =
+              "image/webp";
+
+            extension =
+              "webp";
+
+            break;
+
+
+          case "jpg":
+
+          default:
+
+            mimeType =
+              "image/jpeg";
+
+            extension =
+              "jpg";
+
+            break;
+
+        }
+
+
+        /*
+         * PNG ignores the quality parameter according to
+         * the Canvas specification.
+         *
+         * JPG and WebP use 0.90.
+         */
+        const quality =
+          (
+            selectedFormat === "jpg" ||
+            selectedFormat === "webp"
+          )
+            ? OUTPUT_QUALITY
+            : undefined;
+
+
+        const blob =
+          await canvasToBlob(
+            canvas,
+            mimeType,
+            quality
+          );
+
+
+        return {
+          blob,
+          extension,
+          mimeType
+        };
+
+      }
+
+
+      /* =====================================================
+         DOWNLOAD
+      ===================================================== */
+
+      function downloadBlob(
+        blob,
+        extension
+      ) {
+
+        const url =
+          URL.createObjectURL(
+            blob
+          );
+
+
+        const link =
+          document.createElement(
+            "a"
+          );
+
+
+        link.href =
+          url;
+
+
+        link.download =
+          "instapic_converted." +
+          extension;
+
+
+        document.body.appendChild(
+          link
+        );
+
+
+        link.click();
+
+
+        link.remove();
+
+
+        /*
+         * Release temporary memory.
+         */
+        setTimeout(
+          () => {
+
+            URL.revokeObjectURL(
+              url
+            );
+
+          },
+          1500
+        );
+
+      }
+
+
+      /* =====================================================
+         CONVERT & DOWNLOAD
+      ===================================================== */
+
+      convertBtn.addEventListener(
+        "click",
+        async () => {
+
+          if (!selectedFile) {
+
+            alert(
+              "Please select a photo first."
+            );
+
+            return;
+          }
+
+
+          const originalHTML =
+            convertBtn.innerHTML;
+
+
+          convertBtn.disabled =
+            true;
+
+
+          convertBtn.innerHTML =
+            '<span class="spinner"></span>' +
+            'Converting...';
+
+
+          try {
+
+            /*
+             * Let the UI update before starting Canvas work.
+             */
+            await new Promise(
+              resolve =>
+                requestAnimationFrame(
+                  resolve
+                )
+            );
+
+
+            const result =
+              await convertImage();
+
+
+            /*
+             * Trigger native download.
+             */
+            downloadBlob(
+              result.blob,
+              result.extension
+            );
+
+
+            /*
+             * Reset after download has been triggered.
+             */
+            setTimeout(
+              () => {
+
+                resetTool();
+
+              },
+              250
+            );
+
+
+          } catch (error) {
+
+            console.error(
+              "Image conversion error:",
+              error
+            );
+
+
+            alert(
+              "Conversion failed. Please try another image."
+            );
+
+
+          } finally {
+
+            convertBtn.disabled =
+              false;
+
+
+            convertBtn.innerHTML =
+              originalHTML;
+
+          }
+
+        }
+      );
+
+
+      /* =====================================================
+         RESET
+      ===================================================== */
+
+      function resetTool() {
+
+        selectedFile =
+          null;
+
+
+        selectedFormat =
+          "jpg";
+
+
+        imageInput.value =
+          "";
+
+
+        if (originalObjectURL) {
+
+          URL.revokeObjectURL(
+            originalObjectURL
+          );
+
+          originalObjectURL =
+            null;
+
+        }
+
+
+        originalPreview.removeAttribute(
+          "src"
+        );
+
+
+        currentFormat.textContent =
+          "FORMAT";
+
+
+        fileName.textContent =
+          "";
+
+
+        fileSize.textContent =
+          "";
+
+
+        toolSection.classList.add(
+          "hidden"
+        );
+
+
+        emptyState.classList.remove(
+          "hidden"
+        );
+
+
+        updateFormatButtons();
+
+      }
+
+
+      /* =====================================================
+         CLEANUP
+      ===================================================== */
+
+      window.addEventListener(
+        "beforeunload",
+        () => {
+
+          if (originalObjectURL) {
+
+            URL.revokeObjectURL(
+              originalObjectURL
+            );
+
+          }
+
+        }
+      );
+
+
+      /*
+       * Initial UI state.
+       */
+      updateFormatButtons();
+
+    })();
+  </script>
+
+</body>
+</html>
