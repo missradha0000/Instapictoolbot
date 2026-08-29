@@ -5,7 +5,7 @@
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
   >
 
   <meta name="theme-color" content="#ffffff">
@@ -36,6 +36,7 @@
       padding: 0;
       width: 100%;
       min-height: 100%;
+
       background: #ffffff;
 
       font-family:
@@ -56,13 +57,20 @@
     }
 
     button,
-    input {
+    input,
+    select {
       font-family: inherit;
+    }
+
+    button {
+      -webkit-user-select: none;
+      user-select: none;
     }
 
     .app {
       width: 100%;
-      max-width: 600px;
+      max-width: 620px;
+
       margin: 0 auto;
 
       padding:
@@ -71,21 +79,23 @@
         calc(100px + env(safe-area-inset-bottom));
     }
 
-    /* ============================================
+    /* =========================
        HEADER
-    ============================================ */
+    ========================== */
 
     .brand {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 28px;
+
+      margin-bottom: 27px;
     }
 
     .logo {
       width: 46px;
       height: 46px;
-      flex-shrink: 0;
+
+      flex: 0 0 46px;
 
       display: flex;
       align-items: center;
@@ -96,7 +106,7 @@
       background: #eaf4ff;
       color: #1d7edb;
 
-      font-size: 21px;
+      font-size: 20px;
     }
 
     .brand-title {
@@ -108,6 +118,7 @@
       line-height: 1.2;
 
       font-weight: 750;
+
       letter-spacing: -0.3px;
     }
 
@@ -119,15 +130,15 @@
       font-size: 12.5px;
     }
 
-    /* ============================================
+    /* =========================
        SELECT BUTTON
-    ============================================ */
+    ========================== */
 
     .select-btn {
       width: 100%;
       min-height: 55px;
 
-      border: none;
+      border: 0;
       border-radius: 13px;
 
       background: #1d7edb;
@@ -143,166 +154,228 @@
 
       transition:
         transform 0.12s ease,
-        background 0.15s ease;
+        opacity 0.15s ease;
     }
 
     .select-btn:active {
       transform: scale(0.98);
     }
 
-    .select-btn:hover {
-      background: #176fbf;
+    /* =========================
+       EMPTY STATE
+    ========================== */
+
+    .empty-state {
+      margin-top: 20px;
+
+      padding: 30px 15px;
+
+      border: 1px dashed #dfe5eb;
+
+      border-radius: 13px;
+
+      text-align: center;
+
+      color: #9aa3af;
+
+      font-size: 13px;
+
+      line-height: 1.5;
     }
 
-    /* ============================================
-       IMAGE CARD
-    ============================================ */
+    .empty-state i {
+      display: block;
+
+      margin-bottom: 9px;
+
+      color: #b8c1cb;
+
+      font-size: 28px;
+    }
+
+    /* =========================
+       PREVIEW
+    ========================== */
 
     .preview-card {
-      overflow: hidden;
+      margin-top: 20px;
 
-      border-radius: 15px;
+      padding: 12px;
 
-      border: 1px solid #e7ebef;
+      border: 1px solid #e3e8ed;
+
+      border-radius: 14px;
 
       background: #ffffff;
     }
 
-    .preview-area {
-      padding: 10px;
+    .preview-image-wrap {
+      width: 100%;
 
-      background: #f7f9fb;
+      min-height: 210px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      overflow: hidden;
+
+      border-radius: 10px;
+
+      background:
+        linear-gradient(
+          45deg,
+          #f1f3f5 25%,
+          transparent 25%
+        ),
+        linear-gradient(
+          -45deg,
+          #f1f3f5 25%,
+          transparent 25%
+        ),
+        linear-gradient(
+          45deg,
+          transparent 75%,
+          #f1f3f5 75%
+        ),
+        linear-gradient(
+          -45deg,
+          transparent 75%,
+          #f1f3f5 75%
+        );
+
+      background-size: 20px 20px;
+
+      background-position:
+        0 0,
+        0 10px,
+        10px -10px,
+        -10px 0;
     }
 
     .preview-image {
       display: block;
 
-      width: 100%;
+      max-width: 100%;
+      max-height: 430px;
+
+      width: auto;
       height: auto;
 
-      max-height: 420px;
-
       object-fit: contain;
-
-      border-radius: 10px;
-
-      background: #ffffff;
     }
 
-    .image-details {
-      padding: 13px 14px;
+    .file-info {
+      display: flex;
+
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 10px;
+
+      margin-top: 11px;
+    }
+
+    .file-name {
+      min-width: 0;
+
+      overflow: hidden;
+
+      color: #4f5b6b;
+
+      font-size: 12px;
+
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .format-badge {
-      display: inline-flex;
-      align-items: center;
+      flex: 0 0 auto;
 
       padding: 5px 9px;
 
-      border-radius: 20px;
+      border-radius: 999px;
 
       background: #edf7ff;
 
       color: #1d7edb;
 
       font-size: 11px;
+
       font-weight: 750;
     }
 
-    .file-name {
-      margin-top: 7px;
-
-      color: #697586;
-
-      font-size: 12px;
-
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .file-size {
-      color: #9aa3af;
-      font-size: 11px;
-      margin-top: 3px;
-    }
-
-    /* ============================================
-       SECTION TITLE
-    ============================================ */
+    /* =========================
+       FORMAT SECTION
+    ========================== */
 
     .section-title {
+      margin-top: 20px;
+
       color: #303846;
 
       font-size: 14px;
+
       font-weight: 700;
     }
-
-    /* ============================================
-       FORMAT CHIPS
-    ============================================ */
 
     .format-grid {
       display: grid;
 
       grid-template-columns:
-        repeat(3, 1fr);
+        repeat(3, minmax(0, 1fr));
 
       gap: 9px;
 
-      margin-top: 11px;
+      margin-top: 10px;
     }
 
-    .format-chip {
-      min-height: 48px;
+    .format-btn {
+      min-height: 47px;
 
-      border-radius: 11px;
+      border-radius: 10px;
 
       border: 1px solid #dfe4ea;
 
       background: #ffffff;
 
-      color: #5d6877;
+      color: #596575;
 
       font-size: 13px;
-      font-weight: 700;
+
+      font-weight: 750;
 
       cursor: pointer;
 
       transition:
-        border-color 0.15s ease,
-        background 0.15s ease,
-        color 0.15s ease,
-        transform 0.12s ease;
+        all 0.15s ease;
     }
 
-    .format-chip:active {
+    .format-btn:active {
       transform: scale(0.97);
     }
 
-    .format-chip.selected {
-      background: #edf7ff;
-
+    .format-btn.active {
       border-color: #1d7edb;
 
-      color: #1d7edb;
+      background: #edf7ff;
 
-      box-shadow:
-        0 0 0 1px rgba(29, 126, 219, 0.08);
+      color: #1d7edb;
     }
 
-    /* ============================================
+    /* =========================
        CONVERT BUTTON
-    ============================================ */
+    ========================== */
 
     .convert-btn {
       width: 100%;
 
       min-height: 53px;
 
-      margin-top: 18px;
+      margin-top: 19px;
 
-      border: none;
+      border: 0;
+
       border-radius: 12px;
 
       background: #10b981;
@@ -310,6 +383,7 @@
       color: #ffffff;
 
       font-size: 15px;
+
       font-weight: 750;
 
       cursor: pointer;
@@ -328,64 +402,13 @@
 
     .convert-btn:disabled {
       opacity: 0.65;
+
       cursor: not-allowed;
     }
 
-    /* ============================================
-       INFO
-    ============================================ */
-
-    .info-box {
-      margin-top: 12px;
-
-      padding: 11px 12px;
-
-      border-radius: 10px;
-
-      border: 1px solid #e4f0fb;
-
-      background: #f7fbff;
-
-      color: #738091;
-
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    /* ============================================
-       EMPTY STATE
-    ============================================ */
-
-    .empty-state {
-      margin-top: 20px;
-
-      padding: 28px 15px;
-
-      border: 1px dashed #dfe5eb;
-
-      border-radius: 13px;
-
-      text-align: center;
-
-      color: #9aa3af;
-
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .empty-state i {
-      display: block;
-
-      margin-bottom: 9px;
-
-      color: #b8c1cb;
-
-      font-size: 27px;
-    }
-
-    /* ============================================
-       SPINNER
-    ============================================ */
+    /* =========================
+       LOADING SPINNER
+    ========================== */
 
     .spinner {
       display: inline-block;
@@ -398,7 +421,8 @@
       vertical-align: -4px;
 
       border:
-        2px solid rgba(255,255,255,0.4);
+        2px solid
+        rgba(255, 255, 255, 0.4);
 
       border-top-color: #ffffff;
 
@@ -414,17 +438,35 @@
       }
     }
 
-    /* ============================================
-       BOTTOM SAFE SPACE
-    ============================================ */
+    /* =========================
+       SECURITY INFO
+    ========================== */
+
+    .info-box {
+      margin-top: 12px;
+
+      padding: 11px 12px;
+
+      border-radius: 10px;
+
+      border: 1px solid #e4f0fb;
+
+      background: #f7fbff;
+
+      color: #738091;
+
+      font-size: 12px;
+
+      line-height: 1.5;
+    }
+
+    /* =========================
+       BOTTOM TELEGRAM SPACE
+    ========================== */
 
     .bottom-space {
       height: 96px;
     }
-
-    /* ============================================
-       SMALL DEVICES
-    ============================================ */
 
     @media (max-width: 380px) {
 
@@ -437,8 +479,8 @@
         font-size: 19px;
       }
 
-      .format-grid {
-        gap: 7px;
+      .preview-image-wrap {
+        min-height: 180px;
       }
 
     }
@@ -449,14 +491,14 @@
 
   <main class="app">
 
-    <!-- ==========================================
+    <!-- =========================
          HEADER
-    =========================================== -->
+    ========================== -->
 
     <header class="brand">
 
       <div class="logo">
-        <i class="fa-solid fa-arrows-rotate"></i>
+        <i class="fa-solid fa-images"></i>
       </div>
 
       <div>
@@ -474,9 +516,9 @@
     </header>
 
 
-    <!-- ==========================================
+    <!-- =========================
          FILE INPUT
-    =========================================== -->
+    ========================== -->
 
     <input
       id="imageInput"
@@ -486,23 +528,26 @@
     >
 
 
-    <!-- ==========================================
+    <!-- =========================
          SELECT PHOTO
-    =========================================== -->
+    ========================== -->
 
     <button
       id="selectBtn"
       class="select-btn"
       type="button"
     >
+
       <i class="fa-solid fa-folder-open mr-2"></i>
+
       Select Photo
+
     </button>
 
 
-    <!-- ==========================================
+    <!-- =========================
          EMPTY STATE
-    =========================================== -->
+    ========================== -->
 
     <div
       id="emptyState"
@@ -511,57 +556,51 @@
 
       <i class="fa-regular fa-image"></i>
 
-      Select a JPG, PNG or WebP image
-      to convert its format.
+      Select an image to convert its format.
 
     </div>
 
 
-    <!-- ==========================================
-         TOOL CONTENT
-    =========================================== -->
+    <!-- =========================
+         CONVERTER
+    ========================== -->
 
     <section
-      id="toolSection"
-      class="hidden mt-5"
+      id="converterSection"
+      class="hidden"
     >
 
-      <!-- IMAGE PREVIEW -->
+      <!-- PREVIEW -->
 
       <div class="preview-card">
 
-        <div class="preview-area">
+        <div class="preview-image-wrap">
 
           <img
-            id="originalPreview"
+            id="imagePreview"
             class="preview-image"
             alt="Selected image preview"
+            draggable="false"
           >
 
         </div>
 
 
-        <div class="image-details">
-
-          <span
-            id="currentFormat"
-            class="format-badge"
-          >
-            FORMAT
-          </span>
-
+        <div class="file-info">
 
           <div
             id="fileName"
             class="file-name"
           >
+            image
           </div>
 
 
           <div
-            id="fileSize"
-            class="file-size"
+            id="currentFormat"
+            class="format-badge"
           >
+            JPEG
           </div>
 
         </div>
@@ -571,50 +610,44 @@
 
       <!-- FORMAT PICKER -->
 
-      <div class="mt-5">
-
-        <div class="section-title">
-          Convert to Format:
-        </div>
+      <div class="section-title">
+        Convert to Format:
+      </div>
 
 
-        <div
-          id="formatGrid"
-          class="format-grid"
+      <div
+        id="formatGrid"
+        class="format-grid"
+      >
+
+        <button
+          type="button"
+          class="format-btn active"
+          data-format="jpg"
         >
+          JPG
+        </button>
 
-          <button
-            class="format-chip"
-            data-format="jpg"
-            type="button"
-          >
-            JPG
-          </button>
+        <button
+          type="button"
+          class="format-btn"
+          data-format="png"
+        >
+          PNG
+        </button>
 
-
-          <button
-            class="format-chip"
-            data-format="png"
-            type="button"
-          >
-            PNG
-          </button>
-
-
-          <button
-            class="format-chip"
-            data-format="webp"
-            type="button"
-          >
-            WebP
-          </button>
-
-        </div>
+        <button
+          type="button"
+          class="format-btn"
+          data-format="webp"
+        >
+          WebP
+        </button>
 
       </div>
 
 
-      <!-- CONVERT BUTTON -->
+      <!-- CONVERT -->
 
       <button
         id="convertBtn"
@@ -622,39 +655,33 @@
         type="button"
       >
 
-        <i class="fa-solid fa-download mr-2"></i>
+        <i class="fa-solid fa-arrows-rotate mr-2"></i>
 
         Convert &amp; Download
 
       </button>
 
 
-      <!-- INFO -->
+      <!-- SECURITY -->
 
       <div class="info-box">
 
         <i class="fa-solid fa-shield-halved mr-1"></i>
 
-        Your image stays on this device.
-        No image is uploaded to any server.
+        Your image never leaves this device.
+        Conversion happens locally inside the browser.
 
       </div>
 
     </section>
 
 
-    <!-- ==========================================
-         EXTRA TELEGRAM SAFE SPACE
-    =========================================== -->
+    <!-- TELEGRAM SAFE BOTTOM SPACE -->
 
     <div class="bottom-space"></div>
 
   </main>
 
-
-  <!-- ==========================================
-       JAVASCRIPT
-  =========================================== -->
 
   <script>
     (() => {
@@ -680,24 +707,45 @@
           tg.expand();
 
 
-          if (tg.setHeaderColor) {
-            tg.setHeaderColor("#ffffff");
+          if (
+            typeof tg.setHeaderColor ===
+            "function"
+          ) {
+
+            tg.setHeaderColor(
+              "#ffffff"
+            );
+
           }
 
 
-          if (tg.setBackgroundColor) {
-            tg.setBackgroundColor("#ffffff");
+          if (
+            typeof tg.setBackgroundColor ===
+            "function"
+          ) {
+
+            tg.setBackgroundColor(
+              "#ffffff"
+            );
+
           }
 
 
-          if (tg.setBottomBarColor) {
-            tg.setBottomBarColor("#ffffff");
+          if (
+            typeof tg.setBottomBarColor ===
+            "function"
+          ) {
+
+            tg.setBottomBarColor(
+              "#ffffff"
+            );
+
           }
 
         } catch (error) {
 
           console.warn(
-            "Telegram WebApp setup failed:",
+            "Telegram WebApp setup:",
             error
           );
 
@@ -707,7 +755,7 @@
 
 
       /* =====================================================
-         DOM
+         DOM ELEMENTS
       ===================================================== */
 
       const imageInput =
@@ -715,54 +763,40 @@
           "imageInput"
         );
 
-
       const selectBtn =
         document.getElementById(
           "selectBtn"
         );
-
 
       const emptyState =
         document.getElementById(
           "emptyState"
         );
 
-
-      const toolSection =
+      const converterSection =
         document.getElementById(
-          "toolSection"
+          "converterSection"
         );
 
-
-      const originalPreview =
+      const imagePreview =
         document.getElementById(
-          "originalPreview"
+          "imagePreview"
         );
-
-
-      const currentFormat =
-        document.getElementById(
-          "currentFormat"
-        );
-
 
       const fileName =
         document.getElementById(
           "fileName"
         );
 
-
-      const fileSize =
+      const currentFormat =
         document.getElementById(
-          "fileSize"
+          "currentFormat"
         );
-
 
       const formatGrid =
         document.getElementById(
           "formatGrid"
         );
-
 
       const convertBtn =
         document.getElementById(
@@ -778,140 +812,7 @@
 
       let selectedFormat = "jpg";
 
-      let originalObjectURL = null;
-
-
-      /* =====================================================
-         CONFIG
-      ===================================================== */
-
-      /*
-       * Maximum canvas dimension.
-       *
-       * This protects older phones and Telegram WebViews
-       * from enormous canvas memory allocations.
-       */
-      const MAX_DIMENSION = 1600;
-
-
-      /*
-       * Requested quality for lossy formats.
-       *
-       * 0.9 = 90%.
-       */
-      const OUTPUT_QUALITY = 0.90;
-
-
-      /* =====================================================
-         HELPERS
-      ===================================================== */
-
-      function formatBytes(bytes) {
-
-        if (!bytes || bytes <= 0) {
-          return "0 KB";
-        }
-
-
-        const kb =
-          bytes / 1024;
-
-
-        if (kb < 1024) {
-
-          return (
-            kb.toFixed(
-              kb < 10 ? 2 : 1
-            ) +
-            " KB"
-          );
-
-        }
-
-
-        return (
-          kb / 1024
-        ).toFixed(2) +
-        " MB";
-
-      }
-
-
-      function detectFormat(file) {
-
-        const type =
-          file.type.toLowerCase();
-
-
-        if (
-          type === "image/jpeg" ||
-          type === "image/jpg"
-        ) {
-
-          return "JPEG";
-
-        }
-
-
-        if (
-          type === "image/png"
-        ) {
-
-          return "PNG";
-
-        }
-
-
-        if (
-          type === "image/webp"
-        ) {
-
-          return "WEBP";
-
-        }
-
-
-        /*
-         * Fallback based on filename.
-         */
-        const extension =
-          file.name
-            .split(".")
-            .pop()
-            .toLowerCase();
-
-
-        if (
-          extension === "jpg" ||
-          extension === "jpeg"
-        ) {
-
-          return "JPEG";
-
-        }
-
-
-        if (
-          extension === "png"
-        ) {
-
-          return "PNG";
-
-        }
-
-
-        if (
-          extension === "webp"
-        ) {
-
-          return "WEBP";
-
-        }
-
-
-        return "UNKNOWN";
-
-      }
+      let imageURL = null;
 
 
       /* =====================================================
@@ -923,7 +824,8 @@
         () => {
 
           /*
-           * Allows the same image to be selected again.
+           * Reset input so selecting the same image again
+           * still fires the change event.
            */
           imageInput.value = "";
 
@@ -934,7 +836,7 @@
 
 
       /* =====================================================
-         FILE CHANGE
+         IMAGE SELECTION
       ===================================================== */
 
       imageInput.addEventListener(
@@ -951,97 +853,93 @@
           }
 
 
+          /*
+           * Validate actual MIME type.
+           */
+          const supportedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+          ];
+
+
           if (
-            !file.type.startsWith(
-              "image/"
+            !supportedTypes.includes(
+              file.type
             )
           ) {
 
             alert(
-              "Please select a valid image."
+              "Please select a JPG, PNG or WebP image."
             );
 
-            imageInput.value = "";
-
             return;
+
           }
 
 
-          selectedFile =
-            file;
+          selectedFile = file;
 
 
           /*
-           * Release previous preview URL.
+           * Release previous object URL.
            */
-          if (originalObjectURL) {
+          if (imageURL) {
 
             URL.revokeObjectURL(
-              originalObjectURL
+              imageURL
             );
 
           }
 
 
-          originalObjectURL =
+          imageURL =
             URL.createObjectURL(
               file
             );
 
 
-          originalPreview.src =
-            originalObjectURL;
+          /*
+           * Preview.
+           */
+          imagePreview.src =
+            imageURL;
 
 
           /*
-           * Display information.
+           * File name without extension.
            */
-          currentFormat.textContent =
-            detectFormat(file);
+          const originalName =
+            file.name
+              .replace(
+                /\.[^/.]+$/,
+                ""
+              );
 
 
           fileName.textContent =
-            file.name;
+            originalName ||
+            "Selected image";
 
 
-          fileSize.textContent =
-            formatBytes(
-              file.size
+          /*
+           * Detect original format.
+           */
+          currentFormat.textContent =
+            getFormatName(
+              file.type
             );
 
 
           /*
-           * Default target format.
-           *
-           * If original is JPG, default to PNG.
-           * Otherwise default to JPG.
+           * Show converter.
            */
-          const original =
-            detectFormat(file);
-
-
-          if (original === "JPEG") {
-
-            selectedFormat =
-              "png";
-
-          } else {
-
-            selectedFormat =
-              "jpg";
-
-          }
-
-
-          updateFormatButtons();
-
-
           emptyState.classList.add(
             "hidden"
           );
 
 
-          toolSection.classList.remove(
+          converterSection.classList.remove(
             "hidden"
           );
 
@@ -1050,7 +948,34 @@
 
 
       /* =====================================================
-         FORMAT BUTTONS
+         FORMAT NAME
+      ===================================================== */
+
+      function getFormatName(
+        mimeType
+      ) {
+
+        switch (mimeType) {
+
+          case "image/jpeg":
+            return "JPEG";
+
+          case "image/png":
+            return "PNG";
+
+          case "image/webp":
+            return "WEBP";
+
+          default:
+            return "IMAGE";
+
+        }
+
+      }
+
+
+      /* =====================================================
+         FORMAT PICKER
       ===================================================== */
 
       formatGrid.addEventListener(
@@ -1059,7 +984,7 @@
 
           const button =
             event.target.closest(
-              ".format-chip"
+              ".format-btn"
             );
 
 
@@ -1072,88 +997,54 @@
             button.dataset.format;
 
 
-          updateFormatButtons();
+          formatGrid
+            .querySelectorAll(
+              ".format-btn"
+            )
+            .forEach(
+              item => {
+
+                item.classList.toggle(
+                  "active",
+                  item === button
+                );
+
+              }
+            );
 
         }
       );
 
 
-      function updateFormatButtons() {
-
-        const buttons =
-          formatGrid.querySelectorAll(
-            ".format-chip"
-          );
-
-
-        buttons.forEach(
-          button => {
-
-            const isSelected =
-              button.dataset.format ===
-              selectedFormat;
-
-
-            button.classList.toggle(
-              "selected",
-              isSelected
-            );
-
-          }
-        );
-
-      }
-
-
       /* =====================================================
-         LOAD IMAGE
+         LOAD IMAGE SAFELY
       ===================================================== */
 
       function loadImage(
-        file
+        src
       ) {
 
         return new Promise(
           (resolve, reject) => {
 
-            const url =
-              URL.createObjectURL(
-                file
-              );
-
-
             const img =
               new Image();
 
 
-            img.onload = () => {
-
-              URL.revokeObjectURL(
-                url
-              );
-
-              resolve(img);
-
-            };
+            img.onload =
+              () => resolve(img);
 
 
-            img.onerror = () => {
-
-              URL.revokeObjectURL(
-                url
-              );
-
-              reject(
-                new Error(
-                  "Image could not be decoded."
-                )
-              );
-
-            };
+            img.onerror =
+              () =>
+                reject(
+                  new Error(
+                    "Unable to decode image."
+                  )
+                );
 
 
-            img.src =
-              url;
+            img.src = src;
 
           }
         );
@@ -1162,65 +1053,72 @@
 
 
       /* =====================================================
-         CALCULATE SAFE DIMENSIONS
+         CANVAS DIMENSION PROTECTION
+         
+         High-resolution photos can be enormous.
+         We preserve aspect ratio but limit the canvas
+         to a safe working dimension.
       ===================================================== */
 
-      function getSafeDimensions(
-        img
+      function calculateCanvasSize(
+        width,
+        height
       ) {
 
-        let width =
-          img.naturalWidth;
+        const MAX_DIMENSION =
+          4096;
 
 
-        let height =
-          img.naturalHeight;
+        let outputWidth =
+          width;
+
+        let outputHeight =
+          height;
 
 
-        const largest =
-          Math.max(
-            width,
-            height
-          );
-
-
-        /*
-         * Cap the largest side at 1600px.
-         */
         if (
-          largest >
-          MAX_DIMENSION
+          outputWidth >
+            MAX_DIMENSION ||
+          outputHeight >
+            MAX_DIMENSION
         ) {
 
           const scale =
-            MAX_DIMENSION /
-            largest;
+            Math.min(
+              MAX_DIMENSION /
+                outputWidth,
 
-
-          width =
-            Math.round(
-              width * scale
+              MAX_DIMENSION /
+                outputHeight
             );
 
 
-          height =
-            Math.round(
-              height * scale
+          outputWidth =
+            Math.max(
+              1,
+              Math.round(
+                outputWidth * scale
+              )
+            );
+
+
+          outputHeight =
+            Math.max(
+              1,
+              Math.round(
+                outputHeight * scale
+              )
             );
 
         }
 
 
         return {
-          width: Math.max(
-            1,
-            width
-          ),
+          width:
+            outputWidth,
 
-          height: Math.max(
-            1,
-            height
-          )
+          height:
+            outputHeight
         };
 
       }
@@ -1239,30 +1137,39 @@
         return new Promise(
           (resolve, reject) => {
 
-            canvas.toBlob(
-              blob => {
+            try {
 
-                if (!blob) {
+              canvas.toBlob(
+                blob => {
 
-                  reject(
-                    new Error(
-                      "Browser failed to create output image."
-                    )
-                  );
+                  if (!blob) {
 
-                  return;
-                }
+                    reject(
+                      new Error(
+                        "Canvas could not create output."
+                      )
+                    );
+
+                    return;
+
+                  }
 
 
-                resolve(blob);
+                  resolve(blob);
 
-              },
+                },
 
-              mimeType,
+                mimeType,
 
-              quality
+                quality
 
-            );
+              );
+
+            } catch (error) {
+
+              reject(error);
+
+            }
 
           }
         );
@@ -1285,18 +1192,23 @@
         }
 
 
+        /*
+         * Load the original image from local memory.
+         */
         const img =
           await loadImage(
-            selectedFile
+            imageURL
           );
 
 
-        const {
-          width,
-          height
-        } =
-          getSafeDimensions(
-            img
+        /*
+         * Protect mobile devices from enormous canvas
+         * allocations.
+         */
+        const dimensions =
+          calculateCanvasSize(
+            img.naturalWidth,
+            img.naturalHeight
           );
 
 
@@ -1307,18 +1219,19 @@
 
 
         canvas.width =
-          width;
+          dimensions.width;
 
 
         canvas.height =
-          height;
+          dimensions.height;
 
 
         const ctx =
           canvas.getContext(
             "2d",
             {
-              alpha: true
+              alpha: true,
+              willReadFrequently: false
             }
           );
 
@@ -1332,33 +1245,35 @@
         }
 
 
+        /*
+         * High-quality image scaling.
+         */
         ctx.imageSmoothingEnabled =
           true;
-
 
         ctx.imageSmoothingQuality =
           "high";
 
 
         /*
-         * JPG does not support transparency.
+         * PNG/WebP/JPG conversion.
          *
-         * Put a white background behind transparent
-         * PNG/WebP images.
+         * JPG has no transparency, so use white
+         * background rather than creating black areas.
          */
         if (
-          selectedFormat === "jpg"
+          selectedFormat ===
+          "jpg"
         ) {
 
           ctx.fillStyle =
             "#ffffff";
 
-
           ctx.fillRect(
             0,
             0,
-            width,
-            height
+            canvas.width,
+            canvas.height
           );
 
         }
@@ -1366,16 +1281,17 @@
 
         ctx.drawImage(
           img,
+
           0,
           0,
-          width,
-          height
+
+          canvas.width,
+          canvas.height
         );
 
 
         let mimeType;
-
-
+        let quality;
         let extension;
 
 
@@ -1388,6 +1304,12 @@
             mimeType =
               "image/png";
 
+            /*
+             * PNG ignores the quality parameter.
+             */
+            quality =
+              undefined;
+
             extension =
               "png";
 
@@ -1398,6 +1320,9 @@
 
             mimeType =
               "image/webp";
+
+            quality =
+              0.9;
 
             extension =
               "webp";
@@ -1412,27 +1337,15 @@
             mimeType =
               "image/jpeg";
 
+            quality =
+              0.9;
+
             extension =
               "jpg";
 
             break;
 
         }
-
-
-        /*
-         * PNG ignores the quality parameter according to
-         * the Canvas specification.
-         *
-         * JPG and WebP use 0.90.
-         */
-        const quality =
-          (
-            selectedFormat === "jpg" ||
-            selectedFormat === "webp"
-          )
-            ? OUTPUT_QUALITY
-            : undefined;
 
 
         const blob =
@@ -1453,59 +1366,255 @@
 
 
       /* =====================================================
-         DOWNLOAD
+         TELEGRAM / MOBILE SAFE DOWNLOAD
+         
+         Priority:
+         
+         1. Native Web Share with File
+            → ideal for mobile / Telegram WebView
+         
+         2. <a download>
+            → standard browser / desktop
+         
+         3. Blob URL
+            → final WebView fallback
       ===================================================== */
 
-      function downloadBlob(
+      async function downloadResult(
         blob,
-        extension
+        filename
       ) {
 
-        const url =
+        if (
+          !blob ||
+          blob.size <= 0
+        ) {
+
+          throw new Error(
+            "Generated file is empty."
+          );
+
+        }
+
+
+        /*
+         * ---------------------------------------------------
+         * METHOD 1 — MOBILE / TELEGRAM
+         * ---------------------------------------------------
+         */
+
+        if (
+          typeof navigator.share ===
+          "function"
+        ) {
+
+          try {
+
+            const file =
+              new File(
+                [blob],
+                filename,
+                {
+                  type:
+                    blob.type
+                }
+              );
+
+
+            let shareSupported =
+              true;
+
+
+            if (
+              typeof navigator.canShare ===
+              "function"
+            ) {
+
+              shareSupported =
+                navigator.canShare({
+                  files: [file]
+                });
+
+            }
+
+
+            if (shareSupported) {
+
+              await navigator.share({
+
+                files: [file],
+
+                title:
+                  "InstaPic Converted Image"
+
+              });
+
+
+              return;
+
+            }
+
+          } catch (error) {
+
+            /*
+             * User intentionally closed share sheet.
+             */
+            if (
+              error &&
+              error.name ===
+                "AbortError"
+            ) {
+
+              return;
+
+            }
+
+
+            console.warn(
+              "Native share unavailable:",
+              error
+            );
+
+          }
+
+        }
+
+
+        /*
+         * ---------------------------------------------------
+         * METHOD 2 — NORMAL DOWNLOAD
+         * ---------------------------------------------------
+         */
+
+        const objectURL =
           URL.createObjectURL(
             blob
           );
 
 
-        const link =
-          document.createElement(
-            "a"
+        try {
+
+          const link =
+            document.createElement(
+              "a"
+            );
+
+
+          link.href =
+            objectURL;
+
+
+          link.download =
+            filename;
+
+
+          link.rel =
+            "noopener";
+
+
+          link.style.position =
+            "fixed";
+
+          link.style.left =
+            "-9999px";
+
+
+          document.body.appendChild(
+            link
           );
 
 
-        link.href =
-          url;
+          /*
+           * Standard click.
+           */
+          link.click();
 
 
-        link.download =
-          "instapic_converted." +
-          extension;
+          /*
+           * Some embedded WebViews respond better
+           * to an explicit MouseEvent.
+           */
+          try {
+
+            link.dispatchEvent(
+              new MouseEvent(
+                "click",
+                {
+                  bubbles: true,
+                  cancelable: true,
+                  view: window
+                }
+              )
+            );
+
+          } catch (_) {}
 
 
-        document.body.appendChild(
-          link
-        );
+          link.remove();
 
 
-        link.click();
+          /*
+           * Keep URL alive long enough for browser
+           * download manager to consume it.
+           */
+          setTimeout(
+            () => {
+
+              URL.revokeObjectURL(
+                objectURL
+              );
+
+            },
+            10000
+          );
 
 
-        link.remove();
+          return;
+
+        } catch (error) {
+
+          console.warn(
+            "Anchor download failed:",
+            error
+          );
+
+        }
 
 
         /*
-         * Release temporary memory.
+         * ---------------------------------------------------
+         * METHOD 3 — WEBVIEW FALLBACK
+         * ---------------------------------------------------
          */
-        setTimeout(
-          () => {
 
-            URL.revokeObjectURL(
-              url
-            );
+        try {
 
-          },
-          1500
-        );
+          window.open(
+            objectURL,
+            "_blank"
+          );
+
+
+          setTimeout(
+            () => {
+
+              URL.revokeObjectURL(
+                objectURL
+              );
+
+            },
+            15000
+          );
+
+        } catch (error) {
+
+          URL.revokeObjectURL(
+            objectURL
+          );
+
+          throw error;
+
+        }
 
       }
 
@@ -1525,6 +1634,7 @@
             );
 
             return;
+
           }
 
 
@@ -1537,19 +1647,19 @@
 
 
           convertBtn.innerHTML =
-            '<span class="spinner"></span>' +
-            'Converting...';
+            '<span class="spinner"></span>Converting...';
 
 
           try {
 
             /*
-             * Let the UI update before starting Canvas work.
+             * Allow Telegram WebView to paint the
+             * loading state before CPU-heavy work.
              */
             await new Promise(
               resolve =>
                 requestAnimationFrame(
-                  resolve
+                  () => resolve()
                 )
             );
 
@@ -1558,32 +1668,39 @@
               await convertImage();
 
 
-            /*
-             * Trigger native download.
-             */
-            downloadBlob(
+            const filename =
+              "instapic_converted." +
+              result.extension;
+
+
+            await downloadResult(
               result.blob,
-              result.extension
+              filename
             );
 
 
+            convertBtn.innerHTML =
+              '<i class="fa-solid fa-check mr-2"></i>Done';
+
+
             /*
-             * Reset after download has been triggered.
+             * Restore button text.
              */
             setTimeout(
               () => {
 
-                resetTool();
+                convertBtn.innerHTML =
+                  originalHTML;
 
               },
-              250
+              1800
             );
 
 
           } catch (error) {
 
             console.error(
-              "Image conversion error:",
+              "Conversion error:",
               error
             );
 
@@ -1593,81 +1710,18 @@
             );
 
 
+            convertBtn.innerHTML =
+              originalHTML;
+
           } finally {
 
             convertBtn.disabled =
               false;
 
-
-            convertBtn.innerHTML =
-              originalHTML;
-
           }
 
         }
       );
-
-
-      /* =====================================================
-         RESET
-      ===================================================== */
-
-      function resetTool() {
-
-        selectedFile =
-          null;
-
-
-        selectedFormat =
-          "jpg";
-
-
-        imageInput.value =
-          "";
-
-
-        if (originalObjectURL) {
-
-          URL.revokeObjectURL(
-            originalObjectURL
-          );
-
-          originalObjectURL =
-            null;
-
-        }
-
-
-        originalPreview.removeAttribute(
-          "src"
-        );
-
-
-        currentFormat.textContent =
-          "FORMAT";
-
-
-        fileName.textContent =
-          "";
-
-
-        fileSize.textContent =
-          "";
-
-
-        toolSection.classList.add(
-          "hidden"
-        );
-
-
-        emptyState.classList.remove(
-          "hidden"
-        );
-
-
-        updateFormatButtons();
-
-      }
 
 
       /* =====================================================
@@ -1678,22 +1732,19 @@
         "beforeunload",
         () => {
 
-          if (originalObjectURL) {
+          if (imageURL) {
 
             URL.revokeObjectURL(
-              originalObjectURL
+              imageURL
             );
+
+            imageURL = null;
 
           }
 
         }
       );
 
-
-      /*
-       * Initial UI state.
-       */
-      updateFormatButtons();
 
     })();
   </script>
