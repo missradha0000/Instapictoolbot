@@ -5,7 +5,7 @@
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
   >
 
   <meta name="theme-color" content="#ffffff">
@@ -63,13 +63,17 @@
     body {
       min-height: 100vh;
       min-height: 100dvh;
-
       overflow-x: hidden;
     }
 
     button,
     input {
       font-family: inherit;
+    }
+
+    button {
+      -webkit-user-select: none;
+      user-select: none;
     }
 
     .app {
@@ -84,14 +88,13 @@
         calc(100px + env(safe-area-inset-bottom));
     }
 
-    /* ============================================
+    /* ================================
        HEADER
-    ============================================ */
+    ================================= */
 
     .brand {
       display: flex;
       align-items: center;
-
       gap: 12px;
 
       margin-bottom: 28px;
@@ -110,7 +113,6 @@
       border-radius: 13px;
 
       background: #eaf4ff;
-
       color: #1d7edb;
 
       font-size: 20px;
@@ -137,15 +139,15 @@
       font-size: 12.5px;
     }
 
-    /* ============================================
+    /* ================================
        SELECT BUTTON
-    ============================================ */
+    ================================= */
 
     .select-btn {
       width: 100%;
       min-height: 55px;
 
-      border: none;
+      border: 0;
       border-radius: 13px;
 
       background: #1d7edb;
@@ -164,17 +166,45 @@
         background 0.15s ease;
     }
 
-    .select-btn:hover {
-      background: #176fbf;
-    }
-
     .select-btn:active {
       transform: scale(0.98);
     }
 
-    /* ============================================
-       CROP CONTAINER
-    ============================================ */
+    /* ================================
+       EMPTY STATE
+    ================================= */
+
+    .empty-state {
+      margin-top: 20px;
+
+      padding: 30px 15px;
+
+      border: 1px dashed #dfe5eb;
+
+      border-radius: 13px;
+
+      text-align: center;
+
+      color: #9aa3af;
+
+      font-size: 13px;
+
+      line-height: 1.5;
+    }
+
+    .empty-state i {
+      display: block;
+
+      margin-bottom: 9px;
+
+      color: #b8c1cb;
+
+      font-size: 28px;
+    }
+
+    /* ================================
+       CROPPER
+    ================================= */
 
     .crop-wrapper {
       width: 100%;
@@ -193,11 +223,6 @@
     .crop-area {
       width: 100%;
 
-      /*
-       * A controlled height is important inside Telegram
-       * WebView so the cropper doesn't make the page
-       * unnecessarily huge.
-       */
       height: min(72vw, 430px);
 
       min-height: 260px;
@@ -207,14 +232,9 @@
 
     .crop-area img {
       display: block;
-
       max-width: 100%;
     }
 
-    /*
-     * Cropper's canvas/selection interaction should remain
-     * responsive to touch.
-     */
     .cropper-container,
     .cropper-wrap-box,
     .cropper-drag-box,
@@ -232,9 +252,9 @@
       opacity: 0.55;
     }
 
-    /* ============================================
+    /* ================================
        SECTION TITLE
-    ============================================ */
+    ================================= */
 
     .section-title {
       color: #303846;
@@ -243,9 +263,9 @@
       font-weight: 700;
     }
 
-    /* ============================================
+    /* ================================
        RATIO BUTTONS
-    ============================================ */
+    ================================= */
 
     .ratio-grid {
       display: grid;
@@ -270,13 +290,11 @@
       color: #5d6877;
 
       font-size: 12px;
-
       font-weight: 700;
 
       cursor: pointer;
 
-      transition:
-        all 0.15s ease;
+      transition: all 0.15s ease;
     }
 
     .ratio-btn:active {
@@ -289,15 +307,11 @@
       color: #1d7edb;
 
       border-color: #1d7edb;
-
-      box-shadow:
-        0 0 0 1px
-        rgba(29, 126, 219, 0.08);
     }
 
-    /* ============================================
-       DIMENSION INPUTS
-    ============================================ */
+    /* ================================
+       DIMENSIONS
+    ================================= */
 
     .dimension-grid {
       display: grid;
@@ -350,13 +364,12 @@
       border-color: #1d7edb;
 
       box-shadow:
-        0 0 0 3px
-        rgba(29, 126, 219, 0.09);
+        0 0 0 3px rgba(29, 126, 219, 0.09);
     }
 
-    /* ============================================
-       ASPECT CHECKBOX
-    ============================================ */
+    /* ================================
+       ASPECT RATIO
+    ================================= */
 
     .aspect-row {
       display: flex;
@@ -381,13 +394,11 @@
       height: 17px;
 
       accent-color: #1d7edb;
-
-      cursor: pointer;
     }
 
-    /* ============================================
-       DOWNLOAD BUTTON
-    ============================================ */
+    /* ================================
+       APPLY BUTTON
+    ================================= */
 
     .apply-btn {
       width: 100%;
@@ -396,7 +407,7 @@
 
       margin-top: 19px;
 
-      border: none;
+      border: 0;
 
       border-radius: 12px;
 
@@ -411,8 +422,7 @@
       cursor: pointer;
 
       box-shadow:
-        0 6px 18px
-        rgba(16, 185, 129, 0.16);
+        0 6px 18px rgba(16, 185, 129, 0.16);
 
       transition:
         transform 0.12s ease,
@@ -425,13 +435,12 @@
 
     .apply-btn:disabled {
       opacity: 0.65;
-
       cursor: not-allowed;
     }
 
-    /* ============================================
+    /* ================================
        INFO
-    ============================================ */
+    ================================= */
 
     .info-box {
       margin-top: 12px;
@@ -451,9 +460,9 @@
       line-height: 1.5;
     }
 
-    /* ============================================
+    /* ================================
        SPINNER
-    ============================================ */
+    ================================= */
 
     .spinner {
       display: inline-block;
@@ -478,56 +487,18 @@
     }
 
     @keyframes spin {
-
       to {
         transform: rotate(360deg);
       }
-
     }
 
-    /* ============================================
-       EMPTY STATE
-    ============================================ */
-
-    .empty-state {
-      margin-top: 20px;
-
-      padding: 28px 15px;
-
-      border: 1px dashed #dfe5eb;
-
-      border-radius: 13px;
-
-      text-align: center;
-
-      color: #9aa3af;
-
-      font-size: 13px;
-
-      line-height: 1.5;
-    }
-
-    .empty-state i {
-      display: block;
-
-      margin-bottom: 9px;
-
-      color: #b8c1cb;
-
-      font-size: 27px;
-    }
-
-    /* ============================================
+    /* ================================
        BOTTOM SAFE SPACE
-    ============================================ */
+    ================================= */
 
     .bottom-space {
       height: 96px;
     }
-
-    /* ============================================
-       SMALL DEVICES
-    ============================================ */
 
     @media (max-width: 380px) {
 
@@ -544,10 +515,6 @@
         min-height: 230px;
       }
 
-      .ratio-grid {
-        gap: 7px;
-      }
-
     }
   </style>
 </head>
@@ -556,9 +523,7 @@
 
   <main class="app">
 
-    <!-- ==========================================
-         HEADER
-    =========================================== -->
+    <!-- HEADER -->
 
     <header class="brand">
 
@@ -581,9 +546,7 @@
     </header>
 
 
-    <!-- ==========================================
-         FILE INPUT
-    =========================================== -->
+    <!-- FILE INPUT -->
 
     <input
       id="imageInput"
@@ -593,9 +556,7 @@
     >
 
 
-    <!-- ==========================================
-         SELECT BUTTON
-    =========================================== -->
+    <!-- SELECT PHOTO -->
 
     <button
       id="selectBtn"
@@ -607,9 +568,7 @@
     </button>
 
 
-    <!-- ==========================================
-         EMPTY STATE
-    =========================================== -->
+    <!-- EMPTY STATE -->
 
     <div
       id="emptyState"
@@ -623,18 +582,14 @@
     </div>
 
 
-    <!-- ==========================================
-         TOOL
-    =========================================== -->
+    <!-- TOOL -->
 
     <section
       id="toolSection"
       class="hidden mt-5"
     >
 
-      <!-- ========================================
-           CROPPER
-      ========================================= -->
+      <!-- CROPPER -->
 
       <div class="crop-wrapper">
 
@@ -643,6 +598,7 @@
           <img
             id="cropImage"
             alt="Image to crop"
+            draggable="false"
           >
 
         </div>
@@ -650,9 +606,7 @@
       </div>
 
 
-      <!-- ========================================
-           ASPECT RATIO
-      ========================================= -->
+      <!-- CROP RATIO -->
 
       <div class="mt-5">
 
@@ -674,7 +628,6 @@
             Free Crop
           </button>
 
-
           <button
             type="button"
             class="ratio-btn"
@@ -683,7 +636,6 @@
             1:1 Square
           </button>
 
-
           <button
             type="button"
             class="ratio-btn"
@@ -691,7 +643,6 @@
           >
             16:9 Landscape
           </button>
-
 
           <button
             type="button"
@@ -706,9 +657,7 @@
       </div>
 
 
-      <!-- ========================================
-           DIMENSIONS
-      ========================================= -->
+      <!-- WIDTH / HEIGHT -->
 
       <div class="dimension-grid">
 
@@ -720,7 +669,6 @@
           >
             Width (px)
           </label>
-
 
           <input
             id="widthInput"
@@ -744,7 +692,6 @@
             Height (px)
           </label>
 
-
           <input
             id="heightInput"
             class="dimension-input"
@@ -760,9 +707,7 @@
       </div>
 
 
-      <!-- ========================================
-           MAINTAIN ASPECT RATIO
-      ========================================= -->
+      <!-- MAINTAIN ASPECT -->
 
       <label
         class="aspect-row"
@@ -782,9 +727,7 @@
       </label>
 
 
-      <!-- ========================================
-           APPLY
-      ========================================= -->
+      <!-- APPLY -->
 
       <button
         id="applyBtn"
@@ -799,34 +742,26 @@
       </button>
 
 
-      <!-- ========================================
-           INFO
-      ========================================= -->
+      <!-- INFO -->
 
       <div class="info-box">
 
         <i class="fa-solid fa-shield-halved mr-1"></i>
 
-        Cropping and resizing happen entirely on your
-        device. Your photo is never uploaded.
+        Your image is processed completely on your device.
+        No image is uploaded to any server.
 
       </div>
 
     </section>
 
 
-    <!-- ==========================================
-         TELEGRAM BOTTOM SAFE SPACE
-    =========================================== -->
+    <!-- TELEGRAM SAFE BOTTOM SPACE -->
 
     <div class="bottom-space"></div>
 
   </main>
 
-
-  <!-- ==============================================
-       JAVASCRIPT
-  =============================================== -->
 
   <script>
     (() => {
@@ -834,9 +769,9 @@
       "use strict";
 
 
-      /* =================================================
-         TELEGRAM WEB APP
-      ================================================= */
+      /* =====================================================
+         TELEGRAM WEB APP INITIALIZATION
+      ===================================================== */
 
       const tg =
         window.Telegram &&
@@ -851,37 +786,22 @@
 
           tg.expand();
 
-
-          if (tg.setHeaderColor) {
-
-            tg.setHeaderColor(
-              "#ffffff"
-            );
-
+          if (typeof tg.setHeaderColor === "function") {
+            tg.setHeaderColor("#ffffff");
           }
 
-
-          if (tg.setBackgroundColor) {
-
-            tg.setBackgroundColor(
-              "#ffffff"
-            );
-
+          if (typeof tg.setBackgroundColor === "function") {
+            tg.setBackgroundColor("#ffffff");
           }
 
-
-          if (tg.setBottomBarColor) {
-
-            tg.setBottomBarColor(
-              "#ffffff"
-            );
-
+          if (typeof tg.setBottomBarColor === "function") {
+            tg.setBottomBarColor("#ffffff");
           }
 
         } catch (error) {
 
           console.warn(
-            "Telegram WebApp setup error:",
+            "Telegram WebApp initialization:",
             error
           );
 
@@ -890,73 +810,44 @@
       }
 
 
-      /* =================================================
+      /* =====================================================
          DOM
-      ================================================= */
+      ===================================================== */
 
       const imageInput =
-        document.getElementById(
-          "imageInput"
-        );
-
+        document.getElementById("imageInput");
 
       const selectBtn =
-        document.getElementById(
-          "selectBtn"
-        );
-
+        document.getElementById("selectBtn");
 
       const emptyState =
-        document.getElementById(
-          "emptyState"
-        );
-
+        document.getElementById("emptyState");
 
       const toolSection =
-        document.getElementById(
-          "toolSection"
-        );
-
+        document.getElementById("toolSection");
 
       const cropImage =
-        document.getElementById(
-          "cropImage"
-        );
-
+        document.getElementById("cropImage");
 
       const ratioGrid =
-        document.getElementById(
-          "ratioGrid"
-        );
-
+        document.getElementById("ratioGrid");
 
       const widthInput =
-        document.getElementById(
-          "widthInput"
-        );
-
+        document.getElementById("widthInput");
 
       const heightInput =
-        document.getElementById(
-          "heightInput"
-        );
-
+        document.getElementById("heightInput");
 
       const aspectRatio =
-        document.getElementById(
-          "aspectRatio"
-        );
-
+        document.getElementById("aspectRatio");
 
       const applyBtn =
-        document.getElementById(
-          "applyBtn"
-        );
+        document.getElementById("applyBtn");
 
 
-      /* =================================================
+      /* =====================================================
          STATE
-      ================================================= */
+      ===================================================== */
 
       let selectedFile = null;
 
@@ -966,39 +857,17 @@
 
       let originalAspectRatio = 1;
 
-
-      /*
-       * Maximum output canvas dimension.
-       *
-       * This protects mobile Telegram WebViews from
-       * accidentally creating enormous canvases.
-       */
-      const MAX_OUTPUT_DIMENSION =
-        16000;
+      const MAX_OUTPUT_DIMENSION = 16000;
 
 
-      /*
-       * Maximum working crop dimension.
-       *
-       * Cropper itself works with the source image,
-       * while the final output is constrained below.
-       */
-      const MAX_CROP_DIMENSION =
-        16000;
-
-
-      /* =================================================
-         SELECT PHOTO
-      ================================================= */
+      /* =====================================================
+         SELECT BUTTON
+      ===================================================== */
 
       selectBtn.addEventListener(
         "click",
         () => {
 
-          /*
-           * Reset value so selecting the same image
-           * again fires the change event.
-           */
           imageInput.value = "";
 
           imageInput.click();
@@ -1007,9 +876,9 @@
       );
 
 
-      /* =================================================
-         FILE SELECTED
-      ================================================= */
+      /* =====================================================
+         IMAGE SELECTION
+      ===================================================== */
 
       imageInput.addEventListener(
         "change",
@@ -1025,14 +894,19 @@
           }
 
 
+          /*
+           * Accept only actual image files.
+           */
           if (
-            !file.type.startsWith(
-              "image/"
-            )
+            ![
+              "image/jpeg",
+              "image/png",
+              "image/webp"
+            ].includes(file.type)
           ) {
 
             alert(
-              "Please select a valid image."
+              "Please select a JPG, PNG or WEBP image."
             );
 
             return;
@@ -1040,12 +914,11 @@
           }
 
 
-          selectedFile =
-            file;
+          selectedFile = file;
 
 
           /*
-           * Release previous object URL.
+           * Remove old object URL.
            */
           if (imageObjectURL) {
 
@@ -1057,20 +930,17 @@
 
 
           imageObjectURL =
-            URL.createObjectURL(
-              file
-            );
+            URL.createObjectURL(file);
 
 
           /*
-           * Destroy previous Cropper instance.
+           * Destroy old Cropper.
            */
           if (cropper) {
 
             cropper.destroy();
 
-            cropper =
-              null;
+            cropper = null;
 
           }
 
@@ -1083,26 +953,21 @@
                 cropImage.naturalHeight;
 
 
-              /*
-               * Start Cropper.
-               */
-              initializeCropper();
-
-
-              /*
-               * Set initial dimensions based on
-               * current image dimensions.
-               */
               widthInput.value =
-                Math.round(
-                  cropImage.naturalWidth
+                Math.min(
+                  cropImage.naturalWidth,
+                  MAX_OUTPUT_DIMENSION
                 );
 
 
               heightInput.value =
-                Math.round(
-                  cropImage.naturalHeight
+                Math.min(
+                  cropImage.naturalHeight,
+                  MAX_OUTPUT_DIMENSION
                 );
+
+
+              initializeCropper();
 
             };
 
@@ -1124,22 +989,19 @@
       );
 
 
-      /* =================================================
-         INITIALIZE CROPPER
-      ================================================= */
+      /* =====================================================
+         CROPPER INITIALIZATION
+      ===================================================== */
 
       function initializeCropper() {
 
-        /*
-         * Make sure Cropper.js is actually loaded.
-         */
         if (
           typeof Cropper ===
           "undefined"
         ) {
 
           alert(
-            "Cropper library could not load. Please check your connection and try again."
+            "Cropper.js could not be loaded. Please reopen the app with an internet connection."
           );
 
           return;
@@ -1152,104 +1014,47 @@
             cropImage,
             {
 
-              /*
-               * Free crop initially.
-               */
-              aspectRatio:
-                NaN,
+              aspectRatio: NaN,
 
+              viewMode: 1,
 
-              viewMode:
-                1,
+              dragMode: "crop",
 
+              responsive: true,
 
-              /*
-               * Allow crop box to move/resize.
-               */
-              dragMode:
-                "crop",
+              restore: true,
 
+              checkOrientation: true,
 
-              /*
-               * Keep crop box within image.
-               */
-              responsive:
-                true,
+              zoomable: true,
 
+              zoomOnTouch: true,
 
-              restore:
-                true,
+              zoomOnWheel: true,
 
+              movable: true,
 
-              checkCrossOrigin:
-                false,
+              rotatable: false,
 
+              scalable: false,
 
-              checkOrientation:
-                true,
+              guides: true,
 
+              center: true,
 
-              /*
-               * Enable touch gestures.
-               */
-              zoomable:
-                true,
+              highlight: true,
 
+              background: false,
 
-              zoomOnTouch:
-                true,
+              autoCrop: true,
 
+              autoCropArea: 0.9,
 
-              zoomOnWheel:
-                true,
+              cropBoxMovable: true,
 
+              cropBoxResizable: true,
 
-              movable:
-                true,
-
-
-              rotatable:
-                false,
-
-
-              scalable:
-                false,
-
-
-              guides:
-                true,
-
-
-              center:
-                true,
-
-
-              highlight:
-                true,
-
-
-              background:
-                false,
-
-
-              autoCrop:
-                true,
-
-
-              autoCropArea:
-                0.9,
-
-
-              cropBoxMovable:
-                true,
-
-
-              cropBoxResizable:
-                true,
-
-
-              toggleDragModeOnDblclick:
-                false
+              toggleDragModeOnDblclick: false
 
             }
           );
@@ -1257,9 +1062,9 @@
       }
 
 
-      /* =================================================
+      /* =====================================================
          RATIO BUTTONS
-      ================================================= */
+      ===================================================== */
 
       ratioGrid.addEventListener(
         "click",
@@ -1280,9 +1085,6 @@
             button.dataset.ratio;
 
 
-          /*
-           * Update visual selection.
-           */
           ratioGrid
             .querySelectorAll(
               ".ratio-btn"
@@ -1319,9 +1121,6 @@
           }
 
 
-          /*
-           * Give cropper time to update its crop box.
-           */
           setTimeout(
             updateDimensionInputsFromCrop,
             50
@@ -1331,9 +1130,9 @@
       );
 
 
-      /* =================================================
-         UPDATE DIMENSIONS FROM CROP BOX
-      ================================================= */
+      /* =====================================================
+         UPDATE DIMENSIONS
+      ===================================================== */
 
       function updateDimensionInputsFromCrop() {
 
@@ -1348,33 +1147,24 @@
 
         if (
           data &&
-          Number.isFinite(
-            data.width
-          ) &&
-          Number.isFinite(
-            data.height
-          )
+          Number.isFinite(data.width) &&
+          Number.isFinite(data.height)
         ) {
 
           widthInput.value =
-            Math.round(
-              data.width
-            );
-
+            Math.round(data.width);
 
           heightInput.value =
-            Math.round(
-              data.height
-            );
+            Math.round(data.height);
 
         }
 
       }
 
 
-      /* =================================================
-         WIDTH INPUT
-      ================================================= */
+      /* =====================================================
+         WIDTH CHANGE
+      ===================================================== */
 
       widthInput.addEventListener(
         "input",
@@ -1392,9 +1182,7 @@
 
 
           if (
-            !Number.isFinite(
-              width
-            ) ||
+            !Number.isFinite(width) ||
             width <= 0
           ) {
 
@@ -1410,22 +1198,15 @@
             );
 
 
-          /*
-           * If aspect ratio lock is active,
-           * calculate proportional height.
-           */
-          if (
-            aspectRatio.checked
-          ) {
+          if (aspectRatio.checked) {
 
-            const currentData =
+            const data =
               cropper.getData();
 
 
             const ratio =
-              currentData.height > 0
-                ? currentData.width /
-                  currentData.height
+              data.height > 0
+                ? data.width / data.height
                 : originalAspectRatio;
 
 
@@ -1447,9 +1228,9 @@
       );
 
 
-      /* =================================================
-         HEIGHT INPUT
-      ================================================= */
+      /* =====================================================
+         HEIGHT CHANGE
+      ===================================================== */
 
       heightInput.addEventListener(
         "input",
@@ -1467,9 +1248,7 @@
 
 
           if (
-            !Number.isFinite(
-              height
-            ) ||
+            !Number.isFinite(height) ||
             height <= 0
           ) {
 
@@ -1485,21 +1264,15 @@
             );
 
 
-          /*
-           * Maintain aspect ratio when enabled.
-           */
-          if (
-            aspectRatio.checked
-          ) {
+          if (aspectRatio.checked) {
 
-            const currentData =
+            const data =
               cropper.getData();
 
 
             const ratio =
-              currentData.height > 0
-                ? currentData.width /
-                  currentData.height
+              data.height > 0
+                ? data.width / data.height
                 : originalAspectRatio;
 
 
@@ -1521,43 +1294,9 @@
       );
 
 
-      /* =================================================
-         ASPECT RATIO TOGGLE
-      ================================================= */
-
-      aspectRatio.addEventListener(
-        "change",
-        () => {
-
-          if (
-            aspectRatio.checked &&
-            cropper
-          ) {
-
-            const data =
-              cropper.getData();
-
-
-            if (
-              data.width > 0 &&
-              data.height > 0
-            ) {
-
-              originalAspectRatio =
-                data.width /
-                data.height;
-
-            }
-
-          }
-
-        }
-      );
-
-
-      /* =================================================
-         GET SAFE OUTPUT DIMENSIONS
-      ================================================= */
+      /* =====================================================
+         OUTPUT DIMENSIONS
+      ===================================================== */
 
       function getOutputDimensions() {
 
@@ -1575,9 +1314,10 @@
           );
 
 
-        /*
-         * If dimensions are invalid, use crop size.
-         */
+        const cropData =
+          cropper.getData();
+
+
         if (
           !Number.isFinite(width) ||
           width <= 0
@@ -1585,7 +1325,7 @@
 
           width =
             Math.round(
-              cropper.getData().width
+              cropData.width
             );
 
         }
@@ -1598,7 +1338,7 @@
 
           height =
             Math.round(
-              cropper.getData().height
+              cropData.height
             );
 
         }
@@ -1625,16 +1365,11 @@
 
 
         /*
-         * If aspect ratio is locked, enforce it one final
-         * time before rendering.
+         * Final aspect-ratio protection.
          */
         if (
           aspectRatio.checked
         ) {
-
-          const cropData =
-            cropper.getData();
-
 
           const ratio =
             cropData.height > 0
@@ -1643,10 +1378,6 @@
               : originalAspectRatio;
 
 
-          /*
-           * Keep the user's changed dimension as the
-           * controlling dimension.
-           */
           const requestedWidth =
             parseInt(
               widthInput.value,
@@ -1654,26 +1385,17 @@
             );
 
 
-          const requestedHeight =
-            parseInt(
-              heightInput.value,
-              10
-            );
-
-
           if (
             Number.isFinite(
               requestedWidth
-            )
+            ) &&
+            requestedWidth > 0
           ) {
 
             width =
-              Math.max(
-                1,
-                Math.min(
-                  requestedWidth,
-                  MAX_OUTPUT_DIMENSION
-                )
+              Math.min(
+                requestedWidth,
+                MAX_OUTPUT_DIMENSION
               );
 
 
@@ -1682,29 +1404,9 @@
                 width / ratio
               );
 
-          } else {
-
-            height =
-              Math.max(
-                1,
-                Math.min(
-                  requestedHeight,
-                  MAX_OUTPUT_DIMENSION
-                )
-              );
-
-
-            width =
-              Math.round(
-                height * ratio
-              );
-
           }
 
 
-          /*
-           * Final safety cap.
-           */
           if (
             height >
             MAX_OUTPUT_DIMENSION
@@ -1749,9 +1451,9 @@
       }
 
 
-      /* =================================================
-         CANVAS TO BLOB
-      ================================================= */
+      /* =====================================================
+         CANVAS → BLOB
+      ===================================================== */
 
       function canvasToBlob(
         canvas,
@@ -1762,31 +1464,39 @@
         return new Promise(
           (resolve, reject) => {
 
-            canvas.toBlob(
-              blob => {
+            try {
 
-                if (!blob) {
+              canvas.toBlob(
+                blob => {
 
-                  reject(
-                    new Error(
-                      "Canvas could not create image."
-                    )
-                  );
+                  if (!blob) {
 
-                  return;
+                    reject(
+                      new Error(
+                        "Canvas failed to create image."
+                      )
+                    );
 
-                }
+                    return;
+
+                  }
 
 
-                resolve(blob);
+                  resolve(blob);
 
-              },
+                },
 
-              type,
+                type,
 
-              quality
+                quality
 
-            );
+              );
+
+            } catch (error) {
+
+              reject(error);
+
+            }
 
           }
         );
@@ -1794,41 +1504,27 @@
       }
 
 
-      /* =================================================
-         APPLY CROP + RESIZE
-      ================================================= */
+      /* =====================================================
+         CREATE FINAL IMAGE
+      ===================================================== */
 
-      async function createOutput() {
+      async function createOutputBlob() {
 
-        if (!cropper) {
-
-          throw new Error(
-            "Cropper is not initialized."
-          );
-
-        }
-
-
-        const {
-          width,
-          height
-        } =
+        const dimensions =
           getOutputDimensions();
 
 
         /*
-         * Cropper generates the selected crop region
-         * directly onto a Canvas at the requested output
-         * dimensions.
+         * Cropper performs the actual crop and resize.
          */
         const canvas =
           cropper.getCroppedCanvas({
 
             width:
-              width,
+              dimensions.width,
 
             height:
-              height,
+              dimensions.height,
 
             minWidth:
               1,
@@ -1857,91 +1553,303 @@
         if (!canvas) {
 
           throw new Error(
-            "Unable to create cropped canvas."
+            "Could not create output canvas."
           );
 
         }
 
 
         /*
-         * Final JPEG output.
-         *
-         * 0.92 provides high-quality output while keeping
-         * file size reasonable.
+         * JPEG is intentional because the requested
+         * output filename is instapic_resized.jpg.
          */
-        const blob =
-          await canvasToBlob(
-            canvas,
-            "image/jpeg",
-            0.92
-          );
-
-
-        return blob;
+        return await canvasToBlob(
+          canvas,
+          "image/jpeg",
+          0.92
+        );
 
       }
 
 
-      /* =================================================
-         DOWNLOAD
-      ================================================= */
+      /* =====================================================
+         TELEGRAM / MOBILE SAFE DOWNLOAD SYSTEM
+         
+         IMPORTANT:
+         
+         Desktop:
+             normal <a download>
 
-      function downloadBlob(
-        blob
+         Mobile / Telegram:
+             Web Share API with File
+
+         Fallback:
+             open generated Blob URL
+         
+         Nothing is uploaded to a server.
+      ===================================================== */
+
+      async function downloadFile(
+        blob,
+        filename
       ) {
 
-        const url =
+        if (!blob) {
+
+          throw new Error(
+            "Download data is empty."
+          );
+
+        }
+
+
+        const file =
+          new File(
+            [blob],
+            filename,
+            {
+              type:
+                blob.type ||
+                "image/jpeg"
+            }
+          );
+
+
+        /*
+         * =================================================
+         * METHOD 1
+         * Web Share API
+         *
+         * This is the most useful path on mobile
+         * Telegram WebViews where <a download> can be
+         * ignored by the embedded browser.
+         * =================================================
+         */
+
+        if (
+          typeof navigator.share ===
+          "function"
+        ) {
+
+          try {
+
+            let canShareFiles =
+              true;
+
+
+            if (
+              typeof navigator.canShare ===
+              "function"
+            ) {
+
+              canShareFiles =
+                navigator.canShare({
+                  files: [file]
+                });
+
+            }
+
+
+            if (canShareFiles) {
+
+              await navigator.share({
+
+                files: [file],
+
+                title:
+                  filename,
+
+                text:
+                  "InstaPic processed image"
+
+              });
+
+
+              return true;
+
+            }
+
+          } catch (error) {
+
+            /*
+             * AbortError means the user closed
+             * the share sheet. Do not show an error.
+             */
+            if (
+              error &&
+              error.name ===
+                "AbortError"
+            ) {
+
+              return false;
+
+            }
+
+
+            console.warn(
+              "Web Share unavailable:",
+              error
+            );
+
+          }
+
+        }
+
+
+        /*
+         * =================================================
+         * METHOD 2
+         * Standard browser download
+         *
+         * Works normally on desktop Chrome and browsers
+         * which support download attribute.
+         * =================================================
+         */
+
+        const objectURL =
           URL.createObjectURL(
             blob
           );
 
 
-        const link =
-          document.createElement(
-            "a"
+        try {
+
+          const link =
+            document.createElement(
+              "a"
+            );
+
+
+          link.href =
+            objectURL;
+
+
+          link.download =
+            filename;
+
+
+          link.rel =
+            "noopener";
+
+
+          link.style.display =
+            "none";
+
+
+          document.body.appendChild(
+            link
           );
 
 
-        link.href =
-          url;
+          /*
+           * MouseEvent provides better compatibility
+           * with some embedded browsers.
+           */
+          link.dispatchEvent(
+            new MouseEvent(
+              "click",
+              {
+                bubbles: true,
+                cancelable: true,
+                view: window
+              }
+            )
+          );
 
 
-        link.download =
-          "instapic_resized.jpg";
+          /*
+           * Also call click() for browsers that do not
+           * respond to dispatchEvent.
+           */
+          try {
+
+            link.click();
+
+          } catch (_) {}
 
 
-        document.body.appendChild(
-          link
-        );
+          link.remove();
 
 
-        link.click();
+          /*
+           * Give the browser time to start the download.
+           */
+          setTimeout(
+            () => {
+
+              URL.revokeObjectURL(
+                objectURL
+              );
+
+            },
+            5000
+          );
 
 
-        link.remove();
+          /*
+           * The anchor method has been triggered.
+           */
+          return true;
+
+        } catch (error) {
+
+          console.warn(
+            "Standard download failed:",
+            error
+          );
+
+        }
 
 
         /*
-         * Release object URL after the browser has
-         * received the download instruction.
+         * =================================================
+         * METHOD 3
+         * Blob URL fallback.
+         *
+         * This opens the processed image directly in the
+         * WebView. The user can use Telegram/browser's
+         * native Save/Share action.
+         * =================================================
          */
-        setTimeout(
-          () => {
 
-            URL.revokeObjectURL(
-              url
-            );
+        try {
 
-          },
-          1500
-        );
+          window.open(
+            objectURL,
+            "_blank"
+          );
+
+
+          setTimeout(
+            () => {
+
+              URL.revokeObjectURL(
+                objectURL
+              );
+
+            },
+            10000
+          );
+
+
+          return true;
+
+        } catch (error) {
+
+          URL.revokeObjectURL(
+            objectURL
+          );
+
+          throw error;
+
+        }
 
       }
 
 
-      /* =================================================
+      /* =====================================================
          APPLY & DOWNLOAD
-      ================================================= */
+      ===================================================== */
 
       applyBtn.addEventListener(
         "click",
@@ -1961,7 +1869,7 @@
           if (!cropper) {
 
             alert(
-              "The crop editor is not ready yet."
+              "Crop editor is not ready yet."
             );
 
             return;
@@ -1969,7 +1877,7 @@
           }
 
 
-          const originalHTML =
+          const oldButtonHTML =
             applyBtn.innerHTML;
 
 
@@ -1978,71 +1886,108 @@
 
 
           applyBtn.innerHTML =
-            '<span class="spinner"></span>' +
-            'Processing...';
+            '<span class="spinner"></span>Processing...';
 
 
           try {
 
             /*
-             * Let Telegram WebView render the loading state
-             * before Canvas processing begins.
+             * Give the WebView one frame to render
+             * the processing state.
              */
             await new Promise(
               resolve =>
                 requestAnimationFrame(
-                  resolve
+                  () => resolve()
                 )
             );
 
 
+            /*
+             * Create the final image completely locally.
+             */
             const blob =
-              await createOutput();
+              await createOutputBlob();
+
+
+            if (
+              !blob ||
+              blob.size <= 0
+            ) {
+
+              throw new Error(
+                "Generated image is empty."
+              );
+
+            }
 
 
             /*
-             * Trigger native download.
+             * Telegram/mobile compatible download.
              */
-            downloadBlob(
-              blob
+            await downloadFile(
+              blob,
+              "instapic_resized.jpg"
             );
 
 
             /*
-             * Small delay allows download to start before
-             * cleaning up the cropper.
+             * Restore button.
+             */
+            applyBtn.innerHTML =
+              '<i class="fa-solid fa-check mr-2"></i>' +
+              "Downloaded";
+
+
+            /*
+             * Keep the result state visible briefly,
+             * then restore normal button text.
              */
             setTimeout(
               () => {
 
-                resetTool();
+                applyBtn.innerHTML =
+                  oldButtonHTML;
 
               },
-              300
+              1800
             );
 
 
           } catch (error) {
 
             console.error(
-              "Crop/resize error:",
+              "Image processing/download error:",
               error
             );
 
 
-            alert(
-              "Could not process this image. Please try another photo or smaller dimensions."
-            );
+            /*
+             * User cancellation of Web Share is NOT a
+             * processing error.
+             */
+            if (
+              !(
+                error &&
+                error.name ===
+                  "AbortError"
+              )
+            ) {
 
+              alert(
+                "Could not download the image. Please try again."
+              );
+
+            }
+
+
+            applyBtn.innerHTML =
+              oldButtonHTML;
 
           } finally {
 
             applyBtn.disabled =
               false;
-
-
-            applyBtn.innerHTML =
-              originalHTML;
 
           }
 
@@ -2050,93 +1995,9 @@
       );
 
 
-      /* =================================================
-         RESET TOOL
-      ================================================= */
-
-      function resetTool() {
-
-        selectedFile =
-          null;
-
-
-        if (cropper) {
-
-          cropper.destroy();
-
-          cropper =
-            null;
-
-        }
-
-
-        if (imageObjectURL) {
-
-          URL.revokeObjectURL(
-            imageObjectURL
-          );
-
-          imageObjectURL =
-            null;
-
-        }
-
-
-        cropImage.removeAttribute(
-          "src"
-        );
-
-
-        widthInput.value =
-          "";
-
-
-        heightInput.value =
-          "";
-
-
-        imageInput.value =
-          "";
-
-
-        toolSection.classList.add(
-          "hidden"
-        );
-
-
-        emptyState.classList.remove(
-          "hidden"
-        );
-
-
-        /*
-         * Reset ratio selection.
-         */
-        ratioGrid
-          .querySelectorAll(
-            ".ratio-btn"
-          )
-          .forEach(
-            (button, index) => {
-
-              button.classList.toggle(
-                "active",
-                index === 0
-              );
-
-            }
-          );
-
-
-        aspectRatio.checked =
-          true;
-
-      }
-
-
-      /* =================================================
+      /* =====================================================
          CLEANUP
-      ================================================= */
+      ===================================================== */
 
       window.addEventListener(
         "beforeunload",
@@ -2146,6 +2007,8 @@
 
             cropper.destroy();
 
+            cropper = null;
+
           }
 
 
@@ -2154,6 +2017,8 @@
             URL.revokeObjectURL(
               imageObjectURL
             );
+
+            imageObjectURL = null;
 
           }
 
