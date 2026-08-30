@@ -1,1833 +1,444 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
-  >
-
-  <meta name="theme-color" content="#ffffff">
-
-  <title>Image to PDF Converter | InstaPic</title>
-
-  <!-- Telegram Mini App -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- jsPDF -->
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
-
-  <!-- Font Awesome -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-  >
-
-  <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      min-height: 100%;
-
-      background: #ffffff;
-
-      font-family:
-        Inter,
-        Roboto,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-
-      color: #172033;
-    }
-
-    body {
-      min-height: 100vh;
-      min-height: 100dvh;
-      overflow-x: hidden;
-    }
-
-    button,
-    input {
-      font-family: inherit;
-    }
-
-    button {
-      -webkit-user-select: none;
-      user-select: none;
-    }
-
-    .app {
-      width: 100%;
-      max-width: 620px;
-
-      margin: 0 auto;
-
-      padding:
-        calc(20px + env(safe-area-inset-top))
-        18px
-        calc(100px + env(safe-area-inset-bottom));
-    }
-
-    /* =========================================
-       HEADER
-    ========================================= */
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-
-      margin-bottom: 27px;
-    }
-
-    .logo {
-      width: 46px;
-      height: 46px;
-
-      flex: 0 0 46px;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      border-radius: 13px;
-
-      background: #eaf4ff;
-      color: #1d7edb;
-
-      font-size: 20px;
-    }
-
-    .brand-title {
-      margin: 0;
-
-      color: #1d7edb;
-
-      font-size: 21px;
-      line-height: 1.2;
-
-      font-weight: 750;
-
-      letter-spacing: -0.3px;
-    }
-
-    .brand-subtitle {
-      margin: 4px 0 0;
-
-      color: #8b95a3;
-
-      font-size: 12.5px;
-    }
-
-    /* =========================================
-       SELECT BUTTON
-    ========================================= */
-
-    .select-btn {
-      width: 100%;
-      min-height: 55px;
-
-      border: 0;
-      border-radius: 13px;
-
-      background: #1d7edb;
-      color: #ffffff;
-
-      font-size: 16px;
-      font-weight: 700;
-
-      cursor: pointer;
-
-      box-shadow:
-        0 6px 18px rgba(29, 126, 219, 0.18);
-
-      transition:
-        transform 0.12s ease,
-        opacity 0.15s ease;
-    }
-
-    .select-btn:active {
-      transform: scale(0.98);
-    }
-
-    /* =========================================
-       EMPTY STATE
-    ========================================= */
-
-    .empty-state {
-      margin-top: 20px;
-
-      padding: 30px 15px;
-
-      border: 1px dashed #dfe5eb;
-
-      border-radius: 13px;
-
-      text-align: center;
-
-      color: #9aa3af;
-
-      font-size: 13px;
-
-      line-height: 1.5;
-    }
-
-    .empty-state i {
-      display: block;
-
-      margin-bottom: 9px;
-
-      color: #b8c1cb;
-
-      font-size: 28px;
-    }
-
-    /* =========================================
-       SELECTED IMAGES HEADER
-    ========================================= */
-
-    .selected-header {
-      display: flex;
-
-      align-items: center;
-      justify-content: space-between;
-
-      gap: 10px;
-
-      margin-top: 20px;
-      margin-bottom: 10px;
-    }
-
-    .selected-title {
-      color: #303846;
-
-      font-size: 14px;
-
-      font-weight: 750;
-    }
-
-    .selected-count {
-      padding: 5px 9px;
-
-      border-radius: 999px;
-
-      background: #edf7ff;
-
-      color: #1d7edb;
-
-      font-size: 11px;
-
-      font-weight: 750;
-
-      white-space: nowrap;
-    }
-
-    /* =========================================
-       THUMBNAILS
-    ========================================= */
-
-    .preview-grid {
-      display: grid;
-
-      grid-template-columns:
-        repeat(3, minmax(0, 1fr));
-
-      gap: 9px;
-    }
-
-    .preview-card {
-      position: relative;
-
-      overflow: hidden;
-
-      aspect-ratio: 1 / 1;
-
-      border-radius: 11px;
-
-      background: #f3f5f7;
-
-      border: 1px solid #e3e7eb;
-    }
-
-    .preview-card img {
-      width: 100%;
-      height: 100%;
-
-      display: block;
-
-      object-fit: cover;
-    }
-
-    .preview-number {
-      position: absolute;
-
-      left: 6px;
-      top: 6px;
-
-      min-width: 23px;
-      height: 23px;
-
-      padding: 0 5px;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      border-radius: 999px;
-
-      background: rgba(0, 0, 0, 0.62);
-
-      color: #ffffff;
-
-      font-size: 10px;
-
-      font-weight: 750;
-    }
-
-    /* =========================================
-       CONVERT BUTTON
-    ========================================= */
-
-    .convert-btn {
-      width: 100%;
-
-      min-height: 53px;
-
-      margin-top: 19px;
-
-      border: 0;
-
-      border-radius: 12px;
-
-      background: #10b981;
-
-      color: #ffffff;
-
-      font-size: 15px;
-
-      font-weight: 750;
-
-      cursor: pointer;
-
-      box-shadow:
-        0 6px 18px rgba(16, 185, 129, 0.16);
-
-      transition:
-        transform 0.12s ease,
-        opacity 0.15s ease;
-    }
-
-    .convert-btn:active {
-      transform: scale(0.98);
-    }
-
-    .convert-btn:disabled {
-      opacity: 0.65;
-
-      cursor: not-allowed;
-    }
-
-    /* =========================================
-       SPINNER
-    ========================================= */
-
-    .spinner {
-      display: inline-block;
-
-      width: 18px;
-      height: 18px;
-
-      margin-right: 7px;
-
-      vertical-align: -4px;
-
-      border:
-        2px solid
-        rgba(255, 255, 255, 0.4);
-
-      border-top-color: #ffffff;
-
-      border-radius: 50%;
-
-      animation:
-        spin 0.7s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    /* =========================================
-       INFO
-    ========================================= */
-
-    .info-box {
-      margin-top: 12px;
-
-      padding: 11px 12px;
-
-      border-radius: 10px;
-
-      border: 1px solid #e4f0fb;
-
-      background: #f7fbff;
-
-      color: #738091;
-
-      font-size: 12px;
-
-      line-height: 1.5;
-    }
-
-    /* =========================================
-       BOTTOM TELEGRAM SPACE
-    ========================================= */
-
-    .bottom-space {
-      height: 96px;
-    }
-
-    @media (max-width: 380px) {
-
-      .app {
-        padding-left: 14px;
-        padding-right: 14px;
-      }
-
-      .brand-title {
-        font-size: 19px;
-      }
-
-      .preview-grid {
-        gap: 7px;
-      }
-
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="description" content="InstaPic Image to PDF Converter — private, client-side image to PDF conversion.">
+<title>InstaPic — Image to PDF</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<style>
+:root{--blue:#1d7edb;--green:#10b981;--ink:#102033;--muted:#64748b;--line:#e5eaf0;--bg:#f6f9fc;--card:#fff;--danger:#dc3545;--shadow:0 10px 30px rgba(16,32,51,.08);--r:18px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+button,input,select{font:inherit}button{cursor:pointer}.app{max-width:1180px;margin:auto;padding:18px 14px 50px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:10px}.logo{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--blue),var(--green));display:grid;place-items:center;color:white;font-weight:900;font-size:20px}.brand b{display:block;font-size:19px}.brand span{font-size:12px;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:18px;margin-bottom:16px}
+h1{font-size:26px;margin:0 0 5px}.sub{color:var(--muted);margin:0}.workspace{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr);gap:16px}.upload{border:2px dashed #b9d5ec;background:#fafdff;border-radius:16px;padding:34px 18px;text-align:center;transition:.2s}.upload.drag{border-color:var(--green);background:#f0fdf8}.upload-icon{font-size:38px;margin-bottom:8px}.btn{border:0;border-radius:12px;padding:11px 15px;font-weight:750;min-height:44px;transition:.15s}.btn:disabled{opacity:.45;cursor:not-allowed}.primary{color:#fff;background:linear-gradient(135deg,var(--blue),#1267bb)}.secondary{background:#eef6fd;color:#145f98}.success{background:#eafaf4;color:#087a55}.danger{background:#fff0f1;color:#b4232f}.ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}.full{width:100%}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.count{font-weight:800;margin-bottom:12px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px}.item{border:1px solid var(--line);border-radius:15px;overflow:hidden;background:#fff;position:relative}.thumb{height:145px;background:#edf2f7;display:grid;place-items:center;overflow:hidden}.thumb img{width:100%;height:100%;object-fit:contain}.badge{position:absolute;left:8px;top:8px;background:rgba(16,32,51,.86);color:#fff;border-radius:9px;padding:4px 7px;font-size:12px;font-weight:800}.item-body{padding:10px}.fname{font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meta{font-size:12px;color:var(--muted);margin-top:3px}.controls{display:flex;gap:5px;margin-top:9px}.small{min-height:34px;padding:6px 9px;border-radius:9px;font-size:12px;flex:1}
+details{border-top:1px solid var(--line);padding:13px 0}details:first-of-type{border-top:0}summary{cursor:pointer;font-weight:800;list-style:none}summary::-webkit-details-marker{display:none}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.field label{display:block;font-size:12px;font-weight:750;color:var(--muted);margin-bottom:5px}.field input,.field select{width:100%;height:42px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff;color:var(--ink)}.radio-group,.checks{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.choice{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff;display:flex;align-items:center;gap:6px}.choice:has(input:checked){border-color:#8bc4ed;background:#f0f8ff}.hint{font-size:11px;color:var(--muted);margin-top:6px}.hidden{display:none!important}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.stat{background:#f8fafc;border-radius:12px;padding:10px}.stat b{display:block;font-size:16px}.stat span{font-size:11px;color:var(--muted)}
+.preview-page{margin:14px auto 0;background:#fff;border:1px solid #d8dee7;box-shadow:0 8px 25px rgba(0,0,0,.1);position:relative;overflow:hidden;display:grid;place-items:center}.preview-page img{max-width:100%;max-height:100%;object-fit:contain}.progress-wrap{margin-top:12px}.progress{height:10px;background:#e9eef4;border-radius:20px;overflow:hidden}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .15s}.progress-row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px}
+.result{border:1px solid #bcebd9;background:#f4fffb}.result h2{font-size:19px;margin:0 0 10px;color:#087a55}.pdf-frame{width:100%;height:520px;border:1px solid var(--line);border-radius:12px;margin-top:12px;background:#f8fafc}.errors{margin-top:12px;padding:10px;border-radius:10px;background:#fff4f4;color:#a51d2b;font-size:13px}.privacy{font-size:12px;color:var(--muted);text-align:center;margin-top:12px}.toast{position:fixed;z-index:50;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#102033;color:#fff;padding:11px 15px;border-radius:12px;max-width:90%;transition:.2s}.toast.show{opacity:1;transform:translate(-50%,0)}.sticky-actions{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom));z-index:10;background:rgba(246,249,252,.92);backdrop-filter:blur(10px);padding-top:8px}
+@media(max-width:800px){.workspace{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pdf-frame{height:430px}}
+@media(max-width:430px){.app{padding:12px 10px 40px}.card{padding:14px;border-radius:15px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.thumb{height:120px}.formgrid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:1/-1}}
+</style>
 </head>
-
 <body>
+<div class="app">
+<header>
+  <div class="brand"><div class="logo">IP</div><div><b>InstaPic</b><span>All Image Tools · Image to PDF</span></div></div>
+  <button id="resetTop" class="btn ghost" type="button">Reset</button>
+</header>
 
-  <main class="app">
+<section class="card">
+  <h1>Image to PDF</h1>
+  <p class="sub">Convert one or multiple images into a real PDF — privately on your device.</p>
+</section>
 
-    <!-- =======================================
-         HEADER
-    ======================================== -->
-
-    <header class="brand">
-
-      <div class="logo">
-        <i class="fa-solid fa-file-pdf"></i>
-      </div>
-
-      <div>
-
-        <h1 class="brand-title">
-          Image to PDF Converter
-        </h1>
-
-        <p class="brand-subtitle">
-          Fast, Simple &amp; 100% Client-Side
-        </p>
-
-      </div>
-
-    </header>
-
-
-    <!-- =======================================
-         FILE INPUT
-         
-         MULTIPLE IS IMPORTANT
-    ======================================== -->
-
-    <input
-      id="imageInput"
-      type="file"
-      accept="image/jpeg,image/png,image/webp"
-      multiple
-      hidden
-    >
-
-
-    <!-- =======================================
-         SELECT IMAGES
-    ======================================== -->
-
-    <button
-      id="selectBtn"
-      class="select-btn"
-      type="button"
-    >
-
-      <i class="fa-solid fa-folder-open mr-2"></i>
-
-      Select Images
-
-    </button>
-
-
-    <!-- =======================================
-         EMPTY STATE
-    ======================================== -->
-
-    <div
-      id="emptyState"
-      class="empty-state"
-    >
-
-      <i class="fa-regular fa-images"></i>
-
-      Select one or more images to create a PDF.
-
+<div class="workspace">
+<main>
+<section class="card">
+  <div id="upload" class="upload">
+    <div class="upload-icon">🖼️ → 📄</div>
+    <h2 style="margin:0 0 5px;font-size:19px">Select images</h2>
+    <p class="sub" style="margin-bottom:15px">JPG, PNG, WebP, BMP, GIF, AVIF and other browser-decodable images</p>
+    <input id="fileInput" type="file" multiple accept="image/*" hidden>
+    <button id="selectBtn" class="btn primary" type="button">Select Images</button>
+    <div style="margin-top:10px;color:var(--muted);font-size:12px">or drop images here · Ctrl/Cmd + V also works for pasted images</div>
+  </div>
+  <div id="queueSection" class="hidden" style="margin-top:15px">
+    <div class="count" id="countText">0 images selected</div>
+    <div class="toolbar" style="margin-bottom:12px">
+      <button id="addBtn" class="btn secondary" type="button">＋ Add More Images</button>
+      <button id="clearBtn" class="btn danger" type="button">Clear All</button>
     </div>
-
-
-    <!-- =======================================
-         IMAGE PREVIEWS
-    ======================================== -->
-
-    <section
-      id="previewSection"
-      class="hidden"
-    >
-
-      <div class="selected-header">
-
-        <div class="selected-title">
-          Selected Images
-        </div>
-
-        <div
-          id="selectedCount"
-          class="selected-count"
-        >
-          0 Images Selected
-        </div>
-
-      </div>
-
-
-      <div
-        id="previewGrid"
-        class="preview-grid"
-      ></div>
-
-
-      <!-- =====================================
-           CONVERT TO PDF
-      ====================================== -->
-
-      <button
-        id="convertBtn"
-        class="convert-btn"
-        type="button"
-      >
-
-        <i class="fa-solid fa-file-pdf mr-2"></i>
-
-        Convert to PDF
-
-      </button>
-
-
-      <!-- =====================================
-           SECURITY INFO
-      ====================================== -->
-
-      <div class="info-box">
-
-        <i class="fa-solid fa-shield-halved mr-1"></i>
-
-        Your images are processed locally on your
-        device. Nothing is uploaded to a server.
-
-      </div>
-
-    </section>
-
-
-    <!-- TELEGRAM SAFE BOTTOM SPACE -->
-
-    <div class="bottom-space"></div>
-
-  </main>
-
-
-  <script>
-    (() => {
-
-      "use strict";
-
-
-      /* =====================================================
-         TELEGRAM MINI APP INITIALIZATION
-      ===================================================== */
-
-      const tg =
-        window.Telegram &&
-        window.Telegram.WebApp;
-
-
-      if (tg) {
-
-        try {
-
-          tg.ready();
-
-          tg.expand();
-
-
-          if (
-            typeof tg.setHeaderColor ===
-            "function"
-          ) {
-
-            tg.setHeaderColor(
-              "#ffffff"
-            );
-
-          }
-
-
-          if (
-            typeof tg.setBackgroundColor ===
-            "function"
-          ) {
-
-            tg.setBackgroundColor(
-              "#ffffff"
-            );
-
-          }
-
-
-          if (
-            typeof tg.setBottomBarColor ===
-            "function"
-          ) {
-
-            tg.setBottomBarColor(
-              "#ffffff"
-            );
-
-          }
-
-        } catch (error) {
-
-          console.warn(
-            "Telegram WebApp setup:",
-            error
-          );
-
-        }
-
-      }
-
-
-      /* =====================================================
-         DOM
-      ===================================================== */
-
-      const imageInput =
-        document.getElementById(
-          "imageInput"
-        );
-
-      const selectBtn =
-        document.getElementById(
-          "selectBtn"
-        );
-
-      const emptyState =
-        document.getElementById(
-          "emptyState"
-        );
-
-      const previewSection =
-        document.getElementById(
-          "previewSection"
-        );
-
-      const previewGrid =
-        document.getElementById(
-          "previewGrid"
-        );
-
-      const selectedCount =
-        document.getElementById(
-          "selectedCount"
-        );
-
-      const convertBtn =
-        document.getElementById(
-          "convertBtn"
-        );
-
-
-      /* =====================================================
-         STATE
-      ===================================================== */
-
-      let selectedFiles = [];
-
-      let previewURLs = [];
-
-
-      /*
-       * Maximum image working dimension.
-       *
-       * This is intentionally limited because a phone camera
-       * can easily produce 6000x4000 or larger images.
-       */
-      const MAX_IMAGE_DIMENSION = 4096;
-
-
-      /*
-       * A4 dimensions in millimetres.
-       */
-      const A4_WIDTH = 210;
-      const A4_HEIGHT = 297;
-
-      const PAGE_MARGIN = 10;
-
-
-      /* =====================================================
-         SELECT BUTTON
-      ===================================================== */
-
-      selectBtn.addEventListener(
-        "click",
-        () => {
-
-          /*
-           * Reset input so the user can select the same
-           * images again.
-           */
-          imageInput.value = "";
-
-          imageInput.click();
-
-        }
-      );
-
-
-      /* =====================================================
-         IMAGE SELECTION
-      ===================================================== */
-
-      imageInput.addEventListener(
-        "change",
-        event => {
-
-          const files =
-            Array.from(
-              event.target.files || []
-            );
-
-
-          if (!files.length) {
-            return;
-          }
-
-
-          /*
-           * Only accept supported image types.
-           */
-          const validFiles =
-            files.filter(
-              file =>
-                [
-                  "image/jpeg",
-                  "image/png",
-                  "image/webp"
-                ].includes(
-                  file.type
-                )
-            );
-
-
-          if (!validFiles.length) {
-
-            alert(
-              "Please select JPG, PNG or WebP images."
-            );
-
-            return;
-
-          }
-
-
-          selectedFiles =
-            validFiles;
-
-
-          renderPreviews();
-
-        }
-      );
-
-
-      /* =====================================================
-         RENDER THUMBNAILS
-      ===================================================== */
-
-      function renderPreviews() {
-
-        /*
-         * Release old preview URLs.
-         */
-        previewURLs.forEach(
-          url =>
-            URL.revokeObjectURL(
-              url
-            )
-        );
-
-
-        previewURLs = [];
-
-
-        previewGrid.innerHTML =
-          "";
-
-
-        selectedFiles.forEach(
-          (file, index) => {
-
-            const url =
-              URL.createObjectURL(
-                file
-              );
-
-
-            previewURLs.push(
-              url
-            );
-
-
-            const card =
-              document.createElement(
-                "div"
-              );
-
-
-            card.className =
-              "preview-card";
-
-
-            const img =
-              document.createElement(
-                "img"
-              );
-
-
-            img.src =
-              url;
-
-
-            img.alt =
-              "Image " +
-              (index + 1);
-
-
-            img.loading =
-              index < 6
-                ? "eager"
-                : "lazy";
-
-
-            const number =
-              document.createElement(
-                "div"
-              );
-
-
-            number.className =
-              "preview-number";
-
-
-            number.textContent =
-              index + 1;
-
-
-            card.appendChild(
-              img
-            );
-
-
-            card.appendChild(
-              number
-            );
-
-
-            previewGrid.appendChild(
-              card
-            );
-
-          }
-        );
-
-
-        const count =
-          selectedFiles.length;
-
-
-        selectedCount.textContent =
-          count +
-          (count === 1
-            ? " Image Selected"
-            : " Images Selected");
-
-
-        emptyState.classList.add(
-          "hidden"
-        );
-
-
-        previewSection.classList.remove(
-          "hidden"
-        );
-
-      }
-
-
-      /* =====================================================
-         LOAD IMAGE
-      ===================================================== */
-
-      function loadImage(
-        file
-      ) {
-
-        return new Promise(
-          (resolve, reject) => {
-
-            const url =
-              URL.createObjectURL(
-                file
-              );
-
-
-            const img =
-              new Image();
-
-
-            img.onload =
-              () => {
-
-                URL.revokeObjectURL(
-                  url
-                );
-
-
-                resolve(img);
-
-              };
-
-
-            img.onerror =
-              () => {
-
-                URL.revokeObjectURL(
-                  url
-                );
-
-
-                reject(
-                  new Error(
-                    "Could not read image."
-                  )
-                );
-
-              };
-
-
-            img.src =
-              url;
-
-          }
-        );
-
-      }
-
-
-      /* =====================================================
-         SAFE IMAGE SIZE
-         
-         Prevents huge camera images from creating
-         dangerous canvas allocations.
-      ===================================================== */
-
-      function getSafeDimensions(
-        width,
-        height
-      ) {
-
-        let newWidth =
-          width;
-
-        let newHeight =
-          height;
-
-
-        if (
-          width >
-            MAX_IMAGE_DIMENSION ||
-          height >
-            MAX_IMAGE_DIMENSION
-        ) {
-
-          const scale =
-            Math.min(
-              MAX_IMAGE_DIMENSION /
-                width,
-
-              MAX_IMAGE_DIMENSION /
-                height
-            );
-
-
-          newWidth =
-            Math.max(
-              1,
-              Math.round(
-                width * scale
-              )
-            );
-
-
-          newHeight =
-            Math.max(
-              1,
-              Math.round(
-                height * scale
-              )
-            );
-
-        }
-
-
-        return {
-          width:
-            newWidth,
-
-          height:
-            newHeight
-        };
-
-      }
-
-
-      /* =====================================================
-         IMAGE → JPEG DATA URL
-         
-         PDF pages are generated from JPEG data.
-         JPEG keeps the resulting PDF much smaller than
-         embedding full PNG camera images.
-      ===================================================== */
-
-      function imageToJPEG(
-        img
-      ) {
-
-        const dimensions =
-          getSafeDimensions(
-            img.naturalWidth,
-            img.naturalHeight
-          );
-
-
-        const canvas =
-          document.createElement(
-            "canvas"
-          );
-
-
-        canvas.width =
-          dimensions.width;
-
-
-        canvas.height =
-          dimensions.height;
-
-
-        const ctx =
-          canvas.getContext(
-            "2d"
-          );
-
-
-        if (!ctx) {
-
-          throw new Error(
-            "Canvas is not supported."
-          );
-
-        }
-
-
-        /*
-         * White background prevents transparent PNG/WebP
-         * images from appearing black in the PDF.
-         */
-        ctx.fillStyle =
-          "#ffffff";
-
-
-        ctx.fillRect(
-          0,
-          0,
-          canvas.width,
-          canvas.height
-        );
-
-
-        ctx.imageSmoothingEnabled =
-          true;
-
-
-        ctx.imageSmoothingQuality =
-          "high";
-
-
-        ctx.drawImage(
-          img,
-
-          0,
-          0,
-
-          canvas.width,
-          canvas.height
-        );
-
-
-        return {
-          data:
-            canvas.toDataURL(
-              "image/jpeg",
-              0.90
-            ),
-
-          width:
-            dimensions.width,
-
-          height:
-            dimensions.height
-        };
-
-      }
-
-
-      /* =====================================================
-         CALCULATE A4 FIT
-      ===================================================== */
-
-      function calculateA4Fit(
-        imageWidth,
-        imageHeight
-      ) {
-
-        const availableWidth =
-          A4_WIDTH -
-          PAGE_MARGIN * 2;
-
-
-        const availableHeight =
-          A4_HEIGHT -
-          PAGE_MARGIN * 2;
-
-
-        const imageRatio =
-          imageWidth /
-          imageHeight;
-
-
-        const pageRatio =
-          availableWidth /
-          availableHeight;
-
-
-        let width;
-        let height;
-
-
-        if (
-          imageRatio >
-          pageRatio
-        ) {
-
-          width =
-            availableWidth;
-
-
-          height =
-            width /
-            imageRatio;
-
-        } else {
-
-          height =
-            availableHeight;
-
-
-          width =
-            height *
-            imageRatio;
-
-        }
-
-
-        return {
-          width,
-          height,
-
-          x:
-            (A4_WIDTH -
-              width) /
-            2,
-
-          y:
-            (A4_HEIGHT -
-              height) /
-            2
-        };
-
-      }
-
-
-      /* =====================================================
-         SMALL YIELD
-         
-         Lets Telegram/mobile browser remain responsive
-         while multiple large images are processed.
-      ===================================================== */
-
-      function yieldToBrowser() {
-
-        return new Promise(
-          resolve => {
-
-            if (
-              typeof requestAnimationFrame ===
-              "function"
-            ) {
-
-              requestAnimationFrame(
-                () => resolve()
-              );
-
-            } else {
-
-              setTimeout(
-                resolve,
-                0
-              );
-
-            }
-
-          }
-        );
-
-      }
-
-
-      /* =====================================================
-         CREATE PDF
-      ===================================================== */
-
-      async function createPDF() {
-
-        /*
-         * Verify jsPDF loaded.
-         */
-        if (
-          !window.jspdf ||
-          !window.jspdf.jsPDF
-        ) {
-
-          throw new Error(
-            "PDF library could not be loaded."
-          );
-
-        }
-
-
-        const {
-          jsPDF
-        } =
-          window.jspdf;
-
-
-        /*
-         * A4 portrait PDF.
-         *
-         * Each image gets its own A4 page.
-         */
-        const pdf =
-          new jsPDF({
-            orientation:
-              "portrait",
-
-            unit:
-              "mm",
-
-            format:
-              "a4",
-
-            compress:
-              true
-          });
-
-
-        for (
-          let i = 0;
-          i < selectedFiles.length;
-          i++
-        ) {
-
-          /*
-           * Keep Telegram UI responsive between images.
-           */
-          await yieldToBrowser();
-
-
-          const img =
-            await loadImage(
-              selectedFiles[i]
-            );
-
-
-          const converted =
-            imageToJPEG(
-              img
-            );
-
-
-          /*
-           * First image uses the document's initial page.
-           * Every following image creates a new A4 page.
-           */
-          if (i > 0) {
-
-            pdf.addPage(
-              "a4",
-              "portrait"
-            );
-
-          }
-
-
-          const fit =
-            calculateA4Fit(
-              converted.width,
-              converted.height
-            );
-
-
-          pdf.addImage(
-            converted.data,
-
-            "JPEG",
-
-            fit.x,
-            fit.y,
-
-            fit.width,
-            fit.height,
-
-            undefined,
-
-            "FAST"
-          );
-
-        }
-
-
-        return pdf;
-
-      }
-
-
-      /* =====================================================
-         TELEGRAM / MOBILE PDF DOWNLOAD
-         
-         IMPORTANT:
-         
-         Telegram WebView does not always handle:
-         
-             <a download="file.pdf">
-         
-         the same way as desktop Chrome.
-         
-         Therefore we first try the native File Share API.
-         
-         If unavailable, we use the standard download.
-         
-         If that is blocked by the WebView, the PDF is opened
-         as a Blob URL so the user can save/share it using the
-         native viewer.
-      ===================================================== */
-
-      async function downloadPDF(
-        pdf
-      ) {
-
-        /*
-         * jsPDF generates a Blob directly.
-         */
-        const blob =
-          pdf.output(
-            "blob"
-          );
-
-
-        if (
-          !blob ||
-          blob.size <= 0
-        ) {
-
-          throw new Error(
-            "Generated PDF is empty."
-          );
-
-        }
-
-
-        const filename =
-          "instapic_document.pdf";
-
-
-        /* =================================================
-           METHOD 1 — NATIVE MOBILE SHARE
-        ================================================= */
-
-        if (
-          typeof navigator.share ===
-          "function"
-        ) {
-
-          try {
-
-            const file =
-              new File(
-                [blob],
-                filename,
-                {
-                  type:
-                    "application/pdf"
-                }
-              );
-
-
-            let canShare =
-              true;
-
-
-            if (
-              typeof navigator.canShare ===
-              "function"
-            ) {
-
-              canShare =
-                navigator.canShare({
-                  files: [file]
-                });
-
-            }
-
-
-            if (canShare) {
-
-              await navigator.share({
-
-                files: [file],
-
-                title:
-                  "InstaPic PDF",
-
-                text:
-                  "Generated by InstaPic"
-
-              });
-
-
-              return;
-
-            }
-
-          } catch (error) {
-
-            /*
-             * User closed the native share sheet.
-             */
-            if (
-              error &&
-              error.name ===
-                "AbortError"
-            ) {
-
-              return;
-
-            }
-
-
-            console.warn(
-              "Native PDF sharing unavailable:",
-              error
-            );
-
-          }
-
-        }
-
-
-        /* =================================================
-           METHOD 2 — STANDARD BROWSER DOWNLOAD
-        ================================================= */
-
-        const url =
-          URL.createObjectURL(
-            blob
-          );
-
-
-        try {
-
-          const link =
-            document.createElement(
-              "a"
-            );
-
-
-          link.href =
-            url;
-
-
-          link.download =
-            filename;
-
-
-          link.rel =
-            "noopener";
-
-
-          link.style.position =
-            "fixed";
-
-
-          link.style.left =
-            "-9999px";
-
-
-          link.style.top =
-            "0";
-
-
-          document.body.appendChild(
-            link
-          );
-
-
-          /*
-           * Normal click.
-           */
-          link.click();
-
-
-          /*
-           * Additional click event for embedded WebViews.
-           */
-          try {
-
-            link.dispatchEvent(
-              new MouseEvent(
-                "click",
-                {
-                  bubbles: true,
-                  cancelable: true,
-                  view: window
-                }
-              )
-            );
-
-          } catch (_) {}
-
-
-          link.remove();
-
-
-          /*
-           * Do not revoke immediately.
-           */
-          setTimeout(
-            () => {
-
-              URL.revokeObjectURL(
-                url
-              );
-
-            },
-            15000
-          );
-
-
-          return;
-
-        } catch (error) {
-
-          console.warn(
-            "Standard PDF download failed:",
-            error
-          );
-
-        }
-
-
-        /* =================================================
-           METHOD 3 — WEBVIEW FALLBACK
-        ================================================= */
-
-        try {
-
-          /*
-           * Open the PDF Blob in the WebView/browser.
-           * Telegram/Android can then provide its native
-           * viewer/share/save interface.
-           */
-          window.open(
-            url,
-            "_blank"
-          );
-
-
-          setTimeout(
-            () => {
-
-              URL.revokeObjectURL(
-                url
-              );
-
-            },
-            30000
-          );
-
-        } catch (error) {
-
-          URL.revokeObjectURL(
-            url
-          );
-
-          throw error;
-
-        }
-
-      }
-
-
-      /* =====================================================
-         CONVERT BUTTON
-      ===================================================== */
-
-      convertBtn.addEventListener(
-        "click",
-        async () => {
-
-          if (
-            !selectedFiles.length
-          ) {
-
-            alert(
-              "Please select at least one image."
-            );
-
-            return;
-
-          }
-
-
-          const originalHTML =
-            convertBtn.innerHTML;
-
-
-          convertBtn.disabled =
-            true;
-
-
-          convertBtn.innerHTML =
-            '<span class="spinner"></span>Creating PDF...';
-
-
-          try {
-
-            /*
-             * Let loading UI render before processing.
-             */
-            await yieldToBrowser();
-
-
-            const pdf =
-              await createPDF();
-
-
-            convertBtn.innerHTML =
-              '<span class="spinner"></span>Preparing Download...';
-
-
-            await yieldToBrowser();
-
-
-            /*
-             * Generate/download the PDF.
-             */
-            await downloadPDF(
-              pdf
-            );
-
-
-            /* =============================================
-               SUCCESS
-            ============================================= */
-
-            convertBtn.innerHTML =
-              '<i class="fa-solid fa-check mr-2"></i>PDF Ready';
-
-
-            /*
-             * Reset after successful generation.
-             */
-            setTimeout(
-              () => {
-
-                resetTool();
-
-              },
-              1400
-            );
-
-
-          } catch (error) {
-
-            console.error(
-              "PDF conversion error:",
-              error
-            );
-
-
-            alert(
-              "Could not create the PDF. Please try again with different images."
-            );
-
-
-            convertBtn.innerHTML =
-              originalHTML;
-
-
-            convertBtn.disabled =
-              false;
-
-          }
-
-        }
-      );
-
-
-      /* =====================================================
-         RESET TOOL
-      ===================================================== */
-
-      function resetTool() {
-
-        /*
-         * Release all preview object URLs.
-         */
-        previewURLs.forEach(
-          url =>
-            URL.revokeObjectURL(
-              url
-            )
-        );
-
-
-        previewURLs =
-          [];
-
-
-        selectedFiles =
-          [];
-
-
-        previewGrid.innerHTML =
-          "";
-
-
-        selectedCount.textContent =
-          "0 Images Selected";
-
-
-        previewSection.classList.add(
-          "hidden"
-        );
-
-
-        emptyState.classList.remove(
-          "hidden"
-        );
-
-
-        imageInput.value =
-          "";
-
-
-        convertBtn.disabled =
-          false;
-
-
-        convertBtn.innerHTML =
-          '<i class="fa-solid fa-file-pdf mr-2"></i>Convert to PDF';
-
-      }
-
-
-      /* =====================================================
-         CLEANUP
-      ===================================================== */
-
-      window.addEventListener(
-        "beforeunload",
-        () => {
-
-          previewURLs.forEach(
-            url =>
-              URL.revokeObjectURL(
-                url
-              )
-          );
-
-          previewURLs =
-            [];
-
-        }
-      );
-
-
-    })();
-  </script>
-
+    <div id="queue" class="grid" aria-live="polite"></div>
+    <div id="batchWarning" class="hint hidden"></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2 style="margin:0;font-size:18px">Layout preview</h2>
+  <p class="hint">A live approximation of the first PDF page using your current settings.</p>
+  <div id="previewPage" class="preview-page"><span style="color:#94a3b8">Add an image to preview the PDF page</span></div>
+</section>
+</main>
+
+<aside>
+<section class="card">
+<h2 style="margin:0 0 5px;font-size:18px">PDF Settings</h2>
+<details open>
+<summary>Page</summary>
+<div class="formgrid">
+  <div class="field"><label for="pageSize">Page size</label><select id="pageSize"><option value="A4">A4</option><option value="A5">A5</option><option value="LETTER">Letter</option><option value="LEGAL">Legal</option><option value="CUSTOM">Custom</option></select></div>
+  <div class="field"><label>Orientation</label><div class="radio-group"><label class="choice"><input type="radio" name="orientation" value="portrait" checked> Portrait</label><label class="choice"><input type="radio" name="orientation" value="landscape"> Landscape</label></div></div>
+</div>
+<div id="customSize" class="formgrid hidden">
+  <div class="field"><label for="customW">Width</label><input id="customW" type="number" min="10" max="1000" step=".1" value="210"></div>
+  <div class="field"><label for="customH">Height</label><input id="customH" type="number" min="10" max="1000" step=".1" value="297"></div>
+  <div class="field"><label for="customUnit">Unit</label><select id="customUnit"><option value="mm">mm</option><option value="in">inches</option></select></div>
+</div>
+<div class="formgrid">
+  <div class="field"><label for="marginPreset">Margins</label><select id="marginPreset"><option value="none">None</option><option value="small" selected>Small</option><option value="medium">Medium</option><option value="large">Large</option><option value="custom">Custom</option></select></div>
+  <div class="field"><label for="background">Background</label><input id="background" type="color" value="#ffffff"></div>
+</div>
+<div id="customMargins" class="formgrid hidden">
+  <div class="field"><label>Top (mm)</label><input id="mTop" type="number" min="0" max="500" step=".1" value="10"></div>
+  <div class="field"><label>Right (mm)</label><input id="mRight" type="number" min="0" max="500" step=".1" value="10"></div>
+  <div class="field"><label>Bottom (mm)</label><input id="mBottom" type="number" min="0" max="500" step=".1" value="10"></div>
+  <div class="field"><label>Left (mm)</label><input id="mLeft" type="number" min="0" max="500" step=".1" value="10"></div>
+</div>
+</details>
+
+<details open>
+<summary>Image</summary>
+<div class="formgrid">
+ <div class="field"><label for="fitMode">Image fit</label><select id="fitMode"><option value="fit" selected>Fit — show entire image</option><option value="fill">Fill — crop overflow</option><option value="original">Original size — using DPI</option><option value="custom">Custom size</option></select></div>
+ <div class="field"><label for="quality">Image quality</label><select id="quality"><option value="low">Low</option><option value="medium">Medium</option><option value="high" selected>High</option><option value="maximum">Maximum</option><option value="custom">Custom</option></select></div>
+</div>
+<div id="customQuality" class="field hidden" style="margin-top:10px"><label for="qualityRange">Custom JPEG quality: <span id="qualityValue">85%</span></label><input id="qualityRange" type="range" min="20" max="100" value="85" style="width:100%"></div>
+<div id="customFit" class="formgrid hidden">
+ <div class="field"><label>Width (mm)</label><input id="fitW" type="number" min="1" max="1000" step=".1" value="150"></div>
+ <div class="field"><label>Height (mm)</label><input id="fitH" type="number" min="1" max="1000" step=".1" value="100"></div>
+</div>
+<div class="formgrid">
+ <div class="field"><label for="hAlign">Horizontal alignment</label><select id="hAlign"><option value="left">Left</option><option value="center" selected>Center</option><option value="right">Right</option></select></div>
+ <div class="field"><label for="vAlign">Vertical alignment</label><select id="vAlign"><option value="top">Top</option><option value="center" selected>Center</option><option value="bottom">Bottom</option></select></div>
+</div>
+<div class="field" style="margin-top:10px"><label for="dpi">DPI <span style="font-weight:400">(used for rasterization and Original Size)</span></label><select id="dpi"><option>72</option><option>96</option><option selected>150</option><option>200</option><option>300</option></select></div>
+</details>
+
+<details>
+<summary>Advanced</summary>
+<label class="choice" style="margin-top:10px"><input id="optimize" type="checkbox" checked> Optimize PDF Size</label>
+<p class="hint">Optimization rasterizes non-JPEG sources and limits unnecessary pixel data. PDF size is still dependent on the images and selected settings.</p>
+</details>
+
+<div style="margin-top:15px">
+ <div class="field"><label for="filename">PDF filename</label><input id="filename" type="text" value="InstaPic-Images.pdf" maxlength="180"></div>
+</div>
+<div class="stats">
+ <div class="stat"><b id="pagesStat">0</b><span>Pages before generation</span></div>
+ <div class="stat"><b id="sourceStat">0 B</b><span>Selected image size</span></div>
+ <div class="stat"><b id="estimateStat">—</b><span>Estimated PDF size</span></div>
+</div>
+</section>
+
+<section class="card sticky-actions">
+<button id="generateBtn" class="btn primary full" type="button" disabled>Create PDF</button>
+<div id="progressArea" class="progress-wrap hidden" aria-live="polite">
+ <div class="progress-row"><span id="progressText">Creating PDF…</span><b id="progressPct">0%</b></div>
+ <div class="progress"><div id="progressBar" class="bar"></div></div>
+ <button id="cancelBtn" class="btn danger full" style="margin-top:9px" type="button">Cancel</button>
+</div>
+<div id="engineError" class="errors hidden"></div>
+<p class="privacy">🔒 Your images are processed on your device. They are not uploaded for conversion.</p>
+</section>
+
+<section id="resultCard" class="card result hidden">
+ <h2>PDF READY ✓</h2>
+ <div id="resultName" style="font-weight:800;word-break:break-all"></div>
+ <div class="stats">
+   <div class="stat"><b id="resultPages">0</b><span>PDF pages</span></div>
+   <div class="stat"><b id="resultSize">0 B</b><span>Actual PDF size</span></div>
+   <div class="stat"><b id="resultAvg">0 B</b><span>Average per page</span></div>
+ </div>
+ <div id="partialErrors" class="errors hidden"></div>
+ <iframe id="pdfFrame" class="pdf-frame" title="Generated PDF preview"></iframe>
+ <div class="toolbar" style="margin-top:12px">
+   <button id="previewBtn" class="btn ghost" type="button">Preview PDF</button>
+   <button id="downloadBtn" class="btn primary" type="button">Download PDF</button>
+   <button id="shareBtn" class="btn success hidden" type="button">Share PDF</button>
+   <button id="newPdfBtn" class="btn secondary" type="button">Create New PDF</button>
+ </div>
+</section>
+</aside>
+</div>
+</div>
+<div id="toast" class="toast" role="status"></div>
+
+<script>
+(() => {
+"use strict";
+const $ = id => document.getElementById(id);
+const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+if (tg) { try { tg.ready(); tg.expand(); } catch(e){} }
+
+const state = {
+  items: [],
+  pageSize: "A4", orientation: "portrait",
+  marginPreset: "small", customMargins: {top:10,right:10,bottom:10,left:10},
+  fitMode:"fit", customFit:{w:150,h:100}, hAlign:"center", vAlign:"center",
+  background:"#ffffff", quality:"high", customQuality:0.85, dpi:150, optimize:true,
+  filename:"InstaPic-Images.pdf", pdfBlob:null, pdfUrl:null, busy:false, cancelled:false
+};
+let uid = 1;
+
+function bytes(n) {
+  if (!Number.isFinite(n) || n < 0) return "0 B";
+  if (n < 1024) return n + " B";
+  if (n < 1048576) return (n/1024).toFixed(n<10240?1:0) + " KB";
+  if (n < 1073741824) return (n/1048576).toFixed(n<10485760?2:1) + " MB";
+  return (n/1073741824).toFixed(2) + " GB";
+}
+function toast(msg) { const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove("show"),2600); }
+function escapeName(name) {
+  let s = String(name||"InstaPic-Images").replace(/[<>:"/\\|?*\u0000-\u001F]/g,"-").replace(/\s+/g," ").trim();
+  s = s.replace(/\.pdf$/i,"").replace(/\.+$/,"").trim();
+  return (s || "InstaPic-Images") + ".pdf";
+}
+function defaultNameFrom(file) {
+  if (!file) return "InstaPic-Images.pdf";
+  const n = String(file.name||"").replace(/\.[^.]+$/,"").replace(/[<>:"/\\|?*\u0000-\u001F]/g,"-").trim();
+  return escapeName(n || "InstaPic-Images");
+}
+function nextFrame(){ return new Promise(r=>requestAnimationFrame(()=>r())); }
+function sleep0(){ return new Promise(r=>setTimeout(r,0)); }
+
+function pagePoints() {
+  const presets = {A4:[210,297],A5:[148,210],LETTER:[215.9,279.4],LEGAL:[215.9,355.6]};
+  let [w,h] = state.pageSize==="CUSTOM"
+    ? [num("customW",210), num("customH",297)].map((v,i)=>$("customUnit").value==="in"?v*25.4:v)
+    : presets[state.pageSize];
+  if(state.orientation==="landscape") [w,h]=[h,w];
+  return {w:w/25.4*72,h:h/25.4*72,mmW:w,mmH:h};
+}
+function num(id, fallback){ const v=parseFloat($(id).value); return Number.isFinite(v)?v:fallback; }
+function marginsPt(){
+  let m={none:0,small:6,medium:12,large:20}[state.marginPreset];
+  if(state.marginPreset==="custom") m=state.customMargins;
+  if(typeof m==="number") return {top:m/25.4*72,right:m/25.4*72,bottom:m/25.4*72,left:m/25.4*72};
+  return {top:m.top/25.4*72,right:m.right/25.4*72,bottom:m.bottom/25.4*72,left:m.left/25.4*72};
+}
+function qualityValue(){
+  return {low:.55,medium:.72,high:.85,maximum:.94}[state.quality] ?? state.customQuality;
+}
+function imageMaxPixels(){
+  const q={low:1.2,medium:2,high:3,maximum:4,custom:3}[state.quality] || 3;
+  const dpi=state.dpi;
+  const {w,h}=pagePoints(), m=marginsPt();
+  const areaW=Math.max(1,w-m.left-m.right), areaH=Math.max(1,h-m.top-m.bottom);
+  const base=Math.max(areaW,areaH)/72*dpi;
+  return Math.min(5000, Math.max(800, Math.round(base*q)));
+}
+function revokePdf(){ if(state.pdfUrl){ URL.revokeObjectURL(state.pdfUrl); state.pdfUrl=null; } state.pdfBlob=null; $("resultCard").classList.add("hidden"); $("pdfFrame").removeAttribute("src"); }
+function revokeItem(item){ if(item.url){URL.revokeObjectURL(item.url);item.url=null;} item.thumb=null; }
+function clearItems(){ state.items.forEach(revokeItem); state.items=[]; revokePdf(); renderQueue(); updatePreview(); updateStats(); }
+function showEngineError(msg){ $("engineError").textContent=msg; $("engineError").classList.remove("hidden"); $("generateBtn").disabled=true; }
+function engineReady(){ return !!(window.PDFLib && window.PDFLib.PDFDocument); }
+if(!engineReady()) showEngineError("PDF engine could not be loaded. Please check your connection and reload the page.");
+
+async function decodeFile(file){
+  if(!(file instanceof File) || !file.size) throw new Error("Empty file");
+  const isImage = file.type.startsWith("image/") || /\.(jpe?g|png|webp|bmp|gif|avif)$/i.test(file.name);
+  if(!isImage) throw new Error("Not a supported image file");
+  const url=URL.createObjectURL(file);
+  try{
+    if("createImageBitmap" in window){
+      let bmp;
+      try { bmp=await createImageBitmap(file,{imageOrientation:"from-image"}); }
+      catch(e){ bmp=await createImageBitmap(file); }
+      const w=bmp.width,h=bmp.height; bmp.close();
+      return {url,w,h};
+    }
+    const img=await loadImage(url); return {url,w:img.naturalWidth,h:img.naturalHeight};
+  } catch(e){ URL.revokeObjectURL(url); throw new Error("Unable to decode image"); }
+}
+function loadImage(url){
+  return new Promise((resolve,reject)=>{
+    const img=new Image(); img.onload=()=>resolve(img); img.onerror=()=>reject(new Error("decode failed")); img.src=url;
+  });
+}
+async function addFiles(files){
+  const arr=Array.from(files||[]);
+  if(!arr.length)return;
+  let added=0, failed=[];
+  for(const file of arr){
+    try{
+      const d=await decodeFile(file);
+      state.items.push({id:uid++,file,url:d.url,w:d.w,h:d.h,rotation:0,error:null});
+      added++;
+      if(state.items.length===1 && /^InstaPic-Images\.pdf$/i.test($("filename").value)) $("filename").value=defaultNameFrom(file);
+    }catch(e){ failed.push(file.name||"Unknown file"); }
+    await sleep0();
+  }
+  if(failed.length) toast(`${failed.length} image${failed.length>1?"s":""} could not be read`);
+  if(added) toast(`${added} image${added>1?"s":""} added`);
+  renderQueue(); updateStats(); updatePreview();
+}
+function renderQueue(){
+  const q=$("queue"); q.innerHTML="";
+  $("queueSection").classList.toggle("hidden",state.items.length===0);
+  state.items.forEach((item,i)=>{
+    const el=document.createElement("article"); el.className="item"; el.draggable=true; el.dataset.id=item.id;
+    el.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",String(item.id));});
+    el.addEventListener("dragover",e=>e.preventDefault());
+    el.addEventListener("drop",e=>{e.preventDefault();const from=state.items.findIndex(x=>x.id===Number(e.dataTransfer.getData("text/plain"))); if(from>=0&&from!==i){const [x]=state.items.splice(from,1);state.items.splice(i,0,x);renderQueue();updatePreview();}});
+    const th=document.createElement("div");th.className="thumb";const im=document.createElement("img");im.src=item.url;im.alt=item.file.name;th.appendChild(im);
+    const badge=document.createElement("div");badge.className="badge";badge.textContent="#"+(i+1);th.appendChild(badge);el.appendChild(th);
+    const body=document.createElement("div");body.className="item-body";
+    const fn=document.createElement("div");fn.className="fname";fn.title=item.file.name;fn.textContent=item.file.name;body.appendChild(fn);
+    const meta=document.createElement("div");meta.className="meta";meta.textContent=`${item.w} × ${item.h} · ${bytes(item.file.size)}`;body.appendChild(meta);
+    const controls=document.createElement("div");controls.className="controls";
+    [["↑","Move up",()=>moveItem(i,-1)],["↓","Move down",()=>moveItem(i,1)],["↻","Rotate 90°",()=>rotateItem(i)],["Remove","Remove",()=>removeItem(i)]].forEach(([txt,aria,fn],j)=>{const b=document.createElement("button");b.type="button";b.className="btn ghost small";b.textContent=txt;b.title=aria;b.setAttribute("aria-label",aria);b.disabled=(j===0&&i===0)||(j===1&&i===state.items.length-1);b.onclick=fn;controls.appendChild(b);});
+    body.appendChild(controls);el.appendChild(body);q.appendChild(el);
+  });
+  $("countText").textContent=`${state.items.length} image${state.items.length===1?"":"s"} selected`;
+  $("batchWarning").classList.toggle("hidden",state.items.length<100);
+  if(state.items.length>=100)$("batchWarning").textContent="⚠️ This is a large batch. Processing is sequential and may take longer on mobile.";
+}
+function moveItem(i,d){const j=i+d;if(j<0||j>=state.items.length)return;[state.items[i],state.items[j]]=[state.items[j],state.items[i]];renderQueue();updatePreview();}
+function removeItem(i){revokeItem(state.items[i]);state.items.splice(i,1);renderQueue();updateStats();updatePreview();}
+function rotateItem(i){state.items[i].rotation=(state.items[i].rotation+90)%360;renderQueue();updatePreview();}
+function updateStats(){
+  const total=state.items.reduce((s,x)=>s+x.file.size,0);$("pagesStat").textContent=state.items.length;$("sourceStat").textContent=bytes(total);
+  if(!state.items.length){$("estimateStat").textContent="—";$("generateBtn").disabled=!engineReady();return}
+  let factor={low:.35,medium:.55,high:.72,maximum:.95,custom:.75}[state.quality]||.72;
+  if(state.optimize)factor*=.82;
+  $("estimateStat").textContent="~"+bytes(Math.max(20000,total*factor+state.items.length*1200));
+  $("generateBtn").disabled=state.busy||!engineReady()||state.items.length===0;
+}
+function updatePreview(){
+  const p=$("previewPage");p.innerHTML="";
+  if(!state.items.length){p.innerHTML='<span style="color:#94a3b8">Add an image to preview the PDF page</span>';p.style.width="100%";p.style.height="220px";return}
+  const {w,h}=pagePoints();const scale=Math.min(360/w,300/h);p.style.width=Math.round(w*scale)+"px";p.style.height=Math.round(h*scale)+"px";p.style.background=state.background;
+  const item=state.items[0], img=document.createElement("img");img.src=item.url;img.style.maxWidth="none";img.style.maxHeight="none";img.style.width="auto";img.style.height="auto";
+  const m=marginsPt(), aw=w-m.left-m.right, ah=h-m.top-m.bottom, iw=item.w, ih=item.h;
+  let dw,dh;
+  if(state.fitMode==="custom"){dw=num("fitW",150)/25.4*72;dh=num("fitH",100)/25.4*72}
+  else if(state.fitMode==="original"){const s=72/state.dpi;dw=iw*s;dh=ih*s}
+  else {const s=state.fitMode==="fill"?Math.max(aw/iw,ah/ih):Math.min(aw/iw,ah/ih);dw=iw*s;dh=ih*s}
+  dw*=scale;dh*=scale;img.style.width=dw+"px";img.style.height=dh+"px";img.style.objectFit=state.fitMode==="fill"?"cover":"contain";img.style.transform=`rotate(${item.rotation}deg)`;
+  const wrap=document.createElement("div");wrap.style.position="absolute";wrap.style.left=(m.left*scale)+"px";wrap.style.top=(m.top*scale)+"px";wrap.style.width=(aw*scale)+"px";wrap.style.height=(ah*scale)+"px";wrap.style.display="flex";wrap.style.alignItems=state.vAlign==="top"?"flex-start":state.vAlign==="bottom"?"flex-end":"center";wrap.style.justifyContent=state.hAlign==="left"?"flex-start":state.hAlign==="right"?"flex-end":"center";wrap.style.overflow=state.fitMode==="fill"?"hidden":"visible";wrap.appendChild(img);p.appendChild(wrap);
+}
+async function imageToCanvas(item){
+  const img=await loadImage(item.url);
+  const rotated=item.rotation%360!==0;
+  let sw=img.naturalWidth,sh=img.naturalHeight;
+  let rw=sw,rh=sh;if(rotated){rw=sh;rh=sw}
+  const {w:pw,h:ph}=pagePoints(),m=marginsPt(),aw=Math.max(1,pw-m.left-m.right),ah=Math.max(1,ph-m.top-m.bottom);
+  let targetW,targetH;
+  if(state.fitMode==="custom"){targetW=num("fitW",150)/25.4*72;targetH=num("fitH",100)/25.4*72}
+  else if(state.fitMode==="original"){targetW=rw/state.dpi*72;targetH=rh/state.dpi*72}
+  else {const s=state.fitMode==="fill"?Math.max(aw/rw,ah/rh):Math.min(aw/rw,ah/rh);targetW=rw*s;targetH=rh*s}
+  const maxPx=imageMaxPixels(); const pxScale=Math.min(1,maxPx/Math.max(targetW,targetH,1));
+  let cw=Math.max(1,Math.round(rw*pxScale)),ch=Math.max(1,Math.round(rh*pxScale));
+  if(cw*ch>25000000){const s=Math.sqrt(25000000/(cw*ch));cw=Math.max(1,Math.floor(cw*s));ch=Math.max(1,Math.floor(ch*s))}
+  const canvas=document.createElement("canvas");canvas.width=cw;canvas.height=ch;const ctx=canvas.getContext("2d",{alpha:false});
+  ctx.fillStyle=state.background;ctx.fillRect(0,0,cw,ch);ctx.save();ctx.translate(cw/2,ch/2);ctx.rotate(item.rotation*Math.PI/180);
+  const sx=sw/cw,sy=sh/ch;
+  let drawW=cw,drawH=ch;
+  if(state.fitMode==="fill"){const s=Math.max(cw/sw,ch/sh);drawW=sw*s;drawH=sh*s}else if(state.fitMode==="original"){drawW=cw;drawH=ch}else{const s=Math.min(cw/sw,ch/sh);drawW=sw*s;drawH=sh*s}
+  ctx.drawImage(img,-drawW/2,-drawH/2,drawW,drawH);ctx.restore();
+  const mime=(item.file.type==="image/jpeg"||item.file.type==="image/jpg")?"image/jpeg":"image/jpeg";
+  const q=state.optimize?qualityValue():Math.min(1,qualityValue()+.06);
+  const blob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error("Canvas export failed")),mime,q));
+  const bytesArr=await blob.arrayBuffer();return {bytes:new Uint8Array(bytesArr),width:cw,height:ch,canvas};
+}
+async function embedAndPlace(pdfDoc,itemData){
+  const page=pdfDoc.addPage();const {w:pw,h:ph}=pagePoints(),m=marginsPt();
+  page.drawRectangle({x:0,y:0,width:pw,height:ph,color:PDFLib.rgb(...hexRgb(state.background))});
+  const img=await pdfDoc.embedJpg(itemData.bytes);
+  const aw=pw-m.left-m.right,ah=ph-m.top-m.bottom;
+  let iw,ih,x,y;
+  if(state.fitMode==="custom"){iw=num("fitW",150)/25.4*72;ih=num("fitH",100)/25.4*72}
+  else if(state.fitMode==="original"){iw=itemData.width/state.dpi*72;ih=itemData.height/state.dpi*72}
+  else {const s=state.fitMode==="fill"?Math.max(aw/itemData.width,ah/itemData.height):Math.min(aw/itemData.width,ah/itemData.height);iw=itemData.width*s;ih=itemData.height*s}
+  if(state.fitMode==="fill"){
+    // Draw at cover size and clip to content area by using a temporary page-sized crop image.
+    const s=Math.max(aw/itemData.width,ah/itemData.height);
+    iw=itemData.width*s;ih=itemData.height*s;
+  }
+  x=state.hAlign==="left"?m.left:state.hAlign==="right"?pw-m.right-iw:m.left+(aw-iw)/2;
+  y=state.vAlign==="bottom"?m.bottom:state.vAlign==="top"?ph-m.top-ih:m.bottom+(ah-ih)/2;
+  if(state.fitMode==="fill"){
+    // Re-rasterize to the exact content rectangle so overflow is cropped without distortion.
+    const c=document.createElement("canvas");c.width=Math.max(1,Math.round(aw/72*state.dpi));c.height=Math.max(1,Math.round(ah/72*state.dpi));
+    const cx=c.getContext("2d");cx.fillStyle=state.background;cx.fillRect(0,0,c.width,c.height);
+    const src=new Blob([itemData.bytes],{type:"image/jpeg"});const u=URL.createObjectURL(src);const im=await loadImage(u);URL.revokeObjectURL(u);
+    const scale=Math.max(c.width/im.naturalWidth,c.height/im.naturalHeight);const dw=im.naturalWidth*scale,dh=im.naturalHeight*scale;
+    cx.drawImage(im,(c.width-dw)/2,(c.height-dh)/2,dw,dh);const b=await new Promise(r=>c.toBlob(r,"image/jpeg",qualityValue()));const ab=new Uint8Array(await b.arrayBuffer());
+    const cropImg=await pdfDoc.embedJpg(ab);page.drawImage(cropImg,{x:m.left,y:m.bottom,width:aw,height:ah});return page;
+  }
+  // Rotation is already rasterized into itemData; placement uses resulting dimensions.
+  page.drawImage(img,{x,y,width:iw,height:ih});return page;
+}
+function hexRgb(hex){const h=hex.replace("#","");return [parseInt(h.slice(0,2),16)/255,parseInt(h.slice(2,4),16)/255,parseInt(h.slice(4,6),16)/255]}
+async function generate(){
+  if(!engineReady()||!state.items.length||state.busy)return;
+  state.busy=true;state.cancelled=false;revokePdf();setProgress(0,"Starting…");$("progressArea").classList.remove("hidden");$("generateBtn").disabled=true;
+  const PDFDocument=PDFLib.PDFDocument;let pdfDoc;
+  const failures=[];let success=0;
+  try{
+    pdfDoc=await PDFDocument.create();pdfDoc.setTitle(escapeName($("filename").value).replace(/\.pdf$/i,""));pdfDoc.setProducer("InstaPic Image to PDF");
+    const total=state.items.length;
+    for(let i=0;i<total;i++){
+      if(state.cancelled)throw new Error("__CANCELLED__");
+      const item=state.items[i];setProgress(i/total,`Processing image ${i+1} of ${total}`);
+      await nextFrame();
+      try{const data=await imageToCanvas(item);await embedAndPlace(pdfDoc,data);success++;data.canvas.width=1;data.canvas.height=1;}catch(e){failures.push(item.file.name||`Image ${i+1}`)}
+      await sleep0();
+    }
+    if(!success)throw new Error("No images could be processed.");
+    setProgress(1,"Finalizing PDF…");await nextFrame();
+    const pdfBytes=await pdfDoc.save({useObjectStreams:true,addDefaultPage:false});
+    if(state.cancelled)throw new Error("__CANCELLED__");
+    state.pdfBlob=new Blob([pdfBytes],{type:"application/pdf"});state.pdfUrl=URL.createObjectURL(state.pdfBlob);
+    const filename=escapeName($("filename").value);$("resultName").textContent=filename;$("resultPages").textContent=success;$("resultSize").textContent=bytes(state.pdfBlob.size);$("resultAvg").textContent=bytes(state.pdfBlob.size/success);
+    $("pdfFrame").src=state.pdfUrl;$("resultCard").classList.remove("hidden");
+    if(failures.length){$("partialErrors").textContent=`PDF created with ${success} of ${total} images. Could not process: ${failures.join(", ")}`;$("partialErrors").classList.remove("hidden")}else $("partialErrors").classList.add("hidden");
+    if(state.pdfBlob.size>25*1048576)toast("Large PDF generated — consider lower quality or DPI.");
+    setProgress(1,`PDF ready — ${success} page${success===1?"":"s"}`);setTimeout(()=>{$("progressArea").classList.add("hidden")},900);
+  }catch(e){
+    $("progressArea").classList.add("hidden");
+    if(e.message==="__CANCELLED__"){toast("PDF generation cancelled");}
+    else {showError(e.message||"PDF generation failed.");}
+  }finally{
+    state.busy=false;updateStats();updateShareVisibility();
+  }
+}
+function setProgress(frac,text){const p=Math.max(0,Math.min(1,frac));$("progressBar").style.width=(p*100)+"%";$("progressPct").textContent=Math.round(p*100)+"%";$("progressText").textContent=text}
+function showError(msg){$("engineError").textContent=msg;$("engineError").classList.remove("hidden");toast(msg)}
+function downloadPdf(){
+  if(!state.pdfBlob){toast("Generate a PDF first.");return}
+  const url=URL.createObjectURL(state.pdfBlob);const a=document.createElement("a");a.href=url;a.download=escapeName($("filename").value);a.rel="noopener";a.style.display="none";document.body.appendChild(a);
+  try{a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(url)},1200)}catch(e){a.remove();URL.revokeObjectURL(url);openPdf()}
+}
+function openPdf(){if(state.pdfUrl)window.open(state.pdfUrl,"_blank","noopener,noreferrer")}
+function canShareFile(){try{return !!(navigator.share&&navigator.canShare&&state.pdfBlob&&navigator.canShare({files:[new File([state.pdfBlob],"document.pdf",{type:"application/pdf"})]}))}catch(e){return false}}
+function updateShareVisibility(){$("shareBtn").classList.toggle("hidden",!canShareFile())}
+async function sharePdf(){
+  if(!state.pdfBlob)return;
+  if(!canShareFile()){downloadPdf();return}
+  try{const f=new File([state.pdfBlob],escapeName($("filename").value),{type:"application/pdf"});await navigator.share({files:[f],title:f.name});}
+  catch(e){if(e&&e.name==="AbortError")return;toast("Sharing failed; starting download instead.");downloadPdf()}
+}
+function resetSettings(){
+  $("pageSize").value="A4";document.querySelector('input[name="orientation"][value="portrait"]').checked=true;$("marginPreset").value="small";$("background").value="#ffffff";$("fitMode").value="fit";$("quality").value="high";$("qualityRange").value=85;$("dpi").value="150";$("optimize").checked=true;$("filename").value="InstaPic-Images.pdf";$("customW").value=210;$("customH").value=297;$("customUnit").value="mm";$("fitW").value=150;$("fitH").value=100;$("hAlign").value="center";$("vAlign").value="center";$("mTop").value=$("mRight").value=$("mBottom").value=$("mLeft").value=10;
+  syncSettingsUI();updatePreview();updateStats();
+}
+function syncSettingsUI(){
+  state.pageSize=$("pageSize").value;state.orientation=document.querySelector('input[name="orientation"]:checked').value;state.marginPreset=$("marginPreset").value;state.background=$("background").value;state.fitMode=$("fitMode").value;state.quality=$("quality").value;state.customQuality=num("qualityRange",85)/100;state.dpi=num("dpi",150);state.optimize=$("optimize").checked;state.hAlign=$("hAlign").value;state.vAlign=$("vAlign").value;
+  state.customMargins={top:num("mTop",10),right:num("mRight",10),bottom:num("mBottom",10),left:num("mLeft",10)};state.customFit={w:num("fitW",150),h:num("fitH",100)};
+  $("customSize").classList.toggle("hidden",state.pageSize!=="CUSTOM");$("customMargins").classList.toggle("hidden",state.marginPreset!=="custom");$("customFit").classList.toggle("hidden",state.fitMode!=="custom");$("customQuality").classList.toggle("hidden",state.quality!=="custom");$("qualityValue").textContent=Math.round(state.customQuality*100)+"%";
+}
+function bind(){
+  $("selectBtn").onclick=()=>$("fileInput").click();$("addBtn").onclick=()=>$("fileInput").click();
+  $("fileInput").onchange=async e=>{await addFiles(e.target.files);e.target.value=""};
+  $("clearBtn").onclick=clearItems;$("resetTop").onclick=()=>{clearItems();resetSettings();$("engineError").classList.add("hidden");};
+  $("generateBtn").onclick=generate;$("cancelBtn").onclick=()=>{if(state.busy)state.cancelled=true};
+  $("downloadBtn").onclick=downloadPdf;$("shareBtn").onclick=sharePdf;$("previewBtn").onclick=openPdf;$("newPdfBtn").onclick=()=>{document.querySelector(".workspace").scrollIntoView({behavior:"smooth",block:"start"});toast("Settings remain available — change them and create again.")};
+  const upload=$("upload");["dragenter","dragover"].forEach(ev=>upload.addEventListener(ev,e=>{e.preventDefault();upload.classList.add("drag")}));["dragleave","drop"].forEach(ev=>upload.addEventListener(ev,e=>{e.preventDefault();upload.classList.remove("drag")}));upload.addEventListener("drop",e=>addFiles(e.dataTransfer.files));
+  document.addEventListener("dragover",e=>e.preventDefault());document.addEventListener("drop",e=>{if(!upload.contains(e.target))e.preventDefault()});
+  document.addEventListener("paste",e=>{const files=[];for(const item of e.clipboardData?.items||[]){if(item.kind==="file"){const f=item.getAsFile();if(f)files.push(f)}}if(files.length)addFiles(files)});
+  document.querySelectorAll("select,input").forEach(el=>el.addEventListener("input",()=>{syncSettingsUI();updatePreview();updateStats()}));
+  document.querySelectorAll("input[name=orientation]").forEach(el=>el.addEventListener("change",()=>{syncSettingsUI();updatePreview();updateStats()}));
+  $("filename").addEventListener("input",()=>{state.filename=$("filename").value});
+  window.addEventListener("beforeunload",()=>{state.items.forEach(revokeItem);revokePdf()});
+}
+bind();syncSettingsUI();updateStats();updateShareVisibility();
+})();
+</script>
 </body>
 </html>
