@@ -1,1753 +1,2424 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
-  >
-
-  <meta name="theme-color" content="#ffffff">
-
-  <title>Image Format Converter | InstaPic</title>
-
-  <!-- Telegram Mini App -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Font Awesome -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-  >
-
-  <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      min-height: 100%;
-
-      background: #ffffff;
-
-      font-family:
-        Inter,
-        Roboto,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-
-      color: #172033;
-    }
-
-    body {
-      min-height: 100vh;
-      min-height: 100dvh;
-      overflow-x: hidden;
-    }
-
-    button,
-    input,
-    select {
-      font-family: inherit;
-    }
-
-    button {
-      -webkit-user-select: none;
-      user-select: none;
-    }
-
-    .app {
-      width: 100%;
-      max-width: 620px;
-
-      margin: 0 auto;
-
-      padding:
-        calc(20px + env(safe-area-inset-top))
-        18px
-        calc(100px + env(safe-area-inset-bottom));
-    }
-
-    /* =========================
-       HEADER
-    ========================== */
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-
-      margin-bottom: 27px;
-    }
-
-    .logo {
-      width: 46px;
-      height: 46px;
-
-      flex: 0 0 46px;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      border-radius: 13px;
-
-      background: #eaf4ff;
-      color: #1d7edb;
-
-      font-size: 20px;
-    }
-
-    .brand-title {
-      margin: 0;
-
-      color: #1d7edb;
-
-      font-size: 21px;
-      line-height: 1.2;
-
-      font-weight: 750;
-
-      letter-spacing: -0.3px;
-    }
-
-    .brand-subtitle {
-      margin: 4px 0 0;
-
-      color: #8b95a3;
-
-      font-size: 12.5px;
-    }
-
-    /* =========================
-       SELECT BUTTON
-    ========================== */
-
-    .select-btn {
-      width: 100%;
-      min-height: 55px;
-
-      border: 0;
-      border-radius: 13px;
-
-      background: #1d7edb;
-      color: #ffffff;
-
-      font-size: 16px;
-      font-weight: 700;
-
-      cursor: pointer;
-
-      box-shadow:
-        0 6px 18px rgba(29, 126, 219, 0.18);
-
-      transition:
-        transform 0.12s ease,
-        opacity 0.15s ease;
-    }
-
-    .select-btn:active {
-      transform: scale(0.98);
-    }
-
-    /* =========================
-       EMPTY STATE
-    ========================== */
-
-    .empty-state {
-      margin-top: 20px;
-
-      padding: 30px 15px;
-
-      border: 1px dashed #dfe5eb;
-
-      border-radius: 13px;
-
-      text-align: center;
-
-      color: #9aa3af;
-
-      font-size: 13px;
-
-      line-height: 1.5;
-    }
-
-    .empty-state i {
-      display: block;
-
-      margin-bottom: 9px;
-
-      color: #b8c1cb;
-
-      font-size: 28px;
-    }
-
-    /* =========================
-       PREVIEW
-    ========================== */
-
-    .preview-card {
-      margin-top: 20px;
-
-      padding: 12px;
-
-      border: 1px solid #e3e8ed;
-
-      border-radius: 14px;
-
-      background: #ffffff;
-    }
-
-    .preview-image-wrap {
-      width: 100%;
-
-      min-height: 210px;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      overflow: hidden;
-
-      border-radius: 10px;
-
-      background:
-        linear-gradient(
-          45deg,
-          #f1f3f5 25%,
-          transparent 25%
-        ),
-        linear-gradient(
-          -45deg,
-          #f1f3f5 25%,
-          transparent 25%
-        ),
-        linear-gradient(
-          45deg,
-          transparent 75%,
-          #f1f3f5 75%
-        ),
-        linear-gradient(
-          -45deg,
-          transparent 75%,
-          #f1f3f5 75%
-        );
-
-      background-size: 20px 20px;
-
-      background-position:
-        0 0,
-        0 10px,
-        10px -10px,
-        -10px 0;
-    }
-
-    .preview-image {
-      display: block;
-
-      max-width: 100%;
-      max-height: 430px;
-
-      width: auto;
-      height: auto;
-
-      object-fit: contain;
-    }
-
-    .file-info {
-      display: flex;
-
-      align-items: center;
-      justify-content: space-between;
-
-      gap: 10px;
-
-      margin-top: 11px;
-    }
-
-    .file-name {
-      min-width: 0;
-
-      overflow: hidden;
-
-      color: #4f5b6b;
-
-      font-size: 12px;
-
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .format-badge {
-      flex: 0 0 auto;
-
-      padding: 5px 9px;
-
-      border-radius: 999px;
-
-      background: #edf7ff;
-
-      color: #1d7edb;
-
-      font-size: 11px;
-
-      font-weight: 750;
-    }
-
-    /* =========================
-       FORMAT SECTION
-    ========================== */
-
-    .section-title {
-      margin-top: 20px;
-
-      color: #303846;
-
-      font-size: 14px;
-
-      font-weight: 700;
-    }
-
-    .format-grid {
-      display: grid;
-
-      grid-template-columns:
-        repeat(3, minmax(0, 1fr));
-
-      gap: 9px;
-
-      margin-top: 10px;
-    }
-
-    .format-btn {
-      min-height: 47px;
-
-      border-radius: 10px;
-
-      border: 1px solid #dfe4ea;
-
-      background: #ffffff;
-
-      color: #596575;
-
-      font-size: 13px;
-
-      font-weight: 750;
-
-      cursor: pointer;
-
-      transition:
-        all 0.15s ease;
-    }
-
-    .format-btn:active {
-      transform: scale(0.97);
-    }
-
-    .format-btn.active {
-      border-color: #1d7edb;
-
-      background: #edf7ff;
-
-      color: #1d7edb;
-    }
-
-    /* =========================
-       CONVERT BUTTON
-    ========================== */
-
-    .convert-btn {
-      width: 100%;
-
-      min-height: 53px;
-
-      margin-top: 19px;
-
-      border: 0;
-
-      border-radius: 12px;
-
-      background: #10b981;
-
-      color: #ffffff;
-
-      font-size: 15px;
-
-      font-weight: 750;
-
-      cursor: pointer;
-
-      box-shadow:
-        0 6px 18px rgba(16, 185, 129, 0.16);
-
-      transition:
-        transform 0.12s ease,
-        opacity 0.15s ease;
-    }
-
-    .convert-btn:active {
-      transform: scale(0.98);
-    }
-
-    .convert-btn:disabled {
-      opacity: 0.65;
-
-      cursor: not-allowed;
-    }
-
-    /* =========================
-       LOADING SPINNER
-    ========================== */
-
-    .spinner {
-      display: inline-block;
-
-      width: 18px;
-      height: 18px;
-
-      margin-right: 7px;
-
-      vertical-align: -4px;
-
-      border:
-        2px solid
-        rgba(255, 255, 255, 0.4);
-
-      border-top-color: #ffffff;
-
-      border-radius: 50%;
-
-      animation:
-        spin 0.7s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    /* =========================
-       SECURITY INFO
-    ========================== */
-
-    .info-box {
-      margin-top: 12px;
-
-      padding: 11px 12px;
-
-      border-radius: 10px;
-
-      border: 1px solid #e4f0fb;
-
-      background: #f7fbff;
-
-      color: #738091;
-
-      font-size: 12px;
-
-      line-height: 1.5;
-    }
-
-    /* =========================
-       BOTTOM TELEGRAM SPACE
-    ========================== */
-
-    .bottom-space {
-      height: 96px;
-    }
-
-    @media (max-width: 380px) {
-
-      .app {
-        padding-left: 14px;
-        padding-right: 14px;
-      }
-
-      .brand-title {
-        font-size: 19px;
-      }
-
-      .preview-image-wrap {
-        min-height: 180px;
-      }
-
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1d7edb">
+<meta name="color-scheme" content="light">
+<title>InstaPic | Image Format Converter</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+:root{
+  --blue:#1d7edb;
+  --blue-dark:#1265b1;
+  --green:#10b981;
+  --text:#172033;
+  --muted:#687386;
+  --border:#e5eaf0;
+  --bg:#f6f8fb;
+  --card:#fff;
+  --danger:#dc3545;
+  --shadow:0 10px 30px rgba(20,40,70,.08);
+  --radius:20px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;min-height:100%;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:var(--bg)}
+body{padding-bottom:env(safe-area-inset-bottom)}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed;opacity:.55}
+.app{width:100%;max-width:1120px;margin:auto;padding:16px}
+.header{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-bottom:18px;padding:8px 2px
+}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{
+  width:42px;height:42px;border-radius:13px;
+  display:grid;place-items:center;color:#fff;font-weight:900;font-size:18px;
+  background:linear-gradient(135deg,var(--blue),var(--green));
+  box-shadow:0 8px 20px rgba(29,126,219,.2)
+}
+.header h1{font-size:20px;margin:0}
+.header p{font-size:12px;color:var(--muted);margin:3px 0 0}
+.telegram-badge{
+  display:none;padding:7px 10px;border-radius:999px;background:#eaf5ff;
+  color:var(--blue);font-size:11px;font-weight:800
+}
+.card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:20px;margin-bottom:16px
+}
+.upload{
+  border:2px dashed #cfd9e5;border-radius:18px;padding:28px 18px;text-align:center;
+  transition:.2s;background:#fbfdff
+}
+.upload.drag{border-color:var(--blue);background:#edf7ff;transform:scale(1.005)}
+.upload-icon{
+  width:56px;height:56px;border-radius:18px;margin:0 auto 12px;
+  display:grid;place-items:center;background:#eaf5ff;color:var(--blue);font-size:25px
+}
+.upload h2{font-size:19px;margin:5px 0}
+.upload p{color:var(--muted);font-size:13px;margin:7px 0 15px}
+.file-buttons{display:flex;justify-content:center;flex-wrap:wrap;gap:8px}
+.btn{
+  border:0;border-radius:12px;padding:12px 16px;font-weight:750;
+  min-height:44px;transition:.15s
+}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--blue);color:white}
+.btn-primary:hover{background:var(--blue-dark)}
+.btn-secondary{background:#eef3f7;color:#243143}
+.btn-green{background:var(--green);color:#fff}
+.btn-danger{background:#fff0f1;color:var(--danger)}
+.btn-outline{background:#fff;border:1px solid var(--border);color:#26364a}
+.btn-small{min-height:38px;padding:9px 12px;font-size:13px}
+.hidden{display:none!important}
+.status{
+  display:none;margin-top:14px;padding:11px 13px;border-radius:12px;
+  background:#edf7ff;color:#165f96;font-size:13px
+}
+.status.show{display:block}
+.status.error{background:#fff1f2;color:#a52331}
+.status.success{background:#ecfdf5;color:#08774f}
+.section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.section-title h2{font-size:16px;margin:0}
+.section-title span{font-size:12px;color:var(--muted)}
+.info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.info{
+  border:1px solid var(--border);border-radius:14px;padding:12px;background:#fbfcfe
+}
+.info .label{font-size:11px;color:var(--muted);margin-bottom:5px}
+.info .value{font-size:14px;font-weight:750;overflow-wrap:anywhere}
+.preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.preview-card{border:1px solid var(--border);border-radius:17px;overflow:hidden;background:#fff}
+.preview-head{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.preview-head strong{font-size:13px}
+.preview-head span{font-size:11px;color:var(--muted)}
+.preview-stage{
+  min-height:230px;display:grid;place-items:center;padding:14px;
+  background-image:
+    linear-gradient(45deg,#f0f2f5 25%,transparent 25%),
+    linear-gradient(-45deg,#f0f2f5 25%,transparent 25%),
+    linear-gradient(45deg,transparent 75%,#f0f2f5 75%),
+    linear-gradient(-45deg,transparent 75%,#f0f2f5 75%);
+  background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0
+}
+.preview-stage img{display:block;max-width:100%;max-height:360px;width:auto;height:auto;object-fit:contain;border-radius:8px}
+.preview-meta{padding:12px 14px;font-size:12px;color:var(--muted)}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.setting{border:1px solid var(--border);border-radius:16px;padding:15px;background:#fff}
+.setting.full{grid-column:1/-1}
+.setting h3{font-size:13px;margin:0 0 12px}
+label.field-label{display:block;font-size:12px;font-weight:700;margin-bottom:6px}
+select,input[type="number"],input[type="text"]{
+  width:100%;height:44px;border:1px solid #dbe2ea;border-radius:11px;
+  padding:0 12px;background:#fff;color:var(--text);outline:none
+}
+select:focus,input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(29,126,219,.1)}
+.format-options{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.format-option{position:relative}
+.format-option input{position:absolute;opacity:0;pointer-events:none}
+.format-option label{
+  display:flex;justify-content:center;align-items:center;min-height:46px;
+  border:1px solid var(--border);border-radius:12px;font-size:13px;font-weight:750;
+  cursor:pointer;background:#fff
+}
+.format-option input:checked+label{border-color:var(--blue);background:#edf7ff;color:var(--blue)}
+.format-option.disabled label{opacity:.45;cursor:not-allowed}
+.range-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.range-value{font-weight:800;color:var(--blue);font-size:14px}
+input[type="range"]{width:100%;accent-color:var(--blue);margin:12px 0}
+.range-labels{display:flex;justify-content:space-between;color:var(--muted);font-size:10px}
+.quality-label{font-size:12px;color:var(--muted);margin-top:3px}
+.radio-row{display:flex;gap:12px;flex-wrap:wrap}
+.radio{
+  display:flex;align-items:center;gap:7px;font-size:12px;font-weight:650
+}
+.check{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:650;margin-top:11px}
+.check input{width:18px;height:18px;accent-color:var(--blue)}
+.inline-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.resize-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ratio-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.ratio-btn{
+  border:1px solid var(--border);background:#fff;border-radius:9px;
+  padding:7px 10px;font-size:11px;font-weight:700
+}
+.ratio-btn.active{border-color:var(--blue);background:#edf7ff;color:var(--blue)}
+.helper{font-size:11px;color:var(--muted);line-height:1.5;margin-top:8px}
+.warning{
+  background:#fff8e8;border:1px solid #f6df9d;color:#795a0b;
+  border-radius:12px;padding:11px;font-size:12px;line-height:1.45;margin-top:10px
+}
+.advanced-toggle{
+  width:100%;border:0;background:transparent;text-align:left;padding:0;
+  font-weight:800;font-size:13px;color:var(--blue)
+}
+.advanced-content{margin-top:14px}
+.target-row{display:grid;grid-template-columns:1fr 120px;gap:9px}
+.progress-card{display:none}
+.progress-card.show{display:block}
+.progress-title{font-weight:800;font-size:14px}
+.progress-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.progress-track{height:9px;background:#e9eef3;border-radius:999px;overflow:hidden;margin-top:14px}
+.progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .2s}
+.result-card{display:none}
+.result-card.show{display:block}
+.result-top{
+  padding:14px;border-radius:15px;background:#ecfdf5;border:1px solid #c8f2df;
+  margin-bottom:15px
+}
+.result-top strong{color:#08774f}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.stat{padding:12px;border-radius:13px;background:#f8fafc;border:1px solid var(--border)}
+.stat .label{font-size:10px;color:var(--muted)}
+.stat .value{font-weight:850;font-size:14px;margin-top:4px}
+.action-row{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}
+.action-row .btn{flex:1;min-width:140px}
+.batch-results{display:none}
+.batch-results.show{display:block}
+.batch-item{
+  display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;
+  padding:12px;border:1px solid var(--border);border-radius:13px;margin-top:8px
+}
+.batch-name{font-weight:750;font-size:12px;overflow-wrap:anywhere}
+.batch-info{font-size:11px;color:var(--muted);margin-top:3px}
+.batch-ok{color:#078257;font-weight:800;font-size:11px}
+.batch-error{color:var(--danger);font-weight:800;font-size:11px}
+.batch-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.drop-note{font-size:11px;color:var(--muted);margin-top:12px}
+.footer{text-align:center;color:#8a94a3;font-size:11px;padding:10px 0 24px}
+.toast{
+  position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));
+  transform:translate(-50%,20px);opacity:0;pointer-events:none;
+  background:#172033;color:#fff;border-radius:12px;padding:11px 15px;
+  font-size:12px;z-index:9999;transition:.2s;max-width:90vw;text-align:center
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:760px){
+  .app{padding:12px}
+  .card{padding:15px;border-radius:17px}
+  .preview-grid,.settings-grid{grid-template-columns:1fr}
+  .setting.full{grid-column:auto}
+  .info-grid{grid-template-columns:1fr 1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .preview-stage{min-height:190px}
+  .header h1{font-size:17px}
+}
+@media(max-width:430px){
+  .format-options{grid-template-columns:1fr}
+  .target-row{grid-template-columns:1fr 100px}
+  .action-row .btn{min-width:100%;flex:auto}
+}
+</style>
 </head>
 
 <body>
+<div class="app">
 
-  <main class="app">
+<header class="header">
+  <div class="brand">
+    <div class="logo">IP</div>
+    <div>
+      <h1>Image Format Converter</h1>
+      <p>Convert JPG, PNG & WebP locally in your browser</p>
+    </div>
+  </div>
+  <div id="telegramBadge" class="telegram-badge">Telegram Mini App</div>
+</header>
 
-    <!-- =========================
-         HEADER
-    ========================== -->
+<section class="card">
+  <div id="uploadArea" class="upload">
+    <div class="upload-icon">↥</div>
+    <h2>Select images</h2>
+    <p>Convert images privately. Files stay on your device.</p>
 
-    <header class="brand">
-
-      <div class="logo">
-        <i class="fa-solid fa-images"></i>
-      </div>
-
-      <div>
-
-        <h1 class="brand-title">
-          Image Format Converter
-        </h1>
-
-        <p class="brand-subtitle">
-          Fast, Simple &amp; 100% Client-Side
-        </p>
-
-      </div>
-
-    </header>
-
-
-    <!-- =========================
-         FILE INPUT
-    ========================== -->
-
-    <input
-      id="imageInput"
-      type="file"
-      accept="image/jpeg,image/png,image/webp"
-      hidden
-    >
-
-
-    <!-- =========================
-         SELECT PHOTO
-    ========================== -->
-
-    <button
-      id="selectBtn"
-      class="select-btn"
-      type="button"
-    >
-
-      <i class="fa-solid fa-folder-open mr-2"></i>
-
-      Select Photo
-
-    </button>
-
-
-    <!-- =========================
-         EMPTY STATE
-    ========================== -->
-
-    <div
-      id="emptyState"
-      class="empty-state"
-    >
-
-      <i class="fa-regular fa-image"></i>
-
-      Select an image to convert its format.
-
+    <div class="file-buttons">
+      <button id="selectBtn" class="btn btn-primary">Choose Images</button>
+      <button id="pasteBtn" class="btn btn-secondary hidden">Paste Image</button>
     </div>
 
+    <input id="fileInput" type="file" accept="image/*" multiple class="hidden">
+    <div class="drop-note">Desktop: drag & drop • Ctrl/Cmd + V to paste where supported</div>
+  </div>
 
-    <!-- =========================
-         CONVERTER
-    ========================== -->
+  <div id="status" class="status" role="status" aria-live="polite"></div>
+</section>
 
-    <section
-      id="converterSection"
-      class="hidden"
-    >
+<section id="originalSection" class="card hidden">
+  <div class="section-title">
+    <h2>Original Image</h2>
+    <span id="selectionCount"></span>
+  </div>
 
-      <!-- PREVIEW -->
+  <div class="preview-grid">
+    <div class="preview-card">
+      <div class="preview-head">
+        <strong>ORIGINAL</strong>
+        <span id="originalFormatBadge">—</span>
+      </div>
+      <div class="preview-stage">
+        <img id="originalPreview" alt="Original image preview">
+      </div>
+      <div class="preview-meta" id="originalPreviewMeta">—</div>
+    </div>
 
-      <div class="preview-card">
+    <div class="preview-card">
+      <div class="preview-head">
+        <strong>FILE INFORMATION</strong>
+        <span>Real file data</span>
+      </div>
+      <div style="padding:14px">
+        <div class="info-grid">
+          <div class="info"><div class="label">Filename</div><div id="infoName" class="value">—</div></div>
+          <div class="info"><div class="label">Format</div><div id="infoFormat" class="value">—</div></div>
+          <div class="info"><div class="label">Dimensions</div><div id="infoDimensions" class="value">—</div></div>
+          <div class="info"><div class="label">Original Size</div><div id="infoSize" class="value">—</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-        <div class="preview-image-wrap">
+<section id="settingsSection" class="card hidden">
+  <div class="section-title">
+    <h2>Conversion Settings</h2>
+    <span>Client-side processing</span>
+  </div>
 
-          <img
-            id="imagePreview"
-            class="preview-image"
-            alt="Selected image preview"
-            draggable="false"
-          >
+  <div class="settings-grid">
 
+    <div class="setting">
+      <h3>Output Format</h3>
+      <div class="format-options">
+        <div class="format-option">
+          <input type="radio" name="format" id="fmtJpeg" value="image/jpeg" checked>
+          <label for="fmtJpeg">JPEG</label>
+        </div>
+        <div class="format-option" id="webpOption">
+          <input type="radio" name="format" id="fmtWebp" value="image/webp">
+          <label for="fmtWebp">WebP</label>
+        </div>
+        <div class="format-option">
+          <input type="radio" name="format" id="fmtPng" value="image/png">
+          <label for="fmtPng">PNG</label>
+        </div>
+      </div>
+      <div id="webpSupportText" class="helper"></div>
+    </div>
+
+    <div class="setting" id="qualitySetting">
+      <h3>Quality</h3>
+      <div class="range-row">
+        <span style="font-size:12px;font-weight:700">Encoding Quality</span>
+        <span id="qualityValue" class="range-value">80%</span>
+      </div>
+      <input id="qualitySlider" type="range" min="0" max="100" value="80" step="1" aria-label="Encoding quality">
+      <div class="range-labels"><span>Low</span><span>High</span></div>
+      <div id="qualityLabel" class="quality-label">High</div>
+      <div id="pngQualityNote" class="helper hidden">PNG uses lossless browser encoding. The JPEG/WebP quality slider does not control PNG compression.</div>
+    </div>
+
+    <div class="setting hidden" id="webpModeSetting">
+      <h3>WebP Encoding</h3>
+      <div class="radio-row">
+        <label class="radio"><input type="radio" name="webpMode" value="lossy" checked> Lossy</label>
+        <label class="radio"><input type="radio" name="webpMode" value="lossless"> Lossless</label>
+      </div>
+      <div class="helper">Lossless WebP ignores the lossy quality slider.</div>
+    </div>
+
+    <div class="setting">
+      <h3>Conversion Preset</h3>
+      <select id="presetSelect" aria-label="Conversion preset">
+        <option value="standard">Standard — Balanced</option>
+        <option value="high">High Quality</option>
+        <option value="small">Small File</option>
+        <option value="custom">Custom</option>
+      </select>
+      <div class="helper">Presets only change conversion settings. You remain in control.</div>
+    </div>
+
+    <div class="setting full">
+      <h3>Resize Image</h3>
+      <label class="check">
+        <input type="checkbox" id="resizeEnabled">
+        Enable resize
+      </label>
+
+      <div id="resizeControls" class="hidden" style="margin-top:12px">
+        <div class="resize-row">
+          <div>
+            <label class="field-label" for="widthInput">Width (px)</label>
+            <input id="widthInput" type="number" min="1" max="16384">
+          </div>
+          <div>
+            <label class="field-label" for="heightInput">Height (px)</label>
+            <input id="heightInput" type="number" min="1" max="16384">
+          </div>
         </div>
 
+        <label class="check">
+          <input type="checkbox" id="lockAspect" checked>
+          Lock aspect ratio
+        </label>
 
-        <div class="file-info">
-
-          <div
-            id="fileName"
-            class="file-name"
-          >
-            image
-          </div>
-
-
-          <div
-            id="currentFormat"
-            class="format-badge"
-          >
-            JPEG
-          </div>
-
+        <div class="ratio-row" aria-label="Aspect ratio presets">
+          <button class="ratio-btn active" data-ratio="original">Original</button>
+          <button class="ratio-btn" data-ratio="1:1">1:1</button>
+          <button class="ratio-btn" data-ratio="4:3">4:3</button>
+          <button class="ratio-btn" data-ratio="3:2">3:2</button>
+          <button class="ratio-btn" data-ratio="16:9">16:9</button>
+          <button class="ratio-btn" data-ratio="9:16">9:16</button>
         </div>
 
+        <div style="margin-top:12px">
+          <label class="field-label" for="maxDimension">Maximum Dimension</label>
+          <select id="maxDimension">
+            <option value="">No limit</option>
+            <option value="3840">3840 px</option>
+            <option value="2560">2560 px</option>
+            <option value="1920">1920 px</option>
+            <option value="1280">1280 px</option>
+            <option value="1080">1080 px</option>
+            <option value="720">720 px</option>
+            <option value="custom">Custom dimensions above</option>
+          </select>
+        </div>
       </div>
+    </div>
 
-
-      <!-- FORMAT PICKER -->
-
-      <div class="section-title">
-        Convert to Format:
-      </div>
-
-
-      <div
-        id="formatGrid"
-        class="format-grid"
-      >
-
-        <button
-          type="button"
-          class="format-btn active"
-          data-format="jpg"
-        >
-          JPG
-        </button>
-
-        <button
-          type="button"
-          class="format-btn"
-          data-format="png"
-        >
-          PNG
-        </button>
-
-        <button
-          type="button"
-          class="format-btn"
-          data-format="webp"
-        >
-          WebP
-        </button>
-
-      </div>
-
-
-      <!-- CONVERT -->
-
-      <button
-        id="convertBtn"
-        class="convert-btn"
-        type="button"
-      >
-
-        <i class="fa-solid fa-arrows-rotate mr-2"></i>
-
-        Convert &amp; Download
-
+    <div class="setting full">
+      <button id="advancedToggle" class="advanced-toggle" type="button">
+        ＋ Advanced Settings
       </button>
 
+      <div id="advancedContent" class="advanced-content hidden">
+        <label class="check">
+          <input type="checkbox" id="targetEnabled">
+          Enable target file size
+        </label>
 
-      <!-- SECURITY -->
+        <div id="targetControls" class="hidden" style="margin-top:12px">
+          <div class="target-row">
+            <input id="targetValue" type="number" min="1" step="1" value="500" aria-label="Target file size">
+            <select id="targetUnit" aria-label="Target unit">
+              <option value="1024">KB</option>
+              <option value="1048576">MB</option>
+            </select>
+          </div>
 
-      <div class="info-box">
+          <label class="check">
+            <input type="checkbox" id="smartResizeFallback">
+            Allow Smart Resize fallback when target cannot be reached
+          </label>
 
-        <i class="fa-solid fa-shield-halved mr-1"></i>
+          <div class="helper">
+            Target size is a maximum, not a guarantee. The converter searches for the highest practical quality at or below the target.
+          </div>
+        </div>
 
-        Your image never leaves this device.
-        Conversion happens locally inside the browser.
+        <label class="check">
+          <input type="checkbox" id="metadataRemoval" checked>
+          Re-encode image to remove browser-preserved source metadata where the canvas pipeline strips it
+        </label>
 
+        <div id="backgroundControls" style="margin-top:14px">
+          <h3 style="margin-bottom:8px">JPEG Transparency Background</h3>
+          <div class="radio-row">
+            <label class="radio"><input type="radio" name="bg" value="#ffffff" checked> White</label>
+            <label class="radio"><input type="radio" name="bg" value="#000000"> Black</label>
+            <label class="radio"><input type="radio" name="bg" value="custom"> Custom</label>
+          </div>
+          <input id="bgColor" type="color" value="#ffffff" style="width:100%;height:42px;margin-top:9px;border:1px solid var(--border);border-radius:10px">
+          <div id="transparencyNotice" class="helper">Transparency will be checked after decoding.</div>
+        </div>
       </div>
+    </div>
 
-    </section>
+  </div>
 
+  <div class="warning hidden" id="largeImageWarning">
+    <strong>Large image detected.</strong><br>
+    This image has very high resolution and may require significant memory. Consider enabling resize or Smart Resize.
+  </div>
 
-    <!-- TELEGRAM SAFE BOTTOM SPACE -->
+  <div class="action-row">
+    <button id="convertBtn" class="btn btn-primary">Convert Image</button>
+    <button id="cancelBtn" class="btn btn-danger hidden">Cancel</button>
+    <button id="resetBtn" class="btn btn-secondary">Reset</button>
+  </div>
+</section>
 
-    <div class="bottom-space"></div>
+<section id="progressCard" class="card progress-card" aria-live="polite">
+  <div class="progress-title" id="progressTitle">Preparing image...</div>
+  <div class="progress-sub" id="progressSub">Please wait.</div>
+  <div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
+</section>
 
-  </main>
+<section id="resultSection" class="card result-card">
+  <div class="result-top">
+    <strong>✓ Conversion Complete</strong>
+    <div id="resultSummary" style="font-size:12px;color:#286b55;margin-top:4px">Your converted file is ready.</div>
+  </div>
 
+  <div class="preview-grid">
+    <div class="preview-card">
+      <div class="preview-head">
+        <strong>ORIGINAL</strong>
+        <span id="resultOriginalFormat">—</span>
+      </div>
+      <div class="preview-stage"><img id="resultOriginalPreview" alt="Original preview"></div>
+      <div class="preview-meta" id="resultOriginalMeta">—</div>
+    </div>
 
-  <script>
-    (() => {
+    <div class="preview-card">
+      <div class="preview-head">
+        <strong>CONVERTED</strong>
+        <span id="resultOutputFormat">—</span>
+      </div>
+      <div class="preview-stage"><img id="resultPreview" alt="Converted image preview"></div>
+      <div class="preview-meta" id="resultOutputMeta">—</div>
+    </div>
+  </div>
 
-      "use strict";
+  <div style="margin-top:15px">
+    <div class="stats">
+      <div class="stat"><div class="label">Original</div><div id="statOriginal" class="value">—</div></div>
+      <div class="stat"><div class="label">Converted</div><div id="statOutput" class="value">—</div></div>
+      <div class="stat"><div class="label">Saved / Difference</div><div id="statSaved" class="value">—</div></div>
+      <div class="stat"><div class="label">Reduction</div><div id="statReduction" class="value">—</div></div>
+    </div>
+  </div>
 
+  <div class="action-row">
+    <button id="downloadCurrentBtn" class="btn btn-primary">Download</button>
+    <button id="shareCurrentBtn" class="btn btn-green hidden">Share / Save</button>
+  </div>
+</section>
 
-      /* =====================================================
-         TELEGRAM MINI APP
-      ===================================================== */
+<section id="batchSection" class="card batch-results">
+  <div class="section-title">
+    <h2>Batch Results</h2>
+    <span id="batchSummary">—</span>
+  </div>
+  <div id="batchList"></div>
+  <div class="action-row">
+    <button id="zipBtn" class="btn btn-primary">Download All as ZIP</button>
+    <button id="batchResetBtn" class="btn btn-secondary">Clear Results</button>
+  </div>
+</section>
 
-      const tg =
-        window.Telegram &&
-        window.Telegram.WebApp;
+<div class="footer">
+  InstaPic • Image processing happens locally in your browser
+</div>
+</div>
 
+<div id="toast" class="toast"></div>
 
-      if (tg) {
+<script>
+"use strict";
 
-        try {
+/* =========================================================
+   TELEGRAM
+========================================================= */
+const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+if (tg) {
+  try {
+    tg.ready();
+    if (typeof tg.expand === "function") tg.expand();
+    document.getElementById("telegramBadge").style.display = "block";
+  } catch (_) {}
+}
 
-          tg.ready();
+/* =========================================================
+   DOM
+========================================================= */
+const $ = id => document.getElementById(id);
 
-          tg.expand();
+const els = {
+  uploadArea:$("uploadArea"),
+  selectBtn:$("selectBtn"),
+  pasteBtn:$("pasteBtn"),
+  fileInput:$("fileInput"),
+  status:$("status"),
 
+  originalSection:$("originalSection"),
+  settingsSection:$("settingsSection"),
+  originalPreview:$("originalPreview"),
+  originalPreviewMeta:$("originalPreviewMeta"),
+  selectionCount:$("selectionCount"),
+  originalFormatBadge:$("originalFormatBadge"),
+  infoName:$("infoName"),
+  infoFormat:$("infoFormat"),
+  infoDimensions:$("infoDimensions"),
+  infoSize:$("infoSize"),
 
-          if (
-            typeof tg.setHeaderColor ===
-            "function"
-          ) {
+  fmtJpeg:$("fmtJpeg"),
+  fmtPng:$("fmtPng"),
+  fmtWebp:$("fmtWebp"),
+  webpOption:$("webpOption"),
+  webpSupportText:$("webpSupportText"),
+  qualitySetting:$("qualitySetting"),
+  qualitySlider:$("qualitySlider"),
+  qualityValue:$("qualityValue"),
+  qualityLabel:$("qualityLabel"),
+  pngQualityNote:$("pngQualityNote"),
+  webpModeSetting:$("webpModeSetting"),
 
-            tg.setHeaderColor(
-              "#ffffff"
-            );
+  presetSelect:$("presetSelect"),
+  resizeEnabled:$("resizeEnabled"),
+  resizeControls:$("resizeControls"),
+  widthInput:$("widthInput"),
+  heightInput:$("heightInput"),
+  lockAspect:$("lockAspect"),
+  maxDimension:$("maxDimension"),
 
-          }
+  advancedToggle:$("advancedToggle"),
+  advancedContent:$("advancedContent"),
+  targetEnabled:$("targetEnabled"),
+  targetControls:$("targetControls"),
+  targetValue:$("targetValue"),
+  targetUnit:$("targetUnit"),
+  smartResizeFallback:$("smartResizeFallback"),
+  metadataRemoval:$("metadataRemoval"),
+  backgroundControls:$("backgroundControls"),
+  transparencyNotice:$("transparencyNotice"),
+  bgColor:$("bgColor"),
 
+  largeImageWarning:$("largeImageWarning"),
 
-          if (
-            typeof tg.setBackgroundColor ===
-            "function"
-          ) {
+  convertBtn:$("convertBtn"),
+  cancelBtn:$("cancelBtn"),
+  resetBtn:$("resetBtn"),
 
-            tg.setBackgroundColor(
-              "#ffffff"
-            );
+  progressCard:$("progressCard"),
+  progressTitle:$("progressTitle"),
+  progressSub:$("progressSub"),
+  progressBar:$("progressBar"),
 
-          }
+  resultSection:$("resultSection"),
+  resultSummary:$("resultSummary"),
+  resultOriginalPreview:$("resultOriginalPreview"),
+  resultPreview:$("resultPreview"),
+  resultOriginalFormat:$("resultOriginalFormat"),
+  resultOutputFormat:$("resultOutputFormat"),
+  resultOriginalMeta:$("resultOriginalMeta"),
+  resultOutputMeta:$("resultOutputMeta"),
+  statOriginal:$("statOriginal"),
+  statOutput:$("statOutput"),
+  statSaved:$("statSaved"),
+  statReduction:$("statReduction"),
+  downloadCurrentBtn:$("downloadCurrentBtn"),
+  shareCurrentBtn:$("shareCurrentBtn"),
 
+  batchSection:$("batchSection"),
+  batchSummary:$("batchSummary"),
+  batchList:$("batchList"),
+  zipBtn:$("zipBtn"),
+  batchResetBtn:$("batchResetBtn"),
 
-          if (
-            typeof tg.setBottomBarColor ===
-            "function"
-          ) {
+  toast:$("toast")
+};
 
-            tg.setBottomBarColor(
-              "#ffffff"
-            );
+/* =========================================================
+   STATE
+========================================================= */
+const state = {
+  files: [],
+  currentFile: null,
+  sourceImage: null,
+  sourceObjectUrl: null,
+  sourceDimensions: null,
+  hasTransparency: false,
+  output: null,
+  batchResults: [],
+  processing: false,
+  cancelRequested: false,
+  jobId: 0,
+  lastPreviewJob: 0,
+  webpSupported: false,
+  currentOutputFormat: "image/jpeg"
+};
 
-          }
+/* =========================================================
+   UTILITIES
+========================================================= */
+function showToast(message) {
+  els.toast.textContent = message;
+  els.toast.classList.add("show");
+  clearTimeout(showToast.timer);
+  showToast.timer = setTimeout(() => els.toast.classList.remove("show"), 2800);
+}
 
-        } catch (error) {
+function setStatus(message, type="") {
+  els.status.textContent = message;
+  els.status.className = "status show " + type;
+}
 
-          console.warn(
-            "Telegram WebApp setup:",
-            error
-          );
+function clearStatus() {
+  els.status.textContent = "";
+  els.status.className = "status";
+}
 
-        }
+function formatBytes(bytes) {
+  if (!Number.isFinite(bytes) || bytes < 0) return "—";
+  if (bytes < 1024) return bytes + " B";
+  const units = ["KB","MB","GB"];
+  let value = bytes / 1024;
+  let i = 0;
+  while (value >= 1024 && i < units.length - 1) {
+    value /= 1024;
+    i++;
+  }
+  const decimals = value >= 100 ? 0 : value >= 10 ? 1 : 2;
+  return value.toFixed(decimals) + " " + units[i];
+}
 
+function formatPercent(n) {
+  return Number.isFinite(n) ? n.toFixed(1) + "%" : "—";
+}
+
+function extensionForMime(mime) {
+  if (mime === "image/jpeg") return "jpg";
+  if (mime === "image/png") return "png";
+  if (mime === "image/webp") return "webp";
+  return "img";
+}
+
+function formatNameFromMime(mime) {
+  if (mime === "image/jpeg") return "JPEG";
+  if (mime === "image/png") return "PNG";
+  if (mime === "image/webp") return "WebP";
+  if (mime === "image/gif") return "GIF";
+  if (mime === "image/avif") return "AVIF";
+  if (mime === "image/bmp") return "BMP";
+  return mime || "Unknown";
+}
+
+function safeBaseName(filename) {
+  const original = String(filename || "image");
+  const noExt = original.replace(/\.[^.]+$/, "");
+  const cleaned = noExt
+    .replace(/[<>:"/\\|?*\x00-\x1F]/g, "_")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/[. ]+$/g, "");
+  return (cleaned || "image").slice(0, 160);
+}
+
+function outputFilename(sourceName, mime) {
+  return safeBaseName(sourceName) + "." + extensionForMime(mime);
+}
+
+function mimeMatches(blob, mime) {
+  return blob instanceof Blob &&
+    blob.size > 0 &&
+    String(blob.type).toLowerCase() === mime;
+}
+
+function qualityLabel(value) {
+  value = Number(value);
+  if (value <= 30) return "Very Low";
+  if (value <= 50) return "Low";
+  if (value <= 70) return "Balanced";
+  if (value <= 85) return "High";
+  return "Very High";
+}
+
+function isProbablyImage(file) {
+  if (!file) return false;
+  return file.type.startsWith("image/") ||
+    /\.(jpe?g|png|webp|gif|bmp|avif)$/i.test(file.name);
+}
+
+function isAnimatedGif(file) {
+  return file && file.type === "image/gif";
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/* =========================================================
+   WEBP SUPPORT
+========================================================= */
+function detectWebPEncoding() {
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 2;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return Promise.resolve(false);
+
+  ctx.fillStyle = "#10b981";
+  ctx.fillRect(0,0,2,2);
+
+  return new Promise(resolve => {
+    try {
+      canvas.toBlob(blob => resolve(!!blob && blob.type === "image/webp"), "image/webp", .8);
+    } catch (_) {
+      resolve(false);
+    }
+  });
+}
+
+/* =========================================================
+   FILE DECODE
+========================================================= */
+async function decodeImage(file) {
+  if (!file || !isProbablyImage(file)) {
+    throw new Error("unsupported");
+  }
+
+  if (typeof createImageBitmap === "function") {
+    try {
+      const bitmap = await createImageBitmap(file, {
+        imageOrientation: "from-image",
+        premultiplyAlpha: "default"
+      });
+      return bitmap;
+    } catch (_) {}
+  }
+
+  return await new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(img);
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("decode"));
+    };
+
+    img.src = url;
+  });
+}
+
+function closeImage(image) {
+  if (image && typeof image.close === "function") {
+    try { image.close(); } catch (_) {}
+  }
+}
+
+/* =========================================================
+   TRANSPARENCY DETECTION
+========================================================= */
+async function detectTransparency(image) {
+  const w = image.width || image.naturalWidth;
+  const h = image.height || image.naturalHeight;
+  if (!w || !h) return false;
+
+  const max = 500;
+  const scale = Math.min(1, max / Math.max(w,h));
+  const cw = Math.max(1, Math.round(w * scale));
+  const ch = Math.max(1, Math.round(h * scale));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = cw;
+  canvas.height = ch;
+
+  const ctx = canvas.getContext("2d", {willReadFrequently:true});
+  if (!ctx) return false;
+
+  try {
+    ctx.clearRect(0,0,cw,ch);
+    ctx.drawImage(image,0,0,cw,ch);
+    const pixels = ctx.getImageData(0,0,cw,ch).data;
+
+    for (let i=3; i<pixels.length; i+=4) {
+      if (pixels[i] < 255) {
+        canvas.width = canvas.height = 1;
+        return true;
       }
-
-
-      /* =====================================================
-         DOM ELEMENTS
-      ===================================================== */
-
-      const imageInput =
-        document.getElementById(
-          "imageInput"
-        );
-
-      const selectBtn =
-        document.getElementById(
-          "selectBtn"
-        );
-
-      const emptyState =
-        document.getElementById(
-          "emptyState"
-        );
-
-      const converterSection =
-        document.getElementById(
-          "converterSection"
-        );
-
-      const imagePreview =
-        document.getElementById(
-          "imagePreview"
-        );
-
-      const fileName =
-        document.getElementById(
-          "fileName"
-        );
-
-      const currentFormat =
-        document.getElementById(
-          "currentFormat"
-        );
-
-      const formatGrid =
-        document.getElementById(
-          "formatGrid"
-        );
-
-      const convertBtn =
-        document.getElementById(
-          "convertBtn"
-        );
-
-
-      /* =====================================================
-         STATE
-      ===================================================== */
-
-      let selectedFile = null;
-
-      let selectedFormat = "jpg";
-
-      let imageURL = null;
-
-
-      /* =====================================================
-         SELECT PHOTO
-      ===================================================== */
-
-      selectBtn.addEventListener(
-        "click",
-        () => {
-
-          /*
-           * Reset input so selecting the same image again
-           * still fires the change event.
-           */
-          imageInput.value = "";
-
-          imageInput.click();
-
-        }
-      );
-
-
-      /* =====================================================
-         IMAGE SELECTION
-      ===================================================== */
-
-      imageInput.addEventListener(
-        "change",
-        event => {
-
-          const file =
-            event.target.files &&
-            event.target.files[0];
-
-
-          if (!file) {
-            return;
-          }
-
-
-          /*
-           * Validate actual MIME type.
-           */
-          const supportedTypes = [
-            "image/jpeg",
-            "image/png",
-            "image/webp"
-          ];
-
-
-          if (
-            !supportedTypes.includes(
-              file.type
-            )
-          ) {
-
-            alert(
-              "Please select a JPG, PNG or WebP image."
-            );
-
-            return;
-
-          }
-
-
-          selectedFile = file;
-
-
-          /*
-           * Release previous object URL.
-           */
-          if (imageURL) {
-
-            URL.revokeObjectURL(
-              imageURL
-            );
-
-          }
-
-
-          imageURL =
-            URL.createObjectURL(
-              file
-            );
-
-
-          /*
-           * Preview.
-           */
-          imagePreview.src =
-            imageURL;
-
-
-          /*
-           * File name without extension.
-           */
-          const originalName =
-            file.name
-              .replace(
-                /\.[^/.]+$/,
-                ""
-              );
-
-
-          fileName.textContent =
-            originalName ||
-            "Selected image";
-
-
-          /*
-           * Detect original format.
-           */
-          currentFormat.textContent =
-            getFormatName(
-              file.type
-            );
-
-
-          /*
-           * Show converter.
-           */
-          emptyState.classList.add(
-            "hidden"
-          );
-
-
-          converterSection.classList.remove(
-            "hidden"
-          );
-
-        }
-      );
-
-
-      /* =====================================================
-         FORMAT NAME
-      ===================================================== */
-
-      function getFormatName(
-        mimeType
-      ) {
-
-        switch (mimeType) {
-
-          case "image/jpeg":
-            return "JPEG";
-
-          case "image/png":
-            return "PNG";
-
-          case "image/webp":
-            return "WEBP";
-
-          default:
-            return "IMAGE";
-
-        }
-
-      }
-
-
-      /* =====================================================
-         FORMAT PICKER
-      ===================================================== */
-
-      formatGrid.addEventListener(
-        "click",
-        event => {
-
-          const button =
-            event.target.closest(
-              ".format-btn"
-            );
-
-
-          if (!button) {
-            return;
-          }
-
-
-          selectedFormat =
-            button.dataset.format;
-
-
-          formatGrid
-            .querySelectorAll(
-              ".format-btn"
-            )
-            .forEach(
-              item => {
-
-                item.classList.toggle(
-                  "active",
-                  item === button
-                );
-
-              }
-            );
-
-        }
-      );
-
-
-      /* =====================================================
-         LOAD IMAGE SAFELY
-      ===================================================== */
-
-      function loadImage(
-        src
-      ) {
-
-        return new Promise(
-          (resolve, reject) => {
-
-            const img =
-              new Image();
-
-
-            img.onload =
-              () => resolve(img);
-
-
-            img.onerror =
-              () =>
-                reject(
-                  new Error(
-                    "Unable to decode image."
-                  )
-                );
-
-
-            img.src = src;
-
-          }
-        );
-
-      }
-
-
-      /* =====================================================
-         CANVAS DIMENSION PROTECTION
-         
-         High-resolution photos can be enormous.
-         We preserve aspect ratio but limit the canvas
-         to a safe working dimension.
-      ===================================================== */
-
-      function calculateCanvasSize(
-        width,
-        height
-      ) {
-
-        const MAX_DIMENSION =
-          4096;
-
-
-        let outputWidth =
-          width;
-
-        let outputHeight =
-          height;
-
-
-        if (
-          outputWidth >
-            MAX_DIMENSION ||
-          outputHeight >
-            MAX_DIMENSION
-        ) {
-
-          const scale =
-            Math.min(
-              MAX_DIMENSION /
-                outputWidth,
-
-              MAX_DIMENSION /
-                outputHeight
-            );
-
-
-          outputWidth =
-            Math.max(
-              1,
-              Math.round(
-                outputWidth * scale
-              )
-            );
-
-
-          outputHeight =
-            Math.max(
-              1,
-              Math.round(
-                outputHeight * scale
-              )
-            );
-
-        }
-
-
-        return {
-          width:
-            outputWidth,
-
-          height:
-            outputHeight
-        };
-
-      }
-
-
-      /* =====================================================
-         CANVAS → BLOB
-      ===================================================== */
-
-      function canvasToBlob(
-        canvas,
-        mimeType,
-        quality
-      ) {
-
-        return new Promise(
-          (resolve, reject) => {
-
-            try {
-
-              canvas.toBlob(
-                blob => {
-
-                  if (!blob) {
-
-                    reject(
-                      new Error(
-                        "Canvas could not create output."
-                      )
-                    );
-
-                    return;
-
-                  }
-
-
-                  resolve(blob);
-
-                },
-
-                mimeType,
-
-                quality
-
-              );
-
-            } catch (error) {
-
-              reject(error);
-
-            }
-
-          }
-        );
-
-      }
-
-
-      /* =====================================================
-         CONVERT IMAGE
-      ===================================================== */
-
-      async function convertImage() {
-
-        if (!selectedFile) {
-
-          throw new Error(
-            "No image selected."
-          );
-
-        }
-
-
-        /*
-         * Load the original image from local memory.
-         */
-        const img =
-          await loadImage(
-            imageURL
-          );
-
-
-        /*
-         * Protect mobile devices from enormous canvas
-         * allocations.
-         */
-        const dimensions =
-          calculateCanvasSize(
-            img.naturalWidth,
-            img.naturalHeight
-          );
-
-
-        const canvas =
-          document.createElement(
-            "canvas"
-          );
-
-
-        canvas.width =
-          dimensions.width;
-
-
-        canvas.height =
-          dimensions.height;
-
-
-        const ctx =
-          canvas.getContext(
-            "2d",
-            {
-              alpha: true,
-              willReadFrequently: false
-            }
-          );
-
-
-        if (!ctx) {
-
-          throw new Error(
-            "Canvas is not supported."
-          );
-
-        }
-
-
-        /*
-         * High-quality image scaling.
-         */
-        ctx.imageSmoothingEnabled =
-          true;
-
-        ctx.imageSmoothingQuality =
-          "high";
-
-
-        /*
-         * PNG/WebP/JPG conversion.
-         *
-         * JPG has no transparency, so use white
-         * background rather than creating black areas.
-         */
-        if (
-          selectedFormat ===
-          "jpg"
-        ) {
-
-          ctx.fillStyle =
-            "#ffffff";
-
-          ctx.fillRect(
-            0,
-            0,
-            canvas.width,
-            canvas.height
-          );
-
-        }
-
-
-        ctx.drawImage(
-          img,
-
-          0,
-          0,
-
-          canvas.width,
-          canvas.height
-        );
-
-
-        let mimeType;
-        let quality;
-        let extension;
-
-
-        switch (
-          selectedFormat
-        ) {
-
-          case "png":
-
-            mimeType =
-              "image/png";
-
-            /*
-             * PNG ignores the quality parameter.
-             */
-            quality =
-              undefined;
-
-            extension =
-              "png";
-
-            break;
-
-
-          case "webp":
-
-            mimeType =
-              "image/webp";
-
-            quality =
-              0.9;
-
-            extension =
-              "webp";
-
-            break;
-
-
-          case "jpg":
-
-          default:
-
-            mimeType =
-              "image/jpeg";
-
-            quality =
-              0.9;
-
-            extension =
-              "jpg";
-
-            break;
-
-        }
-
-
-        const blob =
-          await canvasToBlob(
-            canvas,
-            mimeType,
-            quality
-          );
-
-
-        return {
-          blob,
-          extension,
-          mimeType
-        };
-
-      }
-
-
-      /* =====================================================
-         TELEGRAM / MOBILE SAFE DOWNLOAD
-         
-         Priority:
-         
-         1. Native Web Share with File
-            → ideal for mobile / Telegram WebView
-         
-         2. <a download>
-            → standard browser / desktop
-         
-         3. Blob URL
-            → final WebView fallback
-      ===================================================== */
-
-      async function downloadResult(
-        blob,
-        filename
-      ) {
-
-        if (
-          !blob ||
-          blob.size <= 0
-        ) {
-
-          throw new Error(
-            "Generated file is empty."
-          );
-
-        }
-
-
-        /*
-         * ---------------------------------------------------
-         * METHOD 1 — MOBILE / TELEGRAM
-         * ---------------------------------------------------
-         */
-
-        if (
-          typeof navigator.share ===
-          "function"
-        ) {
-
-          try {
-
-            const file =
-              new File(
-                [blob],
-                filename,
-                {
-                  type:
-                    blob.type
-                }
-              );
-
-
-            let shareSupported =
-              true;
-
-
-            if (
-              typeof navigator.canShare ===
-              "function"
-            ) {
-
-              shareSupported =
-                navigator.canShare({
-                  files: [file]
-                });
-
-            }
-
-
-            if (shareSupported) {
-
-              await navigator.share({
-
-                files: [file],
-
-                title:
-                  "InstaPic Converted Image"
-
-              });
-
-
-              return;
-
-            }
-
-          } catch (error) {
-
-            /*
-             * User intentionally closed share sheet.
-             */
-            if (
-              error &&
-              error.name ===
-                "AbortError"
-            ) {
-
-              return;
-
-            }
-
-
-            console.warn(
-              "Native share unavailable:",
-              error
-            );
-
-          }
-
-        }
-
-
-        /*
-         * ---------------------------------------------------
-         * METHOD 2 — NORMAL DOWNLOAD
-         * ---------------------------------------------------
-         */
-
-        const objectURL =
-          URL.createObjectURL(
-            blob
-          );
-
-
-        try {
-
-          const link =
-            document.createElement(
-              "a"
-            );
-
-
-          link.href =
-            objectURL;
-
-
-          link.download =
-            filename;
-
-
-          link.rel =
-            "noopener";
-
-
-          link.style.position =
-            "fixed";
-
-          link.style.left =
-            "-9999px";
-
-
-          document.body.appendChild(
-            link
-          );
-
-
-          /*
-           * Standard click.
-           */
-          link.click();
-
-
-          /*
-           * Some embedded WebViews respond better
-           * to an explicit MouseEvent.
-           */
-          try {
-
-            link.dispatchEvent(
-              new MouseEvent(
-                "click",
-                {
-                  bubbles: true,
-                  cancelable: true,
-                  view: window
-                }
-              )
-            );
-
-          } catch (_) {}
-
-
-          link.remove();
-
-
-          /*
-           * Keep URL alive long enough for browser
-           * download manager to consume it.
-           */
-          setTimeout(
-            () => {
-
-              URL.revokeObjectURL(
-                objectURL
-              );
-
-            },
-            10000
-          );
-
-
+    }
+  } catch (_) {
+    canvas.width = canvas.height = 1;
+  }
+
+  canvas.width = canvas.height = 1;
+  return false;
+}
+
+/* =========================================================
+   CANVAS HELPERS
+========================================================= */
+const MAX_CANVAS_DIMENSION = 16384;
+const MAX_CANVAS_PIXELS = 50000000;
+
+function safeDimensions(sourceW, sourceH, requestedW, requestedH) {
+  let w = Math.max(1, Math.round(requestedW || sourceW));
+  let h = Math.max(1, Math.round(requestedH || sourceH));
+
+  const dimensionScale = Math.min(
+    1,
+    MAX_CANVAS_DIMENSION / w,
+    MAX_CANVAS_DIMENSION / h
+  );
+
+  w = Math.max(1, Math.floor(w * dimensionScale));
+  h = Math.max(1, Math.floor(h * dimensionScale));
+
+  const pixels = w * h;
+  if (pixels > MAX_CANVAS_PIXELS) {
+    const scale = Math.sqrt(MAX_CANVAS_PIXELS / pixels);
+    w = Math.max(1, Math.floor(w * scale));
+    h = Math.max(1, Math.floor(h * scale));
+  }
+
+  return {width:w,height:h};
+}
+
+function getRequestedDimensions(sourceW, sourceH) {
+  if (!els.resizeEnabled.checked) {
+    return safeDimensions(sourceW, sourceH, sourceW, sourceH);
+  }
+
+  let w = parseInt(els.widthInput.value,10);
+  let h = parseInt(els.heightInput.value,10);
+
+  if (!Number.isFinite(w) || w < 1) w = sourceW;
+  if (!Number.isFinite(h) || h < 1) h = sourceH;
+
+  const maxDim = els.maxDimension.value;
+  if (maxDim && maxDim !== "custom") {
+    const limit = parseInt(maxDim,10);
+    if (Math.max(w,h) > limit) {
+      const scale = limit / Math.max(w,h);
+      w = Math.max(1,Math.round(w * scale));
+      h = Math.max(1,Math.round(h * scale));
+    }
+  }
+
+  return safeDimensions(sourceW, sourceH, w, h);
+}
+
+function createCanvas(image, width, height, mime, background) {
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext("2d", {
+    alpha: mime !== "image/jpeg",
+    willReadFrequently: false
+  });
+
+  if (!ctx) throw new Error("canvas");
+
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  if (mime === "image/jpeg") {
+    ctx.save();
+    ctx.fillStyle = background || "#ffffff";
+    ctx.fillRect(0,0,width,height);
+    ctx.restore();
+  }
+
+  ctx.drawImage(image,0,0,width,height);
+
+  return canvas;
+}
+
+function canvasToBlob(canvas, mime, quality) {
+  return new Promise((resolve,reject) => {
+    try {
+      canvas.toBlob(blob => {
+        if (!blob) {
+          reject(new Error("blob"));
           return;
-
-        } catch (error) {
-
-          console.warn(
-            "Anchor download failed:",
-            error
-          );
-
         }
+        resolve(blob);
+      }, mime, quality);
+    } catch (_) {
+      reject(new Error("blob"));
+    }
+  });
+}
 
+/* =========================================================
+   BACKGROUND
+========================================================= */
+function selectedBackground() {
+  const selected = document.querySelector('input[name="bg"]:checked');
+  if (!selected) return "#ffffff";
+  if (selected.value === "custom") return els.bgColor.value || "#ffffff";
+  return selected.value;
+}
 
-        /*
-         * ---------------------------------------------------
-         * METHOD 3 — WEBVIEW FALLBACK
-         * ---------------------------------------------------
-         */
+/* =========================================================
+   FORMAT UI
+========================================================= */
+function selectedMime() {
+  const checked = document.querySelector('input[name="format"]:checked');
+  return checked ? checked.value : "image/jpeg";
+}
 
-        try {
+function updateFormatUI() {
+  const mime = selectedMime();
+  state.currentOutputFormat = mime;
 
-          window.open(
-            objectURL,
-            "_blank"
-          );
+  const isPng = mime === "image/png";
+  const isWebp = mime === "image/webp";
+  const isJpeg = mime === "image/jpeg";
 
+  els.qualitySetting.classList.toggle("hidden", isPng);
+  els.pngQualityNote.classList.toggle("hidden", !isPng);
+  els.webpModeSetting.classList.toggle("hidden", !isWebp);
 
-          setTimeout(
-            () => {
+  els.backgroundControls.style.display = isJpeg ? "block" : "none";
 
-              URL.revokeObjectURL(
-                objectURL
-              );
+  if (isWebp) {
+    updateWebPModeUI();
+  }
 
-            },
-            15000
-          );
+  if (isJpeg && state.hasTransparency) {
+    els.transparencyNotice.textContent =
+      "This image contains transparency. JPEG cannot preserve it, so the selected background will be rendered behind transparent pixels.";
+  } else if (state.hasTransparency && mime === "image/webp") {
+    els.transparencyNotice.textContent =
+      "Transparency will be preserved by the canvas pipeline when WebP alpha encoding is supported.";
+  } else if (state.hasTransparency) {
+    els.transparencyNotice.textContent =
+      "The source contains transparency.";
+  } else {
+    els.transparencyNotice.textContent =
+      "No transparent pixels were detected in the sampled image.";
+  }
+}
 
-        } catch (error) {
+function updateWebPModeUI() {
+  const mode = document.querySelector('input[name="webpMode"]:checked')?.value || "lossy";
+  const lossless = mode === "lossless";
+  els.qualitySetting.classList.toggle("hidden", lossless);
+  els.pngQualityNote.classList.toggle("hidden", true);
+}
 
-          URL.revokeObjectURL(
-            objectURL
-          );
+function applyPreset() {
+  const preset = els.presetSelect.value;
 
-          throw error;
+  if (preset === "standard") els.qualitySlider.value = "80";
+  if (preset === "high") els.qualitySlider.value = "92";
+  if (preset === "small") els.qualitySlider.value = "60";
 
+  updateQualityUI();
+}
+
+function updateQualityUI() {
+  const q = Number(els.qualitySlider.value);
+  els.qualityValue.textContent = q + "%";
+  els.qualityLabel.textContent = qualityLabel(q);
+}
+
+function updateResizeUI() {
+  els.resizeControls.classList.toggle("hidden", !els.resizeEnabled.checked);
+}
+
+function updateTargetUI() {
+  els.targetControls.classList.toggle("hidden", !els.targetEnabled.checked);
+}
+
+/* =========================================================
+   SOURCE LOAD
+========================================================= */
+async function loadFiles(fileList) {
+  const files = Array.from(fileList || []).filter(isProbablyImage);
+
+  if (!files.length) {
+    setStatus("Please select a supported image file.", "error");
+    return;
+  }
+
+  resetResultsOnly();
+
+  state.files = files;
+  state.currentFile = files[0];
+
+  els.selectionCount.textContent =
+    files.length === 1 ? "1 image selected" : files.length + " images selected";
+
+  try {
+    setStatus("Reading image...", "");
+    state.sourceImage = await decodeImage(state.currentFile);
+
+    state.sourceDimensions = {
+      width: state.sourceImage.width || state.sourceImage.naturalWidth,
+      height: state.sourceImage.height || state.sourceImage.naturalHeight
+    };
+
+    state.hasTransparency = await detectTransparency(state.sourceImage);
+
+    updateOriginalUI();
+    updateFormatUI();
+
+    if (isAnimatedGif(state.currentFile)) {
+      setStatus(
+        "Animated GIFs are not preserved. Only the first decoded frame will be converted.",
+        ""
+      );
+    } else {
+      clearStatus();
+    }
+
+    if (
+      state.sourceDimensions.width > 6000 ||
+      state.sourceDimensions.height > 6000 ||
+      state.sourceDimensions.width * state.sourceDimensions.height > 25000000
+    ) {
+      els.largeImageWarning.classList.remove("hidden");
+    } else {
+      els.largeImageWarning.classList.add("hidden");
+    }
+
+    els.widthInput.value = state.sourceDimensions.width;
+    els.heightInput.value = state.sourceDimensions.height;
+
+    els.originalSection.classList.remove("hidden");
+    els.settingsSection.classList.remove("hidden");
+
+  } catch (_) {
+    closeImage(state.sourceImage);
+    state.sourceImage = null;
+    setStatus(
+      "Unable to process this image. The file may be corrupted, unsupported, or too large.",
+      "error"
+    );
+  }
+}
+
+function updateOriginalUI() {
+  const file = state.currentFile;
+  const img = state.sourceImage;
+  if (!file || !img) return;
+
+  if (state.sourceObjectUrl) {
+    URL.revokeObjectURL(state.sourceObjectUrl);
+    state.sourceObjectUrl = null;
+  }
+
+  state.sourceObjectUrl = URL.createObjectURL(file);
+  els.originalPreview.src = state.sourceObjectUrl;
+
+  const mime = file.type || "unknown";
+  const format = formatNameFromMime(mime);
+  const w = img.width || img.naturalWidth;
+  const h = img.height || img.naturalHeight;
+
+  els.originalFormatBadge.textContent = format;
+  els.infoName.textContent = file.name;
+  els.infoFormat.textContent = format;
+  els.infoDimensions.textContent = w + " × " + h + " px";
+  els.infoSize.textContent = formatBytes(file.size);
+
+  els.originalPreviewMeta.textContent =
+    file.name + " • " + format + " • " + w + " × " + h + " px • " + formatBytes(file.size);
+}
+
+/* =========================================================
+   RESIZE EVENTS
+========================================================= */
+function changeWidth() {
+  if (!els.lockAspect.checked || !state.sourceDimensions) return;
+
+  const w = parseInt(els.widthInput.value,10);
+  if (!Number.isFinite(w) || w < 1) return;
+
+  const ratio = state.sourceDimensions.height / state.sourceDimensions.width;
+  els.heightInput.value = Math.max(1,Math.round(w * ratio));
+}
+
+function changeHeight() {
+  if (!els.lockAspect.checked || !state.sourceDimensions) return;
+
+  const h = parseInt(els.heightInput.value,10);
+  if (!Number.isFinite(h) || h < 1) return;
+
+  const ratio = state.sourceDimensions.width / state.sourceDimensions.height;
+  els.widthInput.value = Math.max(1,Math.round(h * ratio));
+}
+
+function applyRatio(ratio) {
+  if (!state.sourceDimensions) return;
+
+  document.querySelectorAll(".ratio-btn").forEach(btn => btn.classList.remove("active"));
+  const button = document.querySelector('.ratio-btn[data-ratio="' + ratio + '"]');
+  if (button) button.classList.add("active");
+
+  if (ratio === "original") {
+    els.widthInput.value = state.sourceDimensions.width;
+    els.heightInput.value = state.sourceDimensions.height;
+    return;
+  }
+
+  const parts = ratio.split(":").map(Number);
+  if (parts.length !== 2 || !parts[0] || !parts[1]) return;
+
+  const r = parts[0] / parts[1];
+  let w = parseInt(els.widthInput.value,10) || state.sourceDimensions.width;
+  let h = Math.round(w / r);
+
+  if (h < 1) {
+    h = 1;
+    w = Math.round(h * r);
+  }
+
+  els.widthInput.value = w;
+  els.heightInput.value = h;
+}
+
+/* =========================================================
+   ENCODE ONE IMAGE
+========================================================= */
+async function encodeAtQuality(image, dimensions, mime, quality, options={}) {
+  if (state.cancelRequested) throw new Error("cancelled");
+
+  const canvas = createCanvas(
+    image,
+    dimensions.width,
+    dimensions.height,
+    mime,
+    options.background
+  );
+
+  let blob;
+
+  if (mime === "image/png") {
+    blob = await canvasToBlob(canvas, "image/png");
+  } else if (mime === "image/jpeg") {
+    blob = await canvasToBlob(canvas, "image/jpeg", quality);
+  } else if (mime === "image/webp") {
+    if (!state.webpSupported) throw new Error("webp-unsupported");
+
+    if (options.lossless) {
+      blob = await canvasToBlob(canvas, "image/webp", 1);
+    } else {
+      blob = await canvasToBlob(canvas, "image/webp", quality);
+    }
+  } else {
+    throw new Error("format");
+  }
+
+  canvas.width = 1;
+  canvas.height = 1;
+
+  if (!mimeMatches(blob,mime)) {
+    throw new Error("mime");
+  }
+
+  return blob;
+}
+
+/* =========================================================
+   TARGET SIZE SEARCH
+========================================================= */
+async function findBestUnderTarget(image, dimensions, mime, targetBytes, options, progressBase=10, progressSpan=50) {
+  if (mime === "image/png") {
+    const blob = await encodeAtQuality(image, dimensions, mime, 1, options);
+    return {
+      blob,
+      quality:null,
+      reached:blob.size <= targetBytes
+    };
+  }
+
+  if (mime === "image/webp" && options.lossless) {
+    const blob = await encodeAtQuality(image, dimensions, mime, 1, options);
+    return {
+      blob,
+      quality:null,
+      reached:blob.size <= targetBytes
+    };
+  }
+
+  let low = 1;
+  let high = 100;
+  let best = null;
+
+  const iterations = 12;
+
+  for (let i=0; i<iterations; i++) {
+    if (state.cancelRequested) throw new Error("cancelled");
+
+    const q = Math.round((low + high) / 2);
+    const blob = await encodeAtQuality(
+      image,
+      dimensions,
+      mime,
+      q / 100,
+      options
+    );
+
+    setProgress(
+      "Finding best quality...",
+      "Testing quality " + q + "% • " + formatBytes(blob.size),
+      progressBase + ((i+1)/iterations)*progressSpan
+    );
+
+    if (blob.size <= targetBytes) {
+      best = {blob,quality:q};
+      low = q + 1;
+    } else {
+      high = q - 1;
+    }
+
+    await sleep(0);
+  }
+
+  if (best) {
+    return {
+      ...best,
+      reached:true
+    };
+  }
+
+  const lowest = await encodeAtQuality(
+    image,
+    dimensions,
+    mime,
+    0.01,
+    options
+  );
+
+  return {
+    blob:lowest,
+    quality:1,
+    reached:lowest.size <= targetBytes
+  };
+}
+
+/* =========================================================
+   SMART RESIZE TARGET
+========================================================= */
+async function smartTargetSearch(image, sourceW, sourceH, mime, targetBytes, options) {
+  const steps = [1, .8, .64, .5, .4, .32, .25, .2, .16, .125, .1];
+  let best = null;
+
+  for (let i=0; i<steps.length; i++) {
+    if (state.cancelRequested) throw new Error("cancelled");
+
+    const scale = steps[i];
+    const dimensions = safeDimensions(
+      sourceW,
+      sourceH,
+      Math.max(1,Math.round(sourceW * scale)),
+      Math.max(1,Math.round(sourceH * scale))
+    );
+
+    setProgress(
+      "Trying Smart Resize...",
+      dimensions.width + " × " + dimensions.height,
+      55 + (i / steps.length) * 30
+    );
+
+    const result = await findBestUnderTarget(
+      image,
+      dimensions,
+      mime,
+      targetBytes,
+      options,
+      55,
+      0
+    );
+
+    best = {
+      ...result,
+      dimensions
+    };
+
+    if (result.reached) {
+      return best;
+    }
+
+    await sleep(0);
+  }
+
+  return best;
+}
+
+/* =========================================================
+   SINGLE CONVERSION
+========================================================= */
+async function convertSingle(file, isBatch=false, batchIndex=0, batchTotal=1) {
+  const localImage = await decodeImage(file);
+
+  try {
+    const sourceW = localImage.width || localImage.naturalWidth;
+    const sourceH = localImage.height || localImage.naturalHeight;
+
+    if (!sourceW || !sourceH) throw new Error("decode");
+
+    const mime = selectedMime();
+
+    if (mime === "image/webp" && !state.webpSupported) {
+      throw new Error("webp-unsupported");
+    }
+
+    const options = {
+      background:selectedBackground(),
+      lossless:mime === "image/webp" &&
+        document.querySelector('input[name="webpMode"]:checked')?.value === "lossless"
+    };
+
+    let dimensions = isBatch
+      ? getBatchDimensions(sourceW,sourceH)
+      : getRequestedDimensions(sourceW,sourceH);
+
+    const quality = Number(els.qualitySlider.value) / 100;
+
+    if (isBatch) {
+      setProgress(
+        "Converting batch...",
+        "Converting " + (batchIndex + 1) + " of " + batchTotal + " • " + file.name,
+        (batchIndex / batchTotal) * 80
+      );
+    } else {
+      setProgress("Preparing image...",sourceW + " × " + sourceH + " px",5);
+    }
+
+    let resultBlob;
+    let resultQuality = null;
+    let targetReached = null;
+
+    const targetEnabled = els.targetEnabled.checked;
+    const targetBytes = targetEnabled
+      ? Number(els.targetValue.value) * Number(els.targetUnit.value)
+      : 0;
+
+    if (targetEnabled && targetBytes > 0) {
+      const result = await findBestUnderTarget(
+        localImage,
+        dimensions,
+        mime,
+        targetBytes,
+        options,
+        10,
+        45
+      );
+
+      resultBlob = result.blob;
+      resultQuality = result.quality;
+      targetReached = result.reached;
+
+      if (
+        !result.reached &&
+        els.smartResizeFallback.checked &&
+        mime !== "image/png" &&
+        !(mime === "image/webp" && options.lossless)
+      ) {
+        const smart = await smartTargetSearch(
+          localImage,
+          sourceW,
+          sourceH,
+          mime,
+          targetBytes,
+          options
+        );
+
+        if (smart && smart.blob && smart.blob.size < resultBlob.size) {
+          resultBlob = smart.blob;
+          resultQuality = smart.quality;
+          dimensions = smart.dimensions;
+          targetReached = smart.reached;
         }
-
       }
+    } else {
+      setProgress(
+        isBatch ? "Converting batch..." : "Converting...",
+        "Generating " + formatNameFromMime(mime) + " output",
+        isBatch ? (batchIndex / batchTotal)*80 + 10 : 25
+      );
 
+      resultBlob = await encodeAtQuality(
+        localImage,
+        dimensions,
+        mime,
+        quality,
+        options
+      );
 
-      /* =====================================================
-         CONVERT & DOWNLOAD
-      ===================================================== */
+      resultQuality = mime === "image/png" || options.lossless ? null : Number(els.qualitySlider.value);
+    }
 
-      convertBtn.addEventListener(
-        "click",
-        async () => {
+    if (state.cancelRequested) throw new Error("cancelled");
 
-          if (!selectedFile) {
+    setProgress(
+      isBatch ? "Finalizing batch..." : "Generating output...",
+      formatBytes(resultBlob.size),
+      isBatch ? ((batchIndex+1)/batchTotal)*85 : 90
+    );
 
-            alert(
-              "Please select a photo first."
-            );
+    const url = URL.createObjectURL(resultBlob);
 
-            return;
+    return {
+      id:cryptoRandomId(),
+      sourceName:file.name,
+      sourceFile:file,
+      blob:resultBlob,
+      url,
+      mime,
+      filename:outputFilename(file.name,mime),
+      size:resultBlob.size,
+      width:dimensions.width,
+      height:dimensions.height,
+      originalSize:file.size,
+      originalWidth:sourceW,
+      originalHeight:sourceH,
+      quality:resultQuality,
+      targetBytes:targetEnabled ? targetBytes : null,
+      targetReached
+    };
+  } finally {
+    closeImage(localImage);
+  }
+}
 
-          }
+function getBatchDimensions(sourceW,sourceH) {
+  if (!els.resizeEnabled.checked) {
+    return safeDimensions(sourceW,sourceH,sourceW,sourceH);
+  }
 
+  return getRequestedDimensions(sourceW,sourceH);
+}
 
-          const originalHTML =
-            convertBtn.innerHTML;
+function cryptoRandomId() {
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  return String(Date.now()) + Math.random().toString(36).slice(2);
+}
 
+/* =========================================================
+   PROGRESS
+========================================================= */
+function setProgress(title,sub,percent) {
+  els.progressCard.classList.add("show");
+  els.progressTitle.textContent = title;
+  els.progressSub.textContent = sub;
+  els.progressBar.style.width = Math.max(0,Math.min(100,percent || 0)) + "%";
+}
 
-          convertBtn.disabled =
-            true;
+/* =========================================================
+   CONVERT BUTTON
+========================================================= */
+async function startConversion() {
+  if (state.processing || !state.currentFile || !state.sourceImage) return;
 
+  const format = selectedMime();
 
-          convertBtn.innerHTML =
-            '<span class="spinner"></span>Converting...';
+  if (format === "image/webp" && !state.webpSupported) {
+    setStatus("WebP output is not supported by this browser.", "error");
+    return;
+  }
 
+  if (els.targetEnabled.checked) {
+    const value = Number(els.targetValue.value);
+    if (!Number.isFinite(value) || value <= 0) {
+      setStatus("Please enter a valid target file size.", "error");
+      return;
+    }
+  }
 
+  state.processing = true;
+  state.cancelRequested = false;
+  state.jobId++;
+
+  els.convertBtn.disabled = true;
+  els.cancelBtn.classList.remove("hidden");
+  els.resultSection.classList.remove("show");
+
+  try {
+    if (state.files.length > 1) {
+      await runBatch();
+    } else {
+      const result = await convertSingle(state.currentFile,false);
+      state.output = result;
+      renderSingleResult(result);
+
+      setProgress(
+        "Complete ✓",
+        "Output ready • " + formatBytes(result.size),
+        100
+      );
+
+      clearStatus();
+
+      if (result.targetBytes) {
+        if (result.targetReached) {
+          showToast(formatBytes(result.size) + " — under target");
+        } else {
+          setStatus(
+            "Target size could not be reached at the current dimensions. Best result: " +
+            formatBytes(result.size) +
+            (els.smartResizeFallback.checked ? "" : " Enable Smart Resize to try reducing dimensions."),
+            "error"
+          );
+        }
+      } else {
+        showToast("Conversion complete");
+      }
+    }
+  } catch (err) {
+    if (err.message === "cancelled") {
+      setStatus("Conversion cancelled. You can select another image or try again.", "");
+      setProgress("Cancelled", "The tool is ready again.", 0);
+    } else {
+      handleError(err);
+    }
+  } finally {
+    state.processing = false;
+    state.cancelRequested = false;
+    els.convertBtn.disabled = false;
+    els.cancelBtn.classList.add("hidden");
+  }
+}
+
+/* =========================================================
+   RESULT
+========================================================= */
+function renderSingleResult(result) {
+  if (!result) return;
+
+  els.resultSection.classList.add("show");
+
+  els.resultOriginalPreview.src = state.sourceObjectUrl || URL.createObjectURL(result.sourceFile);
+  els.resultPreview.src = result.url;
+
+  els.resultOriginalFormat.textContent = formatNameFromMime(result.sourceFile.type);
+  els.resultOutputFormat.textContent = formatNameFromMime(result.mime);
+
+  els.resultOriginalMeta.textContent =
+    result.sourceFile.name + " • " +
+    formatBytes(result.originalSize) + " • " +
+    result.originalWidth + " × " + result.originalHeight + " px";
+
+  els.resultOutputMeta.textContent =
+    result.filename + " • " +
+    formatBytes(result.size) + " • " +
+    result.width + " × " + result.height + " px";
+
+  els.statOriginal.textContent = formatBytes(result.originalSize);
+  els.statOutput.textContent = formatBytes(result.size);
+
+  const difference = result.originalSize - result.size;
+
+  if (difference > 0) {
+    els.statSaved.textContent = formatBytes(difference);
+    els.statReduction.textContent =
+      formatPercent((difference / result.originalSize) * 100);
+    els.resultSummary.textContent =
+      formatBytes(difference) + " saved • " +
+      formatPercent((difference / result.originalSize) * 100) + " smaller";
+  } else if (difference < 0) {
+    els.statSaved.textContent = "+" + formatBytes(Math.abs(difference));
+    els.statReduction.textContent = "Larger";
+    els.resultSummary.textContent =
+      "The converted file is " + formatBytes(Math.abs(difference)) + " larger than the original.";
+  } else {
+    els.statSaved.textContent = "0 B";
+    els.statReduction.textContent = "0%";
+    els.resultSummary.textContent = "Output is the same byte size as the original.";
+  }
+
+  els.downloadCurrentBtn.textContent =
+    "Download " + formatNameFromMime(result.mime);
+
+  updateShareButton(result);
+}
+
+function updateShareButton(result) {
+  els.shareCurrentBtn.classList.add("hidden");
+
+  if (!navigator.share) return;
+
+  try {
+    if (!navigator.canShare || !navigator.canShare({
+      files:[new File([result.blob],result.filename,{type:result.mime})]
+    })) return;
+
+    els.shareCurrentBtn.classList.remove("hidden");
+  } catch (_) {}
+}
+
+/* =========================================================
+   DOWNLOAD MANAGER
+========================================================= */
+async function downloadBlob(blob, filename, mimeType) {
+  if (!(blob instanceof Blob) || !blob.size) {
+    throw new Error("download");
+  }
+
+  if (mimeType && blob.type !== mimeType) {
+    throw new Error("mime");
+  }
+
+  const url = URL.createObjectURL(blob);
+
+  try {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.rel = "noopener";
+    a.style.display = "none";
+
+    document.body.appendChild(a);
+    a.click();
+
+    setTimeout(() => {
+      try { a.remove(); } catch (_) {}
+    }, 100);
+
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+
+    return true;
+  } catch (_) {
+    URL.revokeObjectURL(url);
+    throw new Error("download");
+  }
+}
+
+/* =========================================================
+   SHARE
+========================================================= */
+async function shareResult(result) {
+  if (!navigator.share) {
+    await downloadBlob(result.blob,result.filename,result.mime);
+    return;
+  }
+
+  const file = new File(
+    [result.blob],
+    result.filename,
+    {type:result.mime}
+  );
+
+  try {
+    if (navigator.canShare && !navigator.canShare({files:[file]})) {
+      throw new Error("share");
+    }
+
+    await navigator.share({
+      files:[file],
+      title:"InstaPic",
+      text:"Converted image"
+    });
+
+    showToast("Share sheet opened");
+  } catch (err) {
+    if (err && err.name === "AbortError") return;
+    throw new Error("share");
+  }
+}
+
+/* =========================================================
+   BATCH
+========================================================= */
+async function runBatch() {
+  state.batchResults = [];
+  els.batchList.innerHTML = "";
+  els.batchSection.classList.add("show");
+
+  const total = state.files.length;
+
+  for (let i=0; i<total; i++) {
+    if (state.cancelRequested) throw new Error("cancelled");
+
+    const file = state.files[i];
+
+    try {
+      const result = await convertSingle(file,true,i,total);
+      state.batchResults.push(result);
+
+      appendBatchResult(result,true);
+
+      setProgress(
+        "Converting " + (i+1) + " of " + total,
+        file.name + " complete",
+        ((i+1)/total)*100
+      );
+    } catch (err) {
+      if (err.message === "cancelled") throw err;
+
+      appendBatchError(file,err);
+    }
+
+    await sleep(0);
+  }
+
+  const success = state.batchResults.length;
+  const failed = total - success;
+
+  els.batchSummary.textContent =
+    success + " converted" + (failed ? " • " + failed + " failed" : "");
+
+  if (!success) {
+    setStatus("No images could be converted.", "error");
+  } else if (failed) {
+    setStatus(
+      success + " of " + total + " images converted. Failed files were skipped.",
+      "success"
+    );
+  } else {
+    setStatus("All " + total + " images converted successfully.", "success");
+  }
+
+  els.zipBtn.disabled = success === 0;
+}
+
+function appendBatchResult(result,success) {
+  const item = document.createElement("div");
+  item.className = "batch-item";
+
+  const info = document.createElement("div");
+
+  const name = document.createElement("div");
+  name.className = "batch-name";
+  name.textContent = result.sourceName;
+
+  const details = document.createElement("div");
+  details.className = "batch-info";
+  details.textContent =
+    formatBytes(result.originalSize) + " → " +
+    formatBytes(result.size) + " • " +
+    result.width + " × " + result.height + " • " +
+    formatNameFromMime(result.mime);
+
+  const status = document.createElement("div");
+  status.className = "batch-ok";
+  status.textContent = "✓ Converted";
+
+  info.appendChild(name);
+  info.appendChild(details);
+  info.appendChild(status);
+
+  const actions = document.createElement("div");
+  actions.className = "batch-actions";
+
+  const download = document.createElement("button");
+  download.className = "btn btn-primary btn-small";
+  download.textContent = "Download";
+  download.type = "button";
+
+  download.addEventListener("click",async() => {
+    try {
+      download.disabled = true;
+      await downloadBlob(result.blob,result.filename,result.mime);
+      showToast("Download initiated");
+    } catch (_) {
+      showToast("Unable to start the download.");
+    } finally {
+      download.disabled = false;
+    }
+  });
+
+  actions.appendChild(download);
+
+  if (navigator.share) {
+    try {
+      const file = new File([result.blob],result.filename,{type:result.mime});
+      if (!navigator.canShare || navigator.canShare({files:[file]})) {
+        const share = document.createElement("button");
+        share.className = "btn btn-secondary btn-small";
+        share.textContent = "Share";
+        share.type = "button";
+        share.addEventListener("click",async() => {
           try {
-
-            /*
-             * Allow Telegram WebView to paint the
-             * loading state before CPU-heavy work.
-             */
-            await new Promise(
-              resolve =>
-                requestAnimationFrame(
-                  () => resolve()
-                )
-            );
-
-
-            const result =
-              await convertImage();
-
-
-            const filename =
-              "instapic_converted." +
-              result.extension;
-
-
-            await downloadResult(
-              result.blob,
-              filename
-            );
-
-
-            convertBtn.innerHTML =
-              '<i class="fa-solid fa-check mr-2"></i>Done';
-
-
-            /*
-             * Restore button text.
-             */
-            setTimeout(
-              () => {
-
-                convertBtn.innerHTML =
-                  originalHTML;
-
-              },
-              1800
-            );
-
-
-          } catch (error) {
-
-            console.error(
-              "Conversion error:",
-              error
-            );
-
-
-            alert(
-              "Conversion failed. Please try another image."
-            );
-
-
-            convertBtn.innerHTML =
-              originalHTML;
-
-          } finally {
-
-            convertBtn.disabled =
-              false;
-
+            await shareResult(result);
+          } catch (_) {
+            showToast("Sharing was not available.");
           }
+        });
+        actions.appendChild(share);
+      }
+    } catch (_) {}
+  }
 
-        }
+  item.appendChild(info);
+  item.appendChild(actions);
+  els.batchList.appendChild(item);
+}
+
+function appendBatchError(file,error) {
+  const item = document.createElement("div");
+  item.className = "batch-item";
+
+  const info = document.createElement("div");
+
+  const name = document.createElement("div");
+  name.className = "batch-name";
+  name.textContent = file.name;
+
+  const details = document.createElement("div");
+  details.className = "batch-info";
+  details.textContent = humanError(error);
+
+  const status = document.createElement("div");
+  status.className = "batch-error";
+  status.textContent = "✕ Failed";
+
+  info.appendChild(name);
+  info.appendChild(details);
+  info.appendChild(status);
+
+  item.appendChild(info);
+  els.batchList.appendChild(item);
+}
+
+/* =========================================================
+   ZIP GENERATOR
+   ZIP "store" method is implemented locally.
+========================================================= */
+function crc32(bytes) {
+  let table = crc32.table;
+  if (!table) {
+    table = crc32.table = new Uint32Array(256);
+    for (let n=0;n<256;n++) {
+      let c=n;
+      for (let k=0;k<8;k++) {
+        c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      }
+      table[n]=c>>>0;
+    }
+  }
+
+  let crc = 0 ^ (-1);
+  for (let i=0;i<bytes.length;i++) {
+    crc = (crc >>> 8) ^ table[(crc ^ bytes[i]) & 0xff];
+  }
+  return (crc ^ (-1)) >>> 0;
+}
+
+function writeU16(view,offset,value) {
+  view.setUint16(offset,value,true);
+}
+
+function writeU32(view,offset,value) {
+  view.setUint32(offset,value,true);
+}
+
+function dosDateTime(date=new Date()) {
+  const year = Math.max(1980,date.getFullYear());
+  const time =
+    (date.getHours() << 11) |
+    (date.getMinutes() << 5) |
+    Math.floor(date.getSeconds()/2);
+
+  const day = date.getDate();
+  const month = date.getMonth()+1;
+  const dosYear = Math.max(0,year-1980);
+
+  const dateValue =
+    (dosYear << 9) |
+    (month << 5) |
+    day;
+
+  return {time,date:dateValue};
+}
+
+async function createZip(results) {
+  if (!results.length) throw new Error("zip");
+
+  const encoder = new TextEncoder();
+  const localParts = [];
+  const centralParts = [];
+  let offset = 0;
+  const dt = dosDateTime();
+
+  for (const result of results) {
+    if (!(result.blob instanceof Blob)) continue;
+
+    const data = new Uint8Array(await result.blob.arrayBuffer());
+    const name = encoder.encode(result.filename);
+    const crc = crc32(data);
+
+    const local = new Uint8Array(30 + name.length);
+    const lv = new DataView(local.buffer);
+
+    writeU32(lv,0,0x04034b50);
+    writeU16(lv,4,20);
+    writeU16(lv,6,0x0800);
+    writeU16(lv,8,0);
+    writeU16(lv,10,dt.time);
+    writeU16(lv,12,dt.date);
+    writeU32(lv,14,crc);
+    writeU32(lv,18,data.length);
+    writeU32(lv,22,data.length);
+    writeU16(lv,26,name.length);
+    writeU16(lv,28,0);
+    local.set(name,30);
+
+    localParts.push(local,data);
+
+    const central = new Uint8Array(46 + name.length);
+    const cv = new DataView(central.buffer);
+
+    writeU32(cv,0,0x02014b50);
+    writeU16(cv,4,20);
+    writeU16(cv,6,20);
+    writeU16(cv,8,0x0800);
+    writeU16(cv,10,0);
+    writeU16(cv,12,dt.time);
+    writeU16(cv,14,dt.date);
+    writeU32(cv,16,crc);
+    writeU32(cv,20,data.length);
+    writeU32(cv,24,data.length);
+    writeU16(cv,28,name.length);
+    writeU16(cv,30,0);
+    writeU16(cv,32,0);
+    writeU16(cv,34,0);
+    writeU16(cv,36,0);
+    writeU32(cv,38,0);
+    writeU32(cv,42,offset);
+    central.set(name,46);
+
+    centralParts.push(central);
+    offset += local.length + data.length;
+  }
+
+  let centralSize = 0;
+  for (const p of centralParts) centralSize += p.length;
+
+  const end = new Uint8Array(22);
+  const ev = new DataView(end.buffer);
+
+  writeU32(ev,0,0x06054b50);
+  writeU16(ev,4,0);
+  writeU16(ev,6,0);
+  writeU16(ev,8,centralParts.length);
+  writeU16(ev,10,centralParts.length);
+  writeU32(ev,12,centralSize);
+  writeU32(ev,16,offset);
+  writeU16(ev,20,0);
+
+  return new Blob(
+    [...localParts,...centralParts,end],
+    {type:"application/zip"}
+  );
+}
+
+async function downloadZip() {
+  if (!state.batchResults.length) return;
+
+  els.zipBtn.disabled = true;
+
+  try {
+    setProgress(
+      "Creating ZIP...",
+      "Preparing " + state.batchResults.length + " converted files",
+      10
+    );
+
+    await sleep(0);
+
+    const zip = await createZip(state.batchResults);
+
+    setProgress(
+      "ZIP ready",
+      formatBytes(zip.size),
+      100
+    );
+
+    await downloadBlob(
+      zip,
+      "instapic-converted-images.zip",
+      "application/zip"
+    );
+
+    showToast("ZIP download initiated");
+  } catch (_) {
+    setStatus(
+      "ZIP creation failed. You can download the converted files individually.",
+      "error"
+    );
+  } finally {
+    els.zipBtn.disabled = false;
+  }
+}
+
+/* =========================================================
+   ERROR HANDLING
+========================================================= */
+function humanError(error) {
+  const code = error && error.message ? error.message : "";
+
+  switch (code) {
+    case "unsupported":
+      return "Unsupported image format.";
+    case "decode":
+      return "Unable to decode this image. The file may be corrupted.";
+    case "canvas":
+      return "The browser could not create a safe processing canvas.";
+    case "blob":
+      return "The browser could not generate the converted file.";
+    case "webp-unsupported":
+      return "WebP output is not supported by this browser.";
+    case "mime":
+      return "The browser returned an unexpected output format.";
+    case "download":
+      return "The browser blocked the file download.";
+    case "share":
+      return "File sharing is not available in this environment.";
+    case "zip":
+      return "Unable to create the ZIP file.";
+    case "format":
+      return "This output format is not supported.";
+    case "cancelled":
+      return "Operation cancelled.";
+    default:
+      return "Unable to process this image. It may be corrupted or too large.";
+  }
+}
+
+function handleError(error) {
+  console.error(error);
+  setStatus(humanError(error), "error");
+  els.progressCard.classList.remove("show");
+}
+
+/* =========================================================
+   RESET / CLEANUP
+========================================================= */
+function revokeOutput(result) {
+  if (result && result.url) {
+    try { URL.revokeObjectURL(result.url); } catch (_) {}
+  }
+}
+
+function resetResultsOnly() {
+  if (state.output) revokeOutput(state.output);
+
+  for (const result of state.batchResults) {
+    revokeOutput(result);
+  }
+
+  state.output = null;
+  state.batchResults = [];
+
+  els.resultSection.classList.remove("show");
+  els.batchSection.classList.remove("show");
+  els.batchList.innerHTML = "";
+  els.progressCard.classList.remove("show");
+}
+
+function resetAll() {
+  state.cancelRequested = true;
+  state.processing = false;
+
+  resetResultsOnly();
+
+  closeImage(state.sourceImage);
+  state.sourceImage = null;
+
+  if (state.sourceObjectUrl) {
+    try { URL.revokeObjectURL(state.sourceObjectUrl); } catch (_) {}
+    state.sourceObjectUrl = null;
+  }
+
+  state.files = [];
+  state.currentFile = null;
+  state.sourceDimensions = null;
+  state.hasTransparency = false;
+  state.currentOutputFormat = "image/jpeg";
+
+  els.fileInput.value = "";
+  els.originalPreview.removeAttribute("src");
+  els.resultOriginalPreview.removeAttribute("src");
+  els.resultPreview.removeAttribute("src");
+
+  els.originalSection.classList.add("hidden");
+  els.settingsSection.classList.add("hidden");
+  els.largeImageWarning.classList.add("hidden");
+
+  els.widthInput.value = "";
+  els.heightInput.value = "";
+
+  els.resizeEnabled.checked = false;
+  els.lockAspect.checked = true;
+  els.targetEnabled.checked = false;
+  els.smartResizeFallback.checked = false;
+  els.targetValue.value = "500";
+  els.targetUnit.value = "1024";
+
+  els.qualitySlider.value = "80";
+  els.presetSelect.value = "standard";
+
+  els.fmtJpeg.checked = true;
+  els.fmtPng.checked = false;
+  els.fmtWebp.checked = false;
+
+  document.querySelector('input[name="webpMode"][value="lossy"]').checked = true;
+  document.querySelector('input[name="bg"][value="#ffffff"]').checked = true;
+  els.bgColor.value = "#ffffff";
+
+  els.advancedContent.classList.add("hidden");
+  els.advancedToggle.textContent = "＋ Advanced Settings";
+
+  updateQualityUI();
+  updateResizeUI();
+  updateTargetUI();
+  updateFormatUI();
+
+  els.convertBtn.disabled = false;
+  els.cancelBtn.classList.add("hidden");
+
+  clearStatus();
+  showToast("Reset complete");
+}
+
+/* =========================================================
+   CLIPBOARD
+========================================================= */
+async function handlePaste(event) {
+  const clipboard = event.clipboardData;
+  if (!clipboard) return;
+
+  const items = Array.from(clipboard.items || []);
+  const imageItem = items.find(item => item.type && item.type.startsWith("image/"));
+
+  if (!imageItem) return;
+
+  const file = imageItem.getAsFile();
+  if (!file) return;
+
+  event.preventDefault();
+
+  const named = new File(
+    [file],
+    "pasted-image." + extensionForMime(file.type),
+    {type:file.type,lastModified:Date.now()}
+  );
+
+  await loadFiles([named]);
+}
+
+async function handlePasteButton() {
+  if (!navigator.clipboard || !navigator.clipboard.read) {
+    showToast("Clipboard image access is not supported here.");
+    return;
+  }
+
+  try {
+    const items = await navigator.clipboard.read();
+
+    for (const item of items) {
+      const type = item.types.find(t => t.startsWith("image/"));
+      if (!type) continue;
+
+      const blob = await item.getType(type);
+      const file = new File(
+        [blob],
+        "pasted-image." + extensionForMime(type),
+        {type,lastModified:Date.now()}
       );
 
+      await loadFiles([file]);
+      return;
+    }
 
-      /* =====================================================
-         CLEANUP
-      ===================================================== */
+    showToast("No image found in clipboard.");
+  } catch (_) {
+    showToast("Clipboard permission was not granted.");
+  }
+}
 
-      window.addEventListener(
-        "beforeunload",
-        () => {
+/* =========================================================
+   DRAG DROP
+========================================================= */
+["dragenter","dragover"].forEach(type => {
+  els.uploadArea.addEventListener(type,e => {
+    e.preventDefault();
+    e.stopPropagation();
+    els.uploadArea.classList.add("drag");
+  });
+});
 
-          if (imageURL) {
+["dragleave","drop"].forEach(type => {
+  els.uploadArea.addEventListener(type,e => {
+    e.preventDefault();
+    e.stopPropagation();
+    els.uploadArea.classList.remove("drag");
+  });
+});
 
-            URL.revokeObjectURL(
-              imageURL
-            );
+els.uploadArea.addEventListener("drop",e => {
+  const files = Array.from(e.dataTransfer?.files || []);
+  if (files.length) loadFiles(files);
+});
 
-            imageURL = null;
+/* =========================================================
+   EVENT LISTENERS
+========================================================= */
+els.selectBtn.addEventListener("click",() => els.fileInput.click());
 
-          }
+els.fileInput.addEventListener("change",e => {
+  loadFiles(e.target.files);
+});
 
-        }
-      );
+els.pasteBtn.addEventListener("click",handlePasteButton);
 
+document.addEventListener("paste",handlePaste);
 
-    })();
-  </script>
+document.querySelectorAll('input[name="format"]').forEach(input => {
+  input.addEventListener("change",updateFormatUI);
+});
 
+document.querySelectorAll('input[name="webpMode"]').forEach(input => {
+  input.addEventListener("change",updateWebPModeUI);
+});
+
+document.querySelectorAll('input[name="bg"]').forEach(input => {
+  input.addEventListener("change",updateFormatUI);
+});
+
+els.bgColor.addEventListener("input",updateFormatUI);
+
+els.qualitySlider.addEventListener("input",updateQualityUI);
+
+els.presetSelect.addEventListener("change",applyPreset);
+
+els.resizeEnabled.addEventListener("change",updateResizeUI);
+
+els.widthInput.addEventListener("input",changeWidth);
+els.heightInput.addEventListener("input",changeHeight);
+
+els.maxDimension.addEventListener("change",() => {
+  if (!state.sourceDimensions) return;
+  if (els.maxDimension.value !== "custom") {
+    const limit = parseInt(els.maxDimension.value,10);
+    if (Number.isFinite(limit)) {
+      const w = state.sourceDimensions.width;
+      const h = state.sourceDimensions.height;
+      const scale = Math.min(1,limit/Math.max(w,h));
+      els.widthInput.value = Math.max(1,Math.round(w*scale));
+      els.heightInput.value = Math.max(1,Math.round(h*scale));
+    }
+  }
+});
+
+els.lockAspect.addEventListener("change",() => {
+  if (els.lockAspect.checked) changeWidth();
+});
+
+document.querySelectorAll(".ratio-btn").forEach(btn => {
+  btn.addEventListener("click",() => applyRatio(btn.dataset.ratio));
+});
+
+els.advancedToggle.addEventListener("click",() => {
+  const hidden = els.advancedContent.classList.toggle("hidden");
+  els.advancedToggle.textContent = hidden
+    ? "＋ Advanced Settings"
+    : "− Advanced Settings";
+});
+
+els.targetEnabled.addEventListener("change",updateTargetUI);
+
+els.convertBtn.addEventListener("click",startConversion);
+
+els.cancelBtn.addEventListener("click",() => {
+  if (!state.processing) return;
+  state.cancelRequested = true;
+  els.cancelBtn.disabled = true;
+  setProgress("Cancelling...","Stopping the current operation.",0);
+  setTimeout(() => els.cancelBtn.disabled = false,500);
+});
+
+els.resetBtn.addEventListener("click",resetAll);
+els.batchResetBtn.addEventListener("click",resetAll);
+
+els.downloadCurrentBtn.addEventListener("click",async() => {
+  if (!state.output) return;
+
+  const btn = els.downloadCurrentBtn;
+  btn.disabled = true;
+
+  try {
+    await downloadBlob(
+      state.output.blob,
+      state.output.filename,
+      state.output.mime
+    );
+    showToast("Download initiated");
+  } catch (_) {
+    setStatus(
+      "The browser did not allow the download to start. Try Share / Save if available.",
+      "error"
+    );
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+els.shareCurrentBtn.addEventListener("click",async() => {
+  if (!state.output) return;
+
+  const btn = els.shareCurrentBtn;
+  btn.disabled = true;
+
+  try {
+    await shareResult(state.output);
+  } catch (_) {
+    setStatus("File sharing is not available in this environment.", "error");
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+els.zipBtn.addEventListener("click",downloadZip);
+
+/* =========================================================
+   CLIPBOARD BUTTON AVAILABILITY
+========================================================= */
+if (navigator.clipboard && navigator.clipboard.read) {
+  els.pasteBtn.classList.remove("hidden");
+}
+
+/* =========================================================
+   PAGE VISIBILITY / MEMORY SAFETY
+========================================================= */
+document.addEventListener("visibilitychange",() => {
+  if (document.hidden && state.processing) {
+    /*
+      Do not cancel automatically. Mobile browsers can temporarily
+      background the Mini App during share/download UI.
+    */
+  }
+});
+
+window.addEventListener("beforeunload",() => {
+  if (state.sourceObjectUrl) {
+    try { URL.revokeObjectURL(state.sourceObjectUrl); } catch (_) {}
+  }
+
+  if (state.output) revokeOutput(state.output);
+
+  for (const result of state.batchResults) revokeOutput(result);
+
+  closeImage(state.sourceImage);
+});
+
+/* =========================================================
+   INITIALIZATION
+========================================================= */
+(async function init() {
+  updateQualityUI();
+  updateResizeUI();
+  updateTargetUI();
+
+  state.webpSupported = await detectWebPEncoding();
+
+  if (!state.webpSupported) {
+    els.fmtWebp.disabled = true;
+    els.webpOption.classList.add("disabled");
+    els.webpSupportText.textContent =
+      "WebP output is not supported by this browser.";
+  } else {
+    els.webpSupportText.textContent =
+      "WebP encoding is available in this browser.";
+  }
+
+  updateFormatUI();
+})();
+</script>
 </body>
 </html>
