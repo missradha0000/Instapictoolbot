@@ -1,2033 +1,504 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
-  >
-
-  <meta name="theme-color" content="#ffffff">
-
-  <title>Image Crop & Resize | InstaPic</title>
-
-  <!-- Telegram Mini App -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Cropper.js -->
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css"
-  >
-
-  <script
-    src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"
-  ></script>
-
-  <!-- Font Awesome -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-  >
-
-  <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      min-height: 100%;
-
-      background: #ffffff;
-
-      font-family:
-        Inter,
-        Roboto,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-
-      color: #172033;
-    }
-
-    body {
-      min-height: 100vh;
-      min-height: 100dvh;
-      overflow-x: hidden;
-    }
-
-    button,
-    input {
-      font-family: inherit;
-    }
-
-    button {
-      -webkit-user-select: none;
-      user-select: none;
-    }
-
-    .app {
-      width: 100%;
-      max-width: 620px;
-
-      margin: 0 auto;
-
-      padding:
-        calc(20px + env(safe-area-inset-top))
-        18px
-        calc(100px + env(safe-area-inset-bottom));
-    }
-
-    /* ================================
-       HEADER
-    ================================= */
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-
-      margin-bottom: 28px;
-    }
-
-    .logo {
-      width: 46px;
-      height: 46px;
-
-      flex: 0 0 46px;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      border-radius: 13px;
-
-      background: #eaf4ff;
-      color: #1d7edb;
-
-      font-size: 20px;
-    }
-
-    .brand-title {
-      margin: 0;
-
-      color: #1d7edb;
-
-      font-size: 21px;
-      line-height: 1.2;
-
-      font-weight: 750;
-
-      letter-spacing: -0.3px;
-    }
-
-    .brand-subtitle {
-      margin: 4px 0 0;
-
-      color: #8b95a3;
-
-      font-size: 12.5px;
-    }
-
-    /* ================================
-       SELECT BUTTON
-    ================================= */
-
-    .select-btn {
-      width: 100%;
-      min-height: 55px;
-
-      border: 0;
-      border-radius: 13px;
-
-      background: #1d7edb;
-      color: #ffffff;
-
-      font-size: 16px;
-      font-weight: 700;
-
-      cursor: pointer;
-
-      box-shadow:
-        0 6px 18px rgba(29, 126, 219, 0.18);
-
-      transition:
-        transform 0.12s ease,
-        background 0.15s ease;
-    }
-
-    .select-btn:active {
-      transform: scale(0.98);
-    }
-
-    /* ================================
-       EMPTY STATE
-    ================================= */
-
-    .empty-state {
-      margin-top: 20px;
-
-      padding: 30px 15px;
-
-      border: 1px dashed #dfe5eb;
-
-      border-radius: 13px;
-
-      text-align: center;
-
-      color: #9aa3af;
-
-      font-size: 13px;
-
-      line-height: 1.5;
-    }
-
-    .empty-state i {
-      display: block;
-
-      margin-bottom: 9px;
-
-      color: #b8c1cb;
-
-      font-size: 28px;
-    }
-
-    /* ================================
-       CROPPER
-    ================================= */
-
-    .crop-wrapper {
-      width: 100%;
-
-      overflow: hidden;
-
-      border-radius: 14px;
-
-      background: #111827;
-
-      border: 1px solid #e3e7eb;
-
-      touch-action: none;
-    }
-
-    .crop-area {
-      width: 100%;
-
-      height: min(72vw, 430px);
-
-      min-height: 260px;
-
-      max-height: 430px;
-    }
-
-    .crop-area img {
-      display: block;
-      max-width: 100%;
-    }
-
-    .cropper-container,
-    .cropper-wrap-box,
-    .cropper-drag-box,
-    .cropper-canvas {
-      touch-action: none;
-    }
-
-    .cropper-view-box {
-      outline: 2px solid #ffffff;
-      outline-color: rgba(255, 255, 255, 0.95);
-    }
-
-    .cropper-modal {
-      background-color: #000000;
-      opacity: 0.55;
-    }
-
-    /* ================================
-       SECTION TITLE
-    ================================= */
-
-    .section-title {
-      color: #303846;
-
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    /* ================================
-       RATIO BUTTONS
-    ================================= */
-
-    .ratio-grid {
-      display: grid;
-
-      grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-
-      gap: 8px;
-
-      margin-top: 10px;
-    }
-
-    .ratio-btn {
-      min-height: 45px;
-
-      border-radius: 10px;
-
-      border: 1px solid #dfe4ea;
-
-      background: #ffffff;
-
-      color: #5d6877;
-
-      font-size: 12px;
-      font-weight: 700;
-
-      cursor: pointer;
-
-      transition: all 0.15s ease;
-    }
-
-    .ratio-btn:active {
-      transform: scale(0.97);
-    }
-
-    .ratio-btn.active {
-      background: #edf7ff;
-
-      color: #1d7edb;
-
-      border-color: #1d7edb;
-    }
-
-    /* ================================
-       DIMENSIONS
-    ================================= */
-
-    .dimension-grid {
-      display: grid;
-
-      grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-
-      gap: 10px;
-
-      margin-top: 18px;
-    }
-
-    .input-label {
-      display: block;
-
-      margin-bottom: 6px;
-
-      color: #687384;
-
-      font-size: 12px;
-
-      font-weight: 600;
-    }
-
-    .dimension-input {
-      width: 100%;
-
-      height: 47px;
-
-      padding: 0 12px;
-
-      border-radius: 10px;
-
-      border: 1px solid #dfe4ea;
-
-      background: #ffffff;
-
-      color: #202938;
-
-      font-size: 14px;
-
-      outline: none;
-
-      transition:
-        border-color 0.15s ease,
-        box-shadow 0.15s ease;
-    }
-
-    .dimension-input:focus {
-      border-color: #1d7edb;
-
-      box-shadow:
-        0 0 0 3px rgba(29, 126, 219, 0.09);
-    }
-
-    /* ================================
-       ASPECT RATIO
-    ================================= */
-
-    .aspect-row {
-      display: flex;
-
-      align-items: center;
-
-      gap: 9px;
-
-      margin-top: 13px;
-
-      color: #687384;
-
-      font-size: 12.5px;
-
-      cursor: pointer;
-
-      user-select: none;
-    }
-
-    .aspect-row input {
-      width: 17px;
-      height: 17px;
-
-      accent-color: #1d7edb;
-    }
-
-    /* ================================
-       APPLY BUTTON
-    ================================= */
-
-    .apply-btn {
-      width: 100%;
-
-      min-height: 53px;
-
-      margin-top: 19px;
-
-      border: 0;
-
-      border-radius: 12px;
-
-      background: #10b981;
-
-      color: #ffffff;
-
-      font-size: 15px;
-
-      font-weight: 750;
-
-      cursor: pointer;
-
-      box-shadow:
-        0 6px 18px rgba(16, 185, 129, 0.16);
-
-      transition:
-        transform 0.12s ease,
-        opacity 0.15s ease;
-    }
-
-    .apply-btn:active {
-      transform: scale(0.98);
-    }
-
-    .apply-btn:disabled {
-      opacity: 0.65;
-      cursor: not-allowed;
-    }
-
-    /* ================================
-       INFO
-    ================================= */
-
-    .info-box {
-      margin-top: 12px;
-
-      padding: 11px 12px;
-
-      border-radius: 10px;
-
-      border: 1px solid #e4f0fb;
-
-      background: #f7fbff;
-
-      color: #738091;
-
-      font-size: 12px;
-
-      line-height: 1.5;
-    }
-
-    /* ================================
-       SPINNER
-    ================================= */
-
-    .spinner {
-      display: inline-block;
-
-      width: 18px;
-      height: 18px;
-
-      margin-right: 7px;
-
-      vertical-align: -4px;
-
-      border:
-        2px solid
-        rgba(255, 255, 255, 0.4);
-
-      border-top-color: #ffffff;
-
-      border-radius: 50%;
-
-      animation:
-        spin 0.7s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    /* ================================
-       BOTTOM SAFE SPACE
-    ================================= */
-
-    .bottom-space {
-      height: 96px;
-    }
-
-    @media (max-width: 380px) {
-
-      .app {
-        padding-left: 14px;
-        padding-right: 14px;
-      }
-
-      .brand-title {
-        font-size: 19px;
-      }
-
-      .crop-area {
-        min-height: 230px;
-      }
-
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1d7edb">
+<title>InstaPic | Image Resizer</title>
+<style>
+:root{--blue:#1d7edb;--green:#10b981;--ink:#172033;--muted:#64748b;--line:#e5eaf0;--bg:#f6f8fb;--card:#fff;--danger:#dc3545;--shadow:0 10px 35px rgba(24,45,75,.08)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+button,input,select{font:inherit}button{cursor:pointer;border:0}.app{max-width:1180px;margin:auto;padding:16px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.brand{display:flex;align-items:center;gap:10px}.logo{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--blue),var(--green));color:#fff;display:grid;place-items:center;font-weight:900}.brand b{display:block;font-size:17px}.brand span{color:var(--muted);font-size:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:18px;margin-bottom:16px}.hero{padding:22px}.hero h1{margin:0 0 5px;font-size:27px}.hero p{margin:0;color:var(--muted)}.upload{margin-top:18px;border:2px dashed #b9cbe0;border-radius:16px;padding:28px 15px;text-align:center;background:#fbfdff;transition:.2s}.upload.active{border-color:var(--blue);background:#eef7ff}.upload strong{display:block;font-size:17px}.upload small{display:block;color:var(--muted);margin:6px 0 14px}.primary,.secondary,.danger,.ghost{min-height:44px;padding:10px 15px;border-radius:12px;font-weight:750}.primary{background:var(--blue);color:#fff}.secondary{background:#eaf5ff;color:#1469aa}.ghost{background:#f0f4f8;color:#344054}.danger{background:#fff0f1;color:#b42318}.primary:disabled,.secondary:disabled{opacity:.5;cursor:not-allowed}.privacy{font-size:12px;color:var(--muted);margin-top:12px}.workspace{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(330px,.95fr);gap:16px}.section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:13px}.section-title h2{font-size:16px;margin:0}.muted{color:var(--muted)}.queue{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px}.item{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;position:relative}.thumb{height:130px;background:repeating-conic-gradient(#edf1f5 0 25%,#fff 0 50%) 50%/18px 18px;display:grid;place-items:center}.thumb img{width:100%;height:100%;object-fit:contain}.item-body{padding:9px}.name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meta{font-size:11px;color:var(--muted);margin-top:2px}.item-actions{display:flex;gap:5px;margin-top:8px}.item-actions button{flex:1;min-height:36px;border-radius:9px;background:#f2f6fa}.item-actions .remove{color:#b42318}.bad{padding:8px;background:#fff3f3;color:#b42318;border-top:1px solid #ffd8d8;font-size:12px}.empty{text-align:center;padding:30px;color:var(--muted);border:1px dashed var(--line);border-radius:14px}.fields{display:grid;grid-template-columns:1fr 1fr;gap:11px}.field label{display:block;font-weight:700;font-size:12px;margin-bottom:5px}.field input,.field select{width:100%;min-height:42px;border:1px solid #ccd6e1;border-radius:10px;padding:8px 10px;background:#fff;outline:none}.field input:focus,.field select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #1d7edb18}.full{grid-column:1/-1}.radio-row,.chips{display:flex;flex-wrap:wrap;gap:7px}.chip{padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:#fff;color:#344054}.chip.active{border-color:var(--blue);background:#eaf5ff;color:#075e9e;font-weight:750}.switch{display:flex;align-items:center;gap:9px;margin-top:12px}.switch input{width:18px;height:18px}.hint{font-size:11px;color:var(--muted);margin-top:5px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.stat{background:#f6f9fc;border-radius:12px;padding:10px}.stat b{display:block;font-size:14px}.stat span{font-size:11px;color:var(--muted)}.preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.preview-box{border:1px solid var(--line);border-radius:14px;overflow:hidden}.preview-box header{padding:9px 11px;font-weight:750;border-bottom:1px solid var(--line);font-size:12px}.preview-img{height:260px;background:repeating-conic-gradient(#edf1f5 0 25%,#fff 0 50%) 50%/18px 18px;display:grid;place-items:center}.preview-img img{max-width:100%;max-height:100%;object-fit:contain}.preview-info{padding:10px;font-size:12px}.result{border:1px solid #bdebdc;background:#f4fffa}.result h2{margin:0;color:#087a54}.bar{height:10px;background:#e8edf2;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--green));width:0}.progress-text{display:flex;justify-content:space-between;font-size:12px;margin:7px 0}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}.actions button{flex:1;min-width:135px}.crop-panel{border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:12px}.crop-stage{height:330px;background:#20252c;border-radius:12px;position:relative;overflow:hidden;touch-action:none}.crop-stage img{position:absolute;user-select:none;max-width:none;transform-origin:center;cursor:grab}.crop-box{position:absolute;border:2px solid #fff;box-shadow:0 0 0 9999px rgba(0,0,0,.48);touch-action:none;cursor:move}.crop-box:after{content:"";position:absolute;inset:33.33%;border:1px solid #ffffff88;border-left:0;border-right:0}.range{width:100%}.notice{padding:10px 12px;border-radius:10px;background:#fff8e7;color:#8a5a00;font-size:12px}.error{padding:10px 12px;border-radius:10px;background:#fff1f2;color:#b42318;font-size:12px;margin-top:10px}.hidden{display:none!important}.footer-note{text-align:center;color:var(--muted);font-size:11px;margin-top:14px}@media(max-width:760px){.app{padding:11px}.workspace,.preview-grid{grid-template-columns:1fr}.card{padding:14px;border-radius:15px}.hero h1{font-size:24px}.queue{grid-template-columns:repeat(2,minmax(0,1fr))}.thumb{height:115px}.fields{grid-template-columns:1fr 1fr}.preview-img{height:220px}.crop-stage{height:280px}.actions{position:relative;padding-bottom:calc(4px + env(safe-area-inset-bottom))}}@media(max-width:390px){.queue{grid-template-columns:1fr}.fields{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:1/-1}}
+</style>
 </head>
-
 <body>
-
-  <main class="app">
-
-    <!-- HEADER -->
-
-    <header class="brand">
-
-      <div class="logo">
-        <i class="fa-solid fa-crop-simple"></i>
-      </div>
-
-      <div>
-
-        <h1 class="brand-title">
-          Image Crop &amp; Resize
-        </h1>
-
-        <p class="brand-subtitle">
-          Fast, Simple &amp; 100% Client-Side
-        </p>
-
-      </div>
-
-    </header>
-
-
-    <!-- FILE INPUT -->
-
-    <input
-      id="imageInput"
-      type="file"
-      accept="image/jpeg,image/png,image/webp"
-      hidden
-    >
-
-
-    <!-- SELECT PHOTO -->
-
-    <button
-      id="selectBtn"
-      class="select-btn"
-      type="button"
-    >
-      <i class="fa-solid fa-folder-open mr-2"></i>
-      Select Photo
-    </button>
-
-
-    <!-- EMPTY STATE -->
-
-    <div
-      id="emptyState"
-      class="empty-state"
-    >
-
-      <i class="fa-regular fa-image"></i>
-
-      Select a photo to crop and resize it.
-
-    </div>
-
-
-    <!-- TOOL -->
-
-    <section
-      id="toolSection"
-      class="hidden mt-5"
-    >
-
-      <!-- CROPPER -->
-
-      <div class="crop-wrapper">
-
-        <div class="crop-area">
-
-          <img
-            id="cropImage"
-            alt="Image to crop"
-            draggable="false"
-          >
-
-        </div>
-
-      </div>
-
-
-      <!-- CROP RATIO -->
-
-      <div class="mt-5">
-
-        <div class="section-title">
-          Crop Ratio
-        </div>
-
-
-        <div
-          id="ratioGrid"
-          class="ratio-grid"
-        >
-
-          <button
-            type="button"
-            class="ratio-btn active"
-            data-ratio="free"
-          >
-            Free Crop
-          </button>
-
-          <button
-            type="button"
-            class="ratio-btn"
-            data-ratio="1"
-          >
-            1:1 Square
-          </button>
-
-          <button
-            type="button"
-            class="ratio-btn"
-            data-ratio="1.7777777778"
-          >
-            16:9 Landscape
-          </button>
-
-          <button
-            type="button"
-            class="ratio-btn"
-            data-ratio="1.3333333333"
-          >
-            4:3 Standard
-          </button>
-
-        </div>
-
-      </div>
-
-
-      <!-- WIDTH / HEIGHT -->
-
-      <div class="dimension-grid">
-
-        <div>
-
-          <label
-            class="input-label"
-            for="widthInput"
-          >
-            Width (px)
-          </label>
-
-          <input
-            id="widthInput"
-            class="dimension-input"
-            type="number"
-            min="1"
-            max="16000"
-            inputmode="numeric"
-            placeholder="Width"
-          >
-
-        </div>
-
-
-        <div>
-
-          <label
-            class="input-label"
-            for="heightInput"
-          >
-            Height (px)
-          </label>
-
-          <input
-            id="heightInput"
-            class="dimension-input"
-            type="number"
-            min="1"
-            max="16000"
-            inputmode="numeric"
-            placeholder="Height"
-          >
-
-        </div>
-
-      </div>
-
-
-      <!-- MAINTAIN ASPECT -->
-
-      <label
-        class="aspect-row"
-        for="aspectRatio"
-      >
-
-        <input
-          id="aspectRatio"
-          type="checkbox"
-          checked
-        >
-
-        <span>
-          Maintain Aspect Ratio
-        </span>
-
-      </label>
-
-
-      <!-- APPLY -->
-
-      <button
-        id="applyBtn"
-        class="apply-btn"
-        type="button"
-      >
-
-        <i class="fa-solid fa-download mr-2"></i>
-
-        Apply &amp; Download
-
-      </button>
-
-
-      <!-- INFO -->
-
-      <div class="info-box">
-
-        <i class="fa-solid fa-shield-halved mr-1"></i>
-
-        Your image is processed completely on your device.
-        No image is uploaded to any server.
-
-      </div>
-
+<div class="app">
+<header class="top">
+  <div class="brand"><div class="logo">IP</div><div><b>InstaPic</b><span>All Image Tools · Image Resizer</span></div></div>
+  <button id="resetBtn" class="ghost" type="button">Reset</button>
+</header>
+
+<section class="card hero">
+  <h1>Image Resizer</h1>
+  <p>Resize, crop and convert images precisely — directly on your device.</p>
+  <div id="dropZone" class="upload">
+    <strong>Drop images here</strong>
+    <small>JPG, PNG, WebP, GIF, BMP, AVIF where your browser can decode them</small>
+    <button id="selectBtn" class="primary" type="button">Select Images</button>
+    <input id="fileInput" type="file" multiple accept="image/*" hidden>
+  </div>
+  <div class="privacy">🔒 Your images are processed on your device. They are not uploaded for resizing.</div>
+  <div id="globalMsg"></div>
+</section>
+
+<section id="workspace" class="workspace hidden">
+  <div>
+    <section class="card">
+      <div class="section-title"><h2>Image Queue</h2><div><span id="count" class="muted"></span> <button id="addBtn" class="secondary" type="button">＋ Add More</button></div></div>
+      <div id="queue" class="queue"></div>
     </section>
 
-
-    <!-- TELEGRAM SAFE BOTTOM SPACE -->
-
-    <div class="bottom-space"></div>
-
-  </main>
-
-
-  <script>
-    (() => {
-
-      "use strict";
-
-
-      /* =====================================================
-         TELEGRAM WEB APP INITIALIZATION
-      ===================================================== */
-
-      const tg =
-        window.Telegram &&
-        window.Telegram.WebApp;
-
-
-      if (tg) {
-
-        try {
-
-          tg.ready();
-
-          tg.expand();
-
-          if (typeof tg.setHeaderColor === "function") {
-            tg.setHeaderColor("#ffffff");
-          }
-
-          if (typeof tg.setBackgroundColor === "function") {
-            tg.setBackgroundColor("#ffffff");
-          }
-
-          if (typeof tg.setBottomBarColor === "function") {
-            tg.setBottomBarColor("#ffffff");
-          }
-
-        } catch (error) {
-
-          console.warn(
-            "Telegram WebApp initialization:",
-            error
-          );
-
-        }
-
-      }
-
-
-      /* =====================================================
-         DOM
-      ===================================================== */
-
-      const imageInput =
-        document.getElementById("imageInput");
-
-      const selectBtn =
-        document.getElementById("selectBtn");
-
-      const emptyState =
-        document.getElementById("emptyState");
-
-      const toolSection =
-        document.getElementById("toolSection");
-
-      const cropImage =
-        document.getElementById("cropImage");
-
-      const ratioGrid =
-        document.getElementById("ratioGrid");
-
-      const widthInput =
-        document.getElementById("widthInput");
-
-      const heightInput =
-        document.getElementById("heightInput");
-
-      const aspectRatio =
-        document.getElementById("aspectRatio");
-
-      const applyBtn =
-        document.getElementById("applyBtn");
-
-
-      /* =====================================================
-         STATE
-      ===================================================== */
-
-      let selectedFile = null;
-
-      let cropper = null;
-
-      let imageObjectURL = null;
-
-      let originalAspectRatio = 1;
-
-      const MAX_OUTPUT_DIMENSION = 16000;
-
-
-      /* =====================================================
-         SELECT BUTTON
-      ===================================================== */
-
-      selectBtn.addEventListener(
-        "click",
-        () => {
-
-          imageInput.value = "";
-
-          imageInput.click();
-
-        }
-      );
-
-
-      /* =====================================================
-         IMAGE SELECTION
-      ===================================================== */
-
-      imageInput.addEventListener(
-        "change",
-        event => {
-
-          const file =
-            event.target.files &&
-            event.target.files[0];
-
-
-          if (!file) {
-            return;
-          }
-
-
-          /*
-           * Accept only actual image files.
-           */
-          if (
-            ![
-              "image/jpeg",
-              "image/png",
-              "image/webp"
-            ].includes(file.type)
-          ) {
-
-            alert(
-              "Please select a JPG, PNG or WEBP image."
-            );
-
-            return;
-
-          }
-
-
-          selectedFile = file;
-
-
-          /*
-           * Remove old object URL.
-           */
-          if (imageObjectURL) {
-
-            URL.revokeObjectURL(
-              imageObjectURL
-            );
-
-          }
-
-
-          imageObjectURL =
-            URL.createObjectURL(file);
-
-
-          /*
-           * Destroy old Cropper.
-           */
-          if (cropper) {
-
-            cropper.destroy();
-
-            cropper = null;
-
-          }
-
-
-          cropImage.onload =
-            () => {
-
-              originalAspectRatio =
-                cropImage.naturalWidth /
-                cropImage.naturalHeight;
-
-
-              widthInput.value =
-                Math.min(
-                  cropImage.naturalWidth,
-                  MAX_OUTPUT_DIMENSION
-                );
-
-
-              heightInput.value =
-                Math.min(
-                  cropImage.naturalHeight,
-                  MAX_OUTPUT_DIMENSION
-                );
-
-
-              initializeCropper();
-
-            };
-
-
-          cropImage.src =
-            imageObjectURL;
-
-
-          emptyState.classList.add(
-            "hidden"
-          );
-
-
-          toolSection.classList.remove(
-            "hidden"
-          );
-
-        }
-      );
-
-
-      /* =====================================================
-         CROPPER INITIALIZATION
-      ===================================================== */
-
-      function initializeCropper() {
-
-        if (
-          typeof Cropper ===
-          "undefined"
-        ) {
-
-          alert(
-            "Cropper.js could not be loaded. Please reopen the app with an internet connection."
-          );
-
-          return;
-
-        }
-
-
-        cropper =
-          new Cropper(
-            cropImage,
-            {
-
-              aspectRatio: NaN,
-
-              viewMode: 1,
-
-              dragMode: "crop",
-
-              responsive: true,
-
-              restore: true,
-
-              checkOrientation: true,
-
-              zoomable: true,
-
-              zoomOnTouch: true,
-
-              zoomOnWheel: true,
-
-              movable: true,
-
-              rotatable: false,
-
-              scalable: false,
-
-              guides: true,
-
-              center: true,
-
-              highlight: true,
-
-              background: false,
-
-              autoCrop: true,
-
-              autoCropArea: 0.9,
-
-              cropBoxMovable: true,
-
-              cropBoxResizable: true,
-
-              toggleDragModeOnDblclick: false
-
-            }
-          );
-
-      }
-
-
-      /* =====================================================
-         RATIO BUTTONS
-      ===================================================== */
-
-      ratioGrid.addEventListener(
-        "click",
-        event => {
-
-          const button =
-            event.target.closest(
-              ".ratio-btn"
-            );
-
-
-          if (!button) {
-            return;
-          }
-
-
-          const ratio =
-            button.dataset.ratio;
-
-
-          ratioGrid
-            .querySelectorAll(
-              ".ratio-btn"
-            )
-            .forEach(
-              item => {
-
-                item.classList.toggle(
-                  "active",
-                  item === button
-                );
-
-              }
-            );
-
-
-          if (!cropper) {
-            return;
-          }
-
-
-          if (ratio === "free") {
-
-            cropper.setAspectRatio(
-              NaN
-            );
-
-          } else {
-
-            cropper.setAspectRatio(
-              Number(ratio)
-            );
-
-          }
-
-
-          setTimeout(
-            updateDimensionInputsFromCrop,
-            50
-          );
-
-        }
-      );
-
-
-      /* =====================================================
-         UPDATE DIMENSIONS
-      ===================================================== */
-
-      function updateDimensionInputsFromCrop() {
-
-        if (!cropper) {
-          return;
-        }
-
-
-        const data =
-          cropper.getData();
-
-
-        if (
-          data &&
-          Number.isFinite(data.width) &&
-          Number.isFinite(data.height)
-        ) {
-
-          widthInput.value =
-            Math.round(data.width);
-
-          heightInput.value =
-            Math.round(data.height);
-
-        }
-
-      }
-
-
-      /* =====================================================
-         WIDTH CHANGE
-      ===================================================== */
-
-      widthInput.addEventListener(
-        "input",
-        () => {
-
-          if (!cropper) {
-            return;
-          }
-
-
-          let width =
-            Number(
-              widthInput.value
-            );
-
-
-          if (
-            !Number.isFinite(width) ||
-            width <= 0
-          ) {
-
-            return;
-
-          }
-
-
-          width =
-            Math.min(
-              width,
-              MAX_OUTPUT_DIMENSION
-            );
-
-
-          if (aspectRatio.checked) {
-
-            const data =
-              cropper.getData();
-
-
-            const ratio =
-              data.height > 0
-                ? data.width / data.height
-                : originalAspectRatio;
-
-
-            const height =
-              Math.round(
-                width / ratio
-              );
-
-
-            heightInput.value =
-              Math.min(
-                height,
-                MAX_OUTPUT_DIMENSION
-              );
-
-          }
-
-        }
-      );
-
-
-      /* =====================================================
-         HEIGHT CHANGE
-      ===================================================== */
-
-      heightInput.addEventListener(
-        "input",
-        () => {
-
-          if (!cropper) {
-            return;
-          }
-
-
-          let height =
-            Number(
-              heightInput.value
-            );
-
-
-          if (
-            !Number.isFinite(height) ||
-            height <= 0
-          ) {
-
-            return;
-
-          }
-
-
-          height =
-            Math.min(
-              height,
-              MAX_OUTPUT_DIMENSION
-            );
-
-
-          if (aspectRatio.checked) {
-
-            const data =
-              cropper.getData();
-
-
-            const ratio =
-              data.height > 0
-                ? data.width / data.height
-                : originalAspectRatio;
-
-
-            const width =
-              Math.round(
-                height * ratio
-              );
-
-
-            widthInput.value =
-              Math.min(
-                width,
-                MAX_OUTPUT_DIMENSION
-              );
-
-          }
-
-        }
-      );
-
-
-      /* =====================================================
-         OUTPUT DIMENSIONS
-      ===================================================== */
-
-      function getOutputDimensions() {
-
-        let width =
-          parseInt(
-            widthInput.value,
-            10
-          );
-
-
-        let height =
-          parseInt(
-            heightInput.value,
-            10
-          );
-
-
-        const cropData =
-          cropper.getData();
-
-
-        if (
-          !Number.isFinite(width) ||
-          width <= 0
-        ) {
-
-          width =
-            Math.round(
-              cropData.width
-            );
-
-        }
-
-
-        if (
-          !Number.isFinite(height) ||
-          height <= 0
-        ) {
-
-          height =
-            Math.round(
-              cropData.height
-            );
-
-        }
-
-
-        width =
-          Math.max(
-            1,
-            Math.min(
-              width,
-              MAX_OUTPUT_DIMENSION
-            )
-          );
-
-
-        height =
-          Math.max(
-            1,
-            Math.min(
-              height,
-              MAX_OUTPUT_DIMENSION
-            )
-          );
-
-
-        /*
-         * Final aspect-ratio protection.
-         */
-        if (
-          aspectRatio.checked
-        ) {
-
-          const ratio =
-            cropData.height > 0
-              ? cropData.width /
-                cropData.height
-              : originalAspectRatio;
-
-
-          const requestedWidth =
-            parseInt(
-              widthInput.value,
-              10
-            );
-
-
-          if (
-            Number.isFinite(
-              requestedWidth
-            ) &&
-            requestedWidth > 0
-          ) {
-
-            width =
-              Math.min(
-                requestedWidth,
-                MAX_OUTPUT_DIMENSION
-              );
-
-
-            height =
-              Math.round(
-                width / ratio
-              );
-
-          }
-
-
-          if (
-            height >
-            MAX_OUTPUT_DIMENSION
-          ) {
-
-            height =
-              MAX_OUTPUT_DIMENSION;
-
-
-            width =
-              Math.round(
-                height * ratio
-              );
-
-          }
-
-
-          if (
-            width >
-            MAX_OUTPUT_DIMENSION
-          ) {
-
-            width =
-              MAX_OUTPUT_DIMENSION;
-
-
-            height =
-              Math.round(
-                width / ratio
-              );
-
-          }
-
-        }
-
-
-        return {
-          width,
-          height
-        };
-
-      }
-
-
-      /* =====================================================
-         CANVAS → BLOB
-      ===================================================== */
-
-      function canvasToBlob(
-        canvas,
-        type,
-        quality
-      ) {
-
-        return new Promise(
-          (resolve, reject) => {
-
-            try {
-
-              canvas.toBlob(
-                blob => {
-
-                  if (!blob) {
-
-                    reject(
-                      new Error(
-                        "Canvas failed to create image."
-                      )
-                    );
-
-                    return;
-
-                  }
-
-
-                  resolve(blob);
-
-                },
-
-                type,
-
-                quality
-
-              );
-
-            } catch (error) {
-
-              reject(error);
-
-            }
-
-          }
-        );
-
-      }
-
-
-      /* =====================================================
-         CREATE FINAL IMAGE
-      ===================================================== */
-
-      async function createOutputBlob() {
-
-        const dimensions =
-          getOutputDimensions();
-
-
-        /*
-         * Cropper performs the actual crop and resize.
-         */
-        const canvas =
-          cropper.getCroppedCanvas({
-
-            width:
-              dimensions.width,
-
-            height:
-              dimensions.height,
-
-            minWidth:
-              1,
-
-            minHeight:
-              1,
-
-            maxWidth:
-              MAX_OUTPUT_DIMENSION,
-
-            maxHeight:
-              MAX_OUTPUT_DIMENSION,
-
-            fillColor:
-              "#ffffff",
-
-            imageSmoothingEnabled:
-              true,
-
-            imageSmoothingQuality:
-              "high"
-
-          });
-
-
-        if (!canvas) {
-
-          throw new Error(
-            "Could not create output canvas."
-          );
-
-        }
-
-
-        /*
-         * JPEG is intentional because the requested
-         * output filename is instapic_resized.jpg.
-         */
-        return await canvasToBlob(
-          canvas,
-          "image/jpeg",
-          0.92
-        );
-
-      }
-
-
-      /* =====================================================
-         TELEGRAM / MOBILE SAFE DOWNLOAD SYSTEM
-         
-         IMPORTANT:
-         
-         Desktop:
-             normal <a download>
-
-         Mobile / Telegram:
-             Web Share API with File
-
-         Fallback:
-             open generated Blob URL
-         
-         Nothing is uploaded to a server.
-      ===================================================== */
-
-      async function downloadFile(
-        blob,
-        filename
-      ) {
-
-        if (!blob) {
-
-          throw new Error(
-            "Download data is empty."
-          );
-
-        }
-
-
-        const file =
-          new File(
-            [blob],
-            filename,
-            {
-              type:
-                blob.type ||
-                "image/jpeg"
-            }
-          );
-
-
-        /*
-         * =================================================
-         * METHOD 1
-         * Web Share API
-         *
-         * This is the most useful path on mobile
-         * Telegram WebViews where <a download> can be
-         * ignored by the embedded browser.
-         * =================================================
-         */
-
-        if (
-          typeof navigator.share ===
-          "function"
-        ) {
-
-          try {
-
-            let canShareFiles =
-              true;
-
-
-            if (
-              typeof navigator.canShare ===
-              "function"
-            ) {
-
-              canShareFiles =
-                navigator.canShare({
-                  files: [file]
-                });
-
-            }
-
-
-            if (canShareFiles) {
-
-              await navigator.share({
-
-                files: [file],
-
-                title:
-                  filename,
-
-                text:
-                  "InstaPic processed image"
-
-              });
-
-
-              return true;
-
-            }
-
-          } catch (error) {
-
-            /*
-             * AbortError means the user closed
-             * the share sheet. Do not show an error.
-             */
-            if (
-              error &&
-              error.name ===
-                "AbortError"
-            ) {
-
-              return false;
-
-            }
-
-
-            console.warn(
-              "Web Share unavailable:",
-              error
-            );
-
-          }
-
-        }
-
-
-        /*
-         * =================================================
-         * METHOD 2
-         * Standard browser download
-         *
-         * Works normally on desktop Chrome and browsers
-         * which support download attribute.
-         * =================================================
-         */
-
-        const objectURL =
-          URL.createObjectURL(
-            blob
-          );
-
-
-        try {
-
-          const link =
-            document.createElement(
-              "a"
-            );
-
-
-          link.href =
-            objectURL;
-
-
-          link.download =
-            filename;
-
-
-          link.rel =
-            "noopener";
-
-
-          link.style.display =
-            "none";
-
-
-          document.body.appendChild(
-            link
-          );
-
-
-          /*
-           * MouseEvent provides better compatibility
-           * with some embedded browsers.
-           */
-          link.dispatchEvent(
-            new MouseEvent(
-              "click",
-              {
-                bubbles: true,
-                cancelable: true,
-                view: window
-              }
-            )
-          );
-
-
-          /*
-           * Also call click() for browsers that do not
-           * respond to dispatchEvent.
-           */
-          try {
-
-            link.click();
-
-          } catch (_) {}
-
-
-          link.remove();
-
-
-          /*
-           * Give the browser time to start the download.
-           */
-          setTimeout(
-            () => {
-
-              URL.revokeObjectURL(
-                objectURL
-              );
-
-            },
-            5000
-          );
-
-
-          /*
-           * The anchor method has been triggered.
-           */
-          return true;
-
-        } catch (error) {
-
-          console.warn(
-            "Standard download failed:",
-            error
-          );
-
-        }
-
-
-        /*
-         * =================================================
-         * METHOD 3
-         * Blob URL fallback.
-         *
-         * This opens the processed image directly in the
-         * WebView. The user can use Telegram/browser's
-         * native Save/Share action.
-         * =================================================
-         */
-
-        try {
-
-          window.open(
-            objectURL,
-            "_blank"
-          );
-
-
-          setTimeout(
-            () => {
-
-              URL.revokeObjectURL(
-                objectURL
-              );
-
-            },
-            10000
-          );
-
-
-          return true;
-
-        } catch (error) {
-
-          URL.revokeObjectURL(
-            objectURL
-          );
-
-          throw error;
-
-        }
-
-      }
-
-
-      /* =====================================================
-         APPLY & DOWNLOAD
-      ===================================================== */
-
-      applyBtn.addEventListener(
-        "click",
-        async () => {
-
-          if (!selectedFile) {
-
-            alert(
-              "Please select a photo first."
-            );
-
-            return;
-
-          }
-
-
-          if (!cropper) {
-
-            alert(
-              "Crop editor is not ready yet."
-            );
-
-            return;
-
-          }
-
-
-          const oldButtonHTML =
-            applyBtn.innerHTML;
-
-
-          applyBtn.disabled =
-            true;
-
-
-          applyBtn.innerHTML =
-            '<span class="spinner"></span>Processing...';
-
-
-          try {
-
-            /*
-             * Give the WebView one frame to render
-             * the processing state.
-             */
-            await new Promise(
-              resolve =>
-                requestAnimationFrame(
-                  () => resolve()
-                )
-            );
-
-
-            /*
-             * Create the final image completely locally.
-             */
-            const blob =
-              await createOutputBlob();
-
-
-            if (
-              !blob ||
-              blob.size <= 0
-            ) {
-
-              throw new Error(
-                "Generated image is empty."
-              );
-
-            }
-
-
-            /*
-             * Telegram/mobile compatible download.
-             */
-            await downloadFile(
-              blob,
-              "instapic_resized.jpg"
-            );
-
-
-            /*
-             * Restore button.
-             */
-            applyBtn.innerHTML =
-              '<i class="fa-solid fa-check mr-2"></i>' +
-              "Downloaded";
-
-
-            /*
-             * Keep the result state visible briefly,
-             * then restore normal button text.
-             */
-            setTimeout(
-              () => {
-
-                applyBtn.innerHTML =
-                  oldButtonHTML;
-
-              },
-              1800
-            );
-
-
-          } catch (error) {
-
-            console.error(
-              "Image processing/download error:",
-              error
-            );
-
-
-            /*
-             * User cancellation of Web Share is NOT a
-             * processing error.
-             */
-            if (
-              !(
-                error &&
-                error.name ===
-                  "AbortError"
-              )
-            ) {
-
-              alert(
-                "Could not download the image. Please try again."
-              );
-
-            }
-
-
-            applyBtn.innerHTML =
-              oldButtonHTML;
-
-          } finally {
-
-            applyBtn.disabled =
-              false;
-
-          }
-
-        }
-      );
-
-
-      /* =====================================================
-         CLEANUP
-      ===================================================== */
-
-      window.addEventListener(
-        "beforeunload",
-        () => {
-
-          if (cropper) {
-
-            cropper.destroy();
-
-            cropper = null;
-
-          }
-
-
-          if (imageObjectURL) {
-
-            URL.revokeObjectURL(
-              imageObjectURL
-            );
-
-            imageObjectURL = null;
-
-          }
-
-        }
-      );
-
-
-    })();
-  </script>
-
+    <section id="beforeAfter" class="card hidden">
+      <div class="section-title"><h2>Before / After</h2><span id="activeName" class="muted"></span></div>
+      <div class="preview-grid">
+        <div class="preview-box"><header>ORIGINAL</header><div class="preview-img"><img id="originalPreview"></div><div id="originalInfo" class="preview-info"></div></div>
+        <div class="preview-box"><header>RESIZED</header><div class="preview-img"><img id="outputPreview"></div><div id="outputInfo" class="preview-info">Resize to generate a result.</div></div>
+      </div>
+    </section>
+  </div>
+
+  <div>
+    <section class="card">
+      <div class="section-title"><h2>Resize Settings</h2></div>
+      <div class="field"><label>Resize Mode</label>
+        <select id="mode">
+          <option value="pixels">By Pixels</option><option value="percentage">By Percentage</option>
+          <option value="longest">By Longest Side</option><option value="shortest">By Shortest Side</option>
+          <option value="preset">Preset Dimensions</option><option value="physical">Physical Size (DPI)</option>
+        </select>
+      </div>
+      <div id="pixelFields" class="fields" style="margin-top:11px">
+        <div class="field"><label>Width (px)</label><input id="width" type="number" min="1" step="1"></div>
+        <div class="field"><label>Height (px)</label><input id="height" type="number" min="1" step="1"></div>
+      </div>
+      <label class="switch"><input id="lockRatio" type="checkbox" checked><span>Lock aspect ratio</span></label>
+      <div id="distortHint" class="hint hidden">Unlocking aspect ratio may distort the image.</div>
+
+      <div id="percentageBox" class="field hidden" style="margin-top:11px"><label>Percentage</label><select id="percentage"><option>25</option><option>50</option><option>75</option><option selected>100</option><option>125</option><option>150</option><option>200</option></select></div>
+      <div id="sideBox" class="field hidden" style="margin-top:11px"><label id="sideLabel">Longest Side (px)</label><input id="side" type="number" min="1" step="1"></div>
+      <div id="presetBox" class="field hidden" style="margin-top:11px"><label>Preset</label><select id="preset">
+        <option value="640x360">640 × 360 · 16:9</option><option value="854x480">854 × 480 · 16:9</option><option value="1280x720">HD · 1280 × 720</option><option value="1920x1080">Full HD · 1920 × 1080</option><option value="1080x1080">Instagram Square · 1080 × 1080</option><option value="1080x1350">Instagram Portrait · 1080 × 1350</option><option value="1080x1920">Instagram Story · 1080 × 1920</option><option value="1200x628">1200 × 628 · Social</option><option value="1600x900">1600 × 900 · 16:9</option>
+      </select><div class="hint">Presets use Fit by default; Fill/Crop creates the exact preset geometry.</div></div>
+
+      <div id="physicalBox" class="fields hidden" style="margin-top:11px"><div class="field"><label>Width (in)</label><input id="pinW" type="number" min=".01" step=".01" value="6"></div><div class="field"><label>Height (in)</label><input id="pinH" type="number" min=".01" step=".01" value="4"></div></div>
+
+      <div class="field" style="margin-top:11px"><label>Aspect Ratio Preset</label><select id="ratioPreset"><option value="original">Original</option><option value="1:1">1:1</option><option value="4:3">4:3</option><option value="3:2">3:2</option><option value="16:9">16:9</option><option value="9:16">9:16</option><option value="5:4">5:4</option><option value="4:5">4:5</option><option value="custom">Custom</option></select></div>
+      <div id="customRatio" class="fields hidden" style="margin-top:11px"><div class="field"><label>Ratio W</label><input id="ratioW" type="number" min="1" value="1"></div><div class="field"><label>Ratio H</label><input id="ratioH" type="number" min="1" value="1"></div></div>
+
+      <div class="field" style="margin-top:11px"><label>Fit Mode</label><select id="fit"><option value="fit">Fit — entire image, may leave space</option><option value="fill">Fill / Crop — exact dimensions</option><option value="stretch">Stretch — may distort</option></select></div>
+      <div class="switch"><input id="allowUpscale" type="checkbox"><span>Allow Upscaling</span></div>
+      <div class="switch"><input id="smart" type="checkbox" checked><span>Smart Resize (never upscale unless allowed)</span></div>
+    </section>
+
+    <section id="cropSection" class="card hidden">
+      <div class="section-title"><h2>Crop + Resize</h2><button id="centerCrop" class="ghost" type="button">Center Crop</button></div>
+      <div class="crop-stage" id="cropStage"><img id="cropImage"><div id="cropBox" class="crop-box"></div></div>
+      <div class="fields" style="margin-top:11px"><div class="field"><label>Crop Ratio</label><select id="cropRatio"><option value="free">Free</option><option value="1:1">1:1</option><option value="4:3">4:3</option><option value="3:2">3:2</option><option value="16:9">16:9</option><option value="9:16">9:16</option><option value="5:4">5:4</option><option value="4:5">4:5</option><option value="custom">Custom</option></select></div><div class="field"><label>Zoom</label><input id="zoom" class="range" type="range" min="1" max="3" step=".01" value="1"></div></div>
+      <div class="actions"><button id="rotateLeft" class="ghost" type="button">↶ Rotate</button><button id="rotateRight" class="ghost" type="button">↷ Rotate</button><button id="flipH" class="ghost" type="button">↔ Flip H</button><button id="flipV" class="ghost" type="button">↕ Flip V</button></div>
+    </section>
+
+    <section class="card">
+      <div class="section-title"><h2>Output</h2></div>
+      <div class="fields">
+        <div class="field"><label>Format</label><select id="format"><option value="same">Same as original</option><option value="jpeg">JPG</option><option value="png">PNG</option><option value="webp">WebP</option></select></div>
+        <div class="field"><label>Quality <span id="qualityValue">80%</span></label><input id="quality" type="range" min="1" max="100" value="80"></div>
+        <div class="field"><label>JPEG/WebP Background</label><input id="bg" type="color" value="#ffffff"></div>
+        <div class="field"><label>DPI</label><select id="dpi"><option>72</option><option>96</option><option selected>150</option><option>200</option><option>300</option></select></div>
+        <div class="field full"><label>Output filename</label><input id="filename" type="text" value=""></div>
+      </div>
+      <div id="pngHint" class="hint hidden">PNG uses lossless encoding; the quality slider does not change PNG compression.</div>
+      <div class="actions"><button id="resizeOne" class="primary" type="button">Resize Current</button><button id="resizeAll" class="primary" type="button">Resize All</button></div>
+      <div id="progressBox" class="hidden" style="margin-top:13px"><div class="progress-text"><span id="progressText">Preparing…</span><b id="progressPct">0%</b></div><div class="bar"><i id="progressBar"></i></div><div class="actions"><button id="cancel" class="danger" type="button">Cancel</button></div></div>
+      <div id="outputMsg"></div>
+    </section>
+  </div>
+</section>
+
+<section id="resultSection" class="card result hidden">
+  <div class="section-title"><div><h2>Results</h2><div id="resultSummary" class="muted"></div></div></div>
+  <div id="results"></div>
+  <div class="actions"><button id="downloadAll" class="secondary hidden" type="button">Download All</button><button id="newOperation" class="ghost" type="button">Resize Again</button></div>
+</section>
+<div class="footer-note">InstaPic · Client-side image processing · No upload</div>
+</div>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+(() => {
+'use strict';
+
+const $ = id => document.getElementById(id);
+const state = {
+  files: [], active: 0, results: [], objectUrls: new Set(), busy:false, cancel:false,
+  crop:{x:0,y:0,w:1,h:1}, rotation:0, flipH:false, flipV:false, cropScale:1,
+  generatedPreviewUrl:null
+};
+
+const defaults = () => ({
+  mode:'pixels', width:0,height:0,lock:true, percentage:100, side:1920,
+  preset:'1920x1080', fit:'fit', ratio:'original', ratioW:1,ratioH:1,
+  format:'same',quality:80,bg:'#ffffff',dpi:150,filename:'',allowUpscale:false,smart:true
+});
+
+let settings = defaults();
+
+if (window.Telegram && window.Telegram.WebApp) {
+  try { Telegram.WebApp.ready(); Telegram.WebApp.expand(); } catch(e){}
+}
+
+function fmtBytes(n){
+  if(!Number.isFinite(n)||n<0)return '0 B';
+  if(n<1024)return n+' B';
+  const units=['KB','MB','GB']; let v=n/1024,i=0;
+  while(v>=1024&&i<units.length-1){v/=1024;i++}
+  return v.toFixed(v>=100?0:v>=10?1:2)+' '+units[i];
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+function sanitizeBase(name){
+  let b=(name||'image').replace(/\.[^.]+$/,'').replace(/[<>:"/\\\\|?*\\x00-\\x1F]/g,'-').trim();
+  return b.replace(/\\.+$/,'')||'image';
+}
+function outputName(file, format, custom){
+  let base=custom ? sanitizeBase(custom) : sanitizeBase(file?.name);
+  base=base.replace(/-resized$/i,'');
+  const ext=format==='jpeg'?'jpg':format;
+  return base+'-resized.'+ext;
+}
+function showMsg(text,type='error',target='globalMsg'){
+  $(target).innerHTML=text?`<div class="${type==='error'?'error':'notice'}">${esc(text)}</div>`:'';
+}
+function mimeToFormat(file){
+  const t=(file.type||'').toLowerCase();
+  if(t==='image/png')return 'png'; if(t==='image/webp')return 'webp';
+  if(t==='image/jpeg')return 'jpeg'; return 'jpeg';
+}
+function isImageFile(f){return f && ((f.type||'').startsWith('image/') || /\.(jpe?g|png|webp|bmp|gif|avif)$/i.test(f.name));}
+async function decode(file){
+  if('createImageBitmap' in window){
+    try{
+      const b=await createImageBitmap(file,{imageOrientation:'from-image'});
+      return {source:b,w:b.width,h:b.height,bitmap:true};
+    }catch(e){}
+  }
+  const url=URL.createObjectURL(file); state.objectUrls.add(url);
+  try{
+    const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('Unable to decode image'));i.src=url;});
+    return {source:img,w:img.naturalWidth,h:img.naturalHeight,bitmap:false,url};
+  }catch(e){URL.revokeObjectURL(url);state.objectUrls.delete(url);throw e;}
+}
+function releaseDecoded(d){try{if(d?.bitmap)d.source.close();}catch(e){} if(d?.url){URL.revokeObjectURL(d.url);state.objectUrls.delete(d.url);}}
+async function addFiles(list){
+  const files=[...list].filter(isImageFile);
+  if(!files.length){showMsg('No supported image files were selected.');return;}
+  for(const file of files){
+    try{
+      const d=await decode(file); releaseDecoded(d);
+      state.files.push({file, name:file.name, size:file.size, type:file.type||'unknown', w:d.w,h:d.h, format:mimeToFormat(file), error:null});
+    }catch(e){state.files.push({file,name:file.name,size:file.size,type:file.type||'unknown',w:0,h:0,format:mimeToFormat(file),error:'Unable to read this image.'});}
+  }
+  if(state.files.length===1 || !state.files[state.active]?.w) state.active=0;
+  renderAll();
+}
+function renderAll(){
+  $('workspace').classList.toggle('hidden',!state.files.length);
+  $('count').textContent=state.files.length+' image'+(state.files.length===1?'':'s');
+  $('queue').innerHTML=state.files.map((x,i)=>`
+    <article class="item">
+      <div class="thumb">${x.error?'<span class="muted">Unreadable</span>':`<img src="${URL.createObjectURL(x.file)}" alt="${esc(x.name)}">`}</div>
+      <div class="item-body"><div class="name" title="${esc(x.name)}">#${i+1} · ${esc(x.name)}</div>
+      <div class="meta">${x.error?'Unable to read':`${x.w} × ${x.h} px · ${fmtBytes(x.size)} · ${esc(x.format.toUpperCase())}`}</div>
+      <div class="item-actions"><button onclick="moveItem(${i},-1)" aria-label="Move up">↑</button><button onclick="moveItem(${i},1)" aria-label="Move down">↓</button><button onclick="selectItem(${i})">Open</button><button class="remove" onclick="removeItem(${i})">Remove</button></div></div>
+      ${x.error?'<div class="bad">Unable to read this image. It will be skipped during batch processing.</div>':''}
+    </article>`).join('');
+  // Clean thumbnail URLs after image elements load, avoiding retained URLs.
+  document.querySelectorAll('.thumb img').forEach(img=>{const u=img.src;img.addEventListener('load',()=>{setTimeout(()=>{try{URL.revokeObjectURL(u)}catch(e){}},1000)},{once:true});});
+  if(state.files.length) selectItem(Math.min(state.active,state.files.length-1),false);
+}
+window.moveItem=(i,dir)=>{const j=i+dir;if(j<0||j>=state.files.length)return;[state.files[i],state.files[j]]=[state.files[j],state.files[i]];state.active=j;state.results=[];renderAll();};
+window.removeItem=i=>{state.files.splice(i,1);state.results=[];state.active=Math.max(0,Math.min(state.active,state.files.length-1));renderAll();if(!state.files.length)clearResults();};
+window.selectItem=(i,scroll=true)=>{state.active=i;loadActive();if(scroll) $('beforeAfter').scrollIntoView({behavior:'smooth',block:'nearest'});};
+
+async function loadActive(){
+ const x=state.files[state.active]; if(!x||x.error)return;
+ $('beforeAfter').classList.remove('hidden');$('activeName').textContent=x.name;
+ const url=URL.createObjectURL(x.file); const old=$('originalPreview').dataset.url;
+ if(old)try{URL.revokeObjectURL(old)}catch(e){}
+ $('originalPreview').src=url;$('originalPreview').dataset.url=url;
+ const ratio=(x.w/x.h).toFixed(3);
+ $('originalInfo').innerHTML=`<b>${x.w} × ${x.h} px</b><br>${fmtBytes(x.size)} · ${esc(x.type||'image/*')}<br>Aspect ratio: ${ratio}:1`;
+ const base=sanitizeBase(x.name);
+ $('filename').value=settings.filename||base+'-resized';
+ settings.width=x.w;settings.height=x.h;
+ $('width').value=x.w;$('height').value=x.h;$('side').value=Math.max(x.w,x.h);
+ updateModeUI(); updateControls();
+ initCrop();
+}
+function selectBtnClick(){ $('fileInput').click(); }
+$('selectBtn').onclick=selectBtnClick;$('addBtn').onclick=selectBtnClick;
+$('fileInput').addEventListener('change',e=>{addFiles(e.target.files);e.target.value='';});
+const dz=$('dropZone');
+['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();dz.classList.add('active')}));
+['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();dz.classList.remove('active')}));
+dz.addEventListener('drop',e=>addFiles(e.dataTransfer.files));
+document.addEventListener('dragover',e=>e.preventDefault());document.addEventListener('drop',e=>{if(!dz.contains(e.target))e.preventDefault();});
+document.addEventListener('paste',e=>{const files=[...e.clipboardData.files].filter(isImageFile);if(files.length)addFiles(files);});
+
+function ratioValue(){
+ const x=state.files[state.active]; if(!x)return 1;
+ if(settings.ratio==='custom')return Math.max(1,+settings.ratioW)/Math.max(1,+settings.ratioH);
+ if(settings.ratio==='original')return x.w/x.h;
+ const [a,b]=settings.ratio.split(':').map(Number);return a/b;
+}
+function setDimsFromWidth(w){
+ const r=(state.files[state.active]?.w||1)/(state.files[state.active]?.h||1);
+ settings.width=Math.max(1,Math.round(w));settings.height=Math.max(1,Math.round(w/r));
+ $('width').value=settings.width;$('height').value=settings.height;
+}
+function setDimsFromHeight(h){
+ const r=(state.files[state.active]?.w||1)/(state.files[state.active]?.h||1);
+ settings.height=Math.max(1,Math.round(h));settings.width=Math.max(1,Math.round(h*r));
+ $('width').value=settings.width;$('height').value=settings.height;
+}
+function updateModeUI(){
+ const m=$('mode').value;
+ $('pixelFields').classList.toggle('hidden',!['pixels','preset','physical'].includes(m));
+ $('percentageBox').classList.toggle('hidden',m!=='percentage');$('sideBox').classList.toggle('hidden',!(m==='longest'||m==='shortest'));
+ $('sideLabel').textContent=m==='shortest'?'Shortest Side (px)':'Longest Side (px)';
+ $('presetBox').classList.toggle('hidden',m!=='preset');$('physicalBox').classList.toggle('hidden',m!=='physical');
+}
+function updateControls(){
+ settings.mode=$('mode').value;settings.lock=$('lockRatio').checked;settings.fit=$('fit').value;
+ settings.ratio=$('ratioPreset').value;settings.ratioW=+$('ratioW').value||1;settings.ratioH=+$('ratioH').value||1;
+ $('customRatio').classList.toggle('hidden',settings.ratio!=='custom');
+ $('distortHint').classList.toggle('hidden',settings.lock);
+ const q=+$('quality').value; $('qualityValue').textContent=q+'%';
+ const f=$('format').value; $('pngHint').classList.toggle('hidden',f!=='png');
+ const cropNeeded=settings.fit==='fill'||settings.mode==='preset'&&settings.fit==='fill';
+ $('cropSection').classList.toggle('hidden',!cropNeeded);
+ if(settings.mode==='preset'){
+   const [w,h]=$('preset').value.split('x').map(Number);settings.width=w;settings.height=h;
+   $('width').value=w;$('height').value=h;
+ }
+}
+$('mode').onchange=()=>{settings.mode=$('mode').value;updateModeUI();updateControls();};
+$('lockRatio').onchange=()=>{settings.lock=$('lockRatio').checked;updateControls();};
+$('width').oninput=()=>{if(settings.lock&&state.files[state.active])setDimsFromWidth(+$('width').value||1);else settings.width=+$('width').value||0;};
+$('height').oninput=()=>{if(settings.lock&&state.files[state.active])setDimsFromHeight(+$('height').value||1);else settings.height=+$('height').value||0;};
+$('percentage').onchange=()=>{settings.percentage=+$('percentage').value;};
+$('side').oninput=()=>{settings.side=+$('side').value||0;};
+$('preset').onchange=()=>{settings.preset=$('preset').value;updateControls();};
+$('ratioPreset').onchange=()=>updateControls();$('ratioW').oninput=updateControls;$('ratioH').oninput=updateControls;
+$('fit').onchange=()=>{settings.fit=$('fit').value;updateControls();};
+$('allowUpscale').onchange=()=>settings.allowUpscale=$('allowUpscale').checked;
+$('smart').onchange=()=>settings.smart=$('smart').checked;
+$('format').onchange=()=>{settings.format=$('format').value;updateControls();};
+$('quality').oninput=()=>{$('qualityValue').textContent=$('quality').value+'%';settings.quality=+$('quality').value;};
+$('bg').oninput=()=>settings.bg=$('bg').value;
+$('dpi').onchange=()=>settings.dpi=+$('dpi').value;
+$('filename').oninput=()=>settings.filename=$('filename').value;
+$('pinW').oninput=()=>settings.pinW=+$('pinW').value;$('pinH').oninput=()=>settings.pinH=+$('pinH').value;
+
+function targetDims(x){
+ let w=x.w,h=x.h,m=settings.mode;
+ if(m==='percentage'){const p=Math.max(.01,+settings.percentage||100)/100;w=Math.round(x.w*p);h=Math.round(x.h*p);}
+ else if(m==='longest'||m==='shortest'){
+   const side=Math.max(1,+settings.side||1), cur=m==='longest'?Math.max(x.w,x.h):Math.min(x.w,x.h),s=side/cur;w=Math.round(x.w*s);h=Math.round(x.h*s);
+ } else if(m==='preset'){[w,h]=settings.preset.split('x').map(Number);}
+ else if(m==='physical'){w=Math.round((+settings.pinW||6)*settings.dpi);h=Math.round((+settings.pinH||4)*settings.dpi);}
+ else {w=Math.max(1,Math.round(+settings.width||x.w));h=Math.max(1,Math.round(+settings.height||x.h));}
+ if(m==='pixels' && settings.lock){ if(document.activeElement===$('height'))setDimsFromHeight(h); else setDimsFromWidth(w);w=settings.width;h=settings.height; }
+ if(settings.smart&&!settings.allowUpscale){const scale=Math.min(1,x.w/w,x.h/h);if(scale<1){w=Math.max(1,Math.floor(w*scale));h=Math.max(1,Math.floor(h*scale));}}
+ return {w,h};
+}
+function validateDims(w,h){
+ if(!Number.isInteger(w)||!Number.isInteger(h)||w<1||h<1)return 'Dimensions must be positive integers.';
+ if(w>20000||h>20000||w*h>80000000)return 'Requested dimensions are too large for this browser. Try smaller dimensions.';
+ return null;
+}
+function qualityLabel(v){return v<=30?'Very Low':v<=50?'Low':v<=70?'Balanced':v<=85?'High':'Maximum';}
+function resolveFormat(x){
+ let f=settings.format;if(f==='same')f=x.format;
+ if(!['jpeg','png','webp'].includes(f))f='jpeg';
+ if(f==='webp'&&!canvasSupportsWebP())f='jpeg';
+ return f;
+}
+let webpSupport;
+function canvasSupportsWebP(){if(webpSupport!==undefined)return webpSupport;try{const c=document.createElement('canvas');webpSupport=c.toDataURL('image/webp').startsWith('data:image/webp');}catch(e){webpSupport=false}return webpSupport;}
+function ratioCropForTarget(x,tw,th){
+ const tr=tw/th, sr=x.w/x.h;let w,h;
+ if(sr>tr){h=x.h;w=h*tr}else{w=x.w;h=w/tr}
+ return {x:(x.w-w)/2,y:(x.h-h)/2,w,h};
+}
+function getCropSource(x,tw,th){
+ if(settings.fit!=='fill')return {x:0,y:0,w:x.w,h:x.h};
+ return state.crop?.w>0?state.crop:ratioCropForTarget(x,tw,th);
+}
+function canvasToBlob(canvas,mime,q){
+ return new Promise((res,rej)=>canvas.toBlob(b=>b?res(b):rej(new Error('Browser could not encode the image.')),mime,q));
+}
+async function renderOutput(x){
+ const d=await decode(x.file);let tw,th=targetDims(x);tw=th.w;th=th.h;
+ const err=validateDims(tw,th);if(err){releaseDecoded(d);throw new Error(err);}
+ const c=document.createElement('canvas');c.width=tw;c.height=th;const ctx=c.getContext('2d',{alpha:true});
+ if(!ctx){releaseDecoded(d);throw new Error('Canvas processing is unavailable in this browser.');}
+ const f=resolveFormat(x);
+ if(f==='jpeg'){ctx.fillStyle=settings.bg;ctx.fillRect(0,0,tw,th);}
+ const src=getCropSource(x,tw,th);let dx=0,dy=0,dw=tw,dh=th;
+ if(settings.fit==='fit'){
+   const s=Math.min(tw/src.w,th/src.h);dw=Math.max(1,src.w*s);dh=Math.max(1,src.h*s);
+   dx=(tw-dw)/2;dy=(th-dh)/2;
+ } else if(settings.fit==='fill'){dw=tw;dh=th;}
+ ctx.save();
+ const cx=tw/2,cy=th/2;
+ ctx.translate(cx,cy);
+ ctx.rotate((state.rotation||0)*Math.PI/180);
+ ctx.scale(state.flipH?-1:1,state.flipV?-1:1);
+ ctx.translate(-cx,-cy);
+ try{ctx.drawImage(d.source,src.x,src.y,src.w,src.h,dx,dy,dw,dh);}catch(e){releaseDecoded(d);throw new Error('Could not render this image.');}
+ ctx.restore();
+ const mime=f==='jpeg'?'image/jpeg':f==='png'?'image/png':'image/webp';
+ const q=f==='png'?undefined:Math.max(.01,Math.min(1,(settings.quality||80)/100));
+ let blob=await canvasToBlob(c,mime,q);
+ releaseDecoded(d);
+ if(!blob||blob.size===0)throw new Error('Output file could not be created.');
+ return {blob,w:tw,h:th,format:f,source:x};
+}
+function updateCropBox(){
+ const x=state.files[state.active];if(!x||!$('cropSection').classList.contains('hidden')){}
+ if(!x)return;
+ const stage=$('cropStage'),img=$('cropImage'),box=$('cropBox');
+ const sw=stage.clientWidth,sh=stage.clientHeight;const ratio=x.w/x.h;
+ let iw=sw,ih=sw/ratio;if(ih<sh){ih=sh;iw=sh*ratio;}
+ const z=state.cropScale||1;img.style.width=iw*z+'px';img.style.height=ih*z+'px';img.style.left=(sw-iw*z)/2+'px';img.style.top=(sh-ih*z)/2+'px';
+ const cr=state.crop;box.style.left=Math.max(0,(sw-(Math.min(sw,sw*cr.w/x.w)))/2)+'px';
+ box.style.width=Math.min(sw,Math.max(60,sw*cr.w/x.w))+'px';box.style.height=Math.min(sh,Math.max(60,sh*cr.h/x.h))+'px';box.style.top=(sh-Math.min(sh,Math.max(60,sh*cr.h/x.h)))/2+'px';
+}
+function initCrop(){
+ const x=state.files[state.active];if(!x)return;
+ state.rotation=0;state.flipH=false;state.flipV=false;state.cropScale=1;
+ state.crop=ratioCropForTarget(x,Math.max(1,targetDims(x).w),Math.max(1,targetDims(x).h));
+ $('zoom').value=1;
+ requestAnimationFrame(updateCropBox);
+}
+$('zoom').oninput=()=>{state.cropScale=+$('zoom').value;updateCropBox();};
+$('centerCrop').onclick=()=>{const x=state.files[state.active];if(x){state.crop=ratioCropForTarget(x,...[targetDims(x).w,targetDims(x).h]);updateCropBox();}};
+$('rotateLeft').onclick=()=>{state.rotation=(state.rotation+270)%360;updateCropBox();};
+$('rotateRight').onclick=()=>{state.rotation=(state.rotation+90)%360;updateCropBox();};
+$('flipH').onclick=()=>{state.flipH=!state.flipH;updateCropBox();};
+$('flipV').onclick=()=>{state.flipV=!state.flipV;updateCropBox();};
+$('cropRatio').onchange=()=>{const x=state.files[state.active];if(!x)return;let tr=$('cropRatio').value;if(tr==='free')return;let r=tr==='custom'?(+$('ratioW').value/+ $('ratioH').value):tr.split(':').reduce((a,b)=>a/Number(b),Number(tr.split(':')[0]));let w=x.w,h=w/r;if(h>x.h){h=x.h;w=h*r}state.crop={x:(x.w-w)/2,y:(x.h-h)/2,w,h};updateCropBox();};
+let cropDrag=null;
+$('cropBox').addEventListener('pointerdown',e=>{e.preventDefault();$('cropBox').setPointerCapture(e.pointerId);cropDrag={sx:e.clientX,sy:e.clientY,orig:{...state.crop}}});
+$('cropBox').addEventListener('pointermove',e=>{if(!cropDrag)return;const x=state.files[state.active],stage=$('cropStage');const dx=(e.clientX-cropDrag.sx)*x.w/stage.clientWidth,dy=(e.clientY-cropDrag.sy)*x.h/stage.clientHeight;state.crop.x=Math.max(0,Math.min(x.w-state.crop.w,cropDrag.orig.x+dx));state.crop.y=Math.max(0,Math.min(x.h-state.crop.h,cropDrag.orig.y+dy));updateCropBox()});
+$('cropBox').addEventListener('pointerup',()=>cropDrag=null);
+
+async function createResult(index){
+ const x=state.files[index];if(!x||x.error)throw new Error('Invalid image.');
+ const r=await renderOutput(x);const custom=settings.filename.trim();
+ r.filename=custom?outputName(x,r.format,custom):outputName(x,r.format);
+ return r;
+}
+function reduction(src,out){
+ const delta=src-out;const pct=src?delta/src*100:0;
+ if(delta>0)return `Saved ${fmtBytes(delta)} · ${pct.toFixed(1)}% reduction`;
+ if(delta<0)return `Output is ${fmtBytes(-delta)} larger than original`;
+ return 'Same file size';
+}
+function resultHTML(r,i){
+ const url=URL.createObjectURL(r.blob);state.objectUrls.add(url);r.url=url;
+ return `<article class="card" style="margin:10px 0;box-shadow:none">
+  <div class="section-title"><div><b>${esc(r.filename)}</b><div class="muted" style="font-size:12px">${esc(r.source.name)}</div></div><span>✓ Done</span></div>
+  <div class="stats"><div class="stat"><b>${r.source.w}×${r.source.h}</b><span>Original</span></div><div class="stat"><b>${r.w}×${r.h}</b><span>Output</span></div><div class="stat"><b>${fmtBytes(r.blob.size)}</b><span>Output size</span></div></div>
+  <div class="muted" style="font-size:12px;margin-top:8px">${fmtBytes(r.source.size)} → ${fmtBytes(r.blob.size)} · ${reduction(r.source.size,r.blob.size)}</div>
+  <div class="actions"><button class="primary" onclick="downloadResult(${i})">Download</button><button class="secondary" onclick="shareResult(${i})">Share</button></div>
+ </article>`;
+}
+window.downloadResult=i=>downloadBlob(state.results[i]?.blob,state.results[i]?.filename);
+window.shareResult=async i=>{const r=state.results[i];if(!r)return;try{const f=new File([r.blob],r.filename,{type:r.blob.type});if(!navigator.share)throw new Error('unsupported');if(navigator.canShare&&!navigator.canShare({files:[f]}))throw new Error('unsupported');await navigator.share({files:[f],title:r.filename});}catch(e){if(e.name==='AbortError')return;downloadBlob(r.blob,r.filename);}};
+function downloadBlob(blob,filename){
+ if(!(blob instanceof Blob)||blob.size===0){showMsg('The output file is unavailable. Resize again.','error','outputMsg');return;}
+ const url=URL.createObjectURL(blob);state.objectUrls.add(url);
+ try{
+  const a=document.createElement('a');a.href=url;a.download=filename||'image-resized.jpg';a.rel='noopener';a.style.display='none';document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>{URL.revokeObjectURL(url);state.objectUrls.delete(url)},1500);
+ }catch(e){
+  window.open(url,'_blank','noopener');
+  setTimeout(()=>{URL.revokeObjectURL(url);state.objectUrls.delete(url)},30000);
+  showMsg('Your browser blocked the automatic download. The image was opened so you can save it manually.','notice','outputMsg');
+ }
+}
+function setProgress(done,total,text){const p=Math.round(done/total*100);$('progressBar').style.width=p+'%';$('progressPct').textContent=p+'%';$('progressText').textContent=text;}
+async function runBatch(indices){
+ if(state.busy)return;state.busy=true;state.cancel=false;$('progressBox').classList.remove('hidden');$('resizeOne').disabled=true;$('resizeAll').disabled=true;$('outputMsg').innerHTML='';
+ const results=[];const failures=[];
+ try{
+  for(let n=0;n<indices.length;n++){
+   if(state.cancel)break;
+   const i=indices[n];setProgress(n,indices.length,`Resizing ${n+1} of ${indices.length}`);
+   await new Promise(requestAnimationFrame);
+   try{const r=await createResult(i);results.push(r);}catch(e){failures.push({name:state.files[i]?.name||'Unknown',message:e.message||'Unable to process'});}
+   setProgress(n+1,indices.length,`Resizing ${n+1} of ${indices.length}`);
+   await new Promise(requestAnimationFrame);
+  }
+ }finally{
+  state.busy=false;$('progressBox').classList.add('hidden');$('resizeOne').disabled=false;$('resizeAll').disabled=false;
+ }
+ if(state.cancel){showMsg('Operation cancelled. Selected images were kept.','notice','outputMsg');return;}
+ state.results.forEach(r=>{if(r.url){URL.revokeObjectURL(r.url);state.objectUrls.delete(r.url)}});
+ state.results=results;
+ renderResults(failures);
+}
+function renderResults(failures=[]){
+ $('resultSection').classList.toggle('hidden',!state.results.length);
+ $('results').innerHTML=state.results.map(resultHTML).join('');
+ $('resultSummary').textContent=`${state.results.length} completed${failures.length?' · '+failures.length+' failed':''}`;
+ $('downloadAll').classList.toggle('hidden',state.results.length<2);
+ if(failures.length) $('outputMsg').innerHTML=`<div class="notice">Completed ${state.results.length} image${state.results.length===1?'':'s'}; ${failures.length} failed: ${failures.map(x=>esc(x.name)).join(', ')}</div>`;
+}
+$('resizeOne').onclick=()=>{if(!state.files[state.active])return;runBatch([state.active])};
+$('resizeAll').onclick=()=>{const valid=state.files.map((x,i)=>x.error?null:i).filter(x=>x!==null);if(valid.length>1)showMsg('Large batch detected. Images are processed one at a time to reduce memory usage.','notice','outputMsg');runBatch(valid)};
+$('cancel').onclick=()=>{state.cancel=true;};
+$('newOperation').onclick=()=>{window.scrollTo({top:0,behavior:'smooth'});};
+$('downloadAll').onclick=async()=>{
+ if(state.results.length<2)return;
+ // ZIP is intentionally implemented with a tiny store-only ZIP writer, avoiding a large third-party dependency.
+ try{
+  const zip=await makeZip(state.results.map(r=>({name:r.filename,data:new Uint8Array(await r.blob.arrayBuffer())})));
+  downloadBlob(zip,'InstaPic-resized-images.zip');
+ }catch(e){
+  showMsg('ZIP creation failed. Individual downloads remain available.','error','outputMsg');
+ }
+};
+function crc32(data){
+ let c=0^(-1);for(let i=0;i<data.length;i++){c=(c>>>8)^CRC[(c^data[i])&255]}return(c^(-1))>>>0;
+}
+const CRC=(()=>{const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xedb88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function u16(v){return new Uint8Array([v&255,v>>>8&255])}function u32(v){return new Uint8Array([v&255,v>>>8&255,v>>>16&255,v>>>24&255])}
+async function makeZip(entries){
+ const parts=[];let offset=0;const central=[];
+ for(const e of entries){
+  const name=new TextEncoder().encode(e.name),data=e.data,crc=crc32(data);
+  const h=new Uint8Array([...u32(0x04034b50),...u16(20),...u16(0),...u16(0),...u16(0),...u16(0),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0),...name]);
+  parts.push(h,data);const c=new Uint8Array([...u32(0x02014b50),...u16(20),...u16(20),...u16(0),...u16(0),...u16(0),...u16(0),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(offset),...name]);central.push(c);offset+=h.length+data.length;
+ }
+ const cd=central.reduce((a,b)=>a+b.length,0),end=new Uint8Array([...u32(0x06054b50),...u16(0),...u16(0),...u16(entries.length),...u16(entries.length),...u32(cd),...u32(offset),...u16(0)]);
+ return new Blob([...parts,...central,end],{type:'application/zip'});
+}
+function clearResults(){
+ state.results.forEach(r=>{if(r.url)try{URL.revokeObjectURL(r.url)}catch(e){}});state.results=[];$('resultSection').classList.add('hidden');$('results').innerHTML='';
+}
+$('resetBtn').onclick=()=>{
+ state.objectUrls.forEach(u=>{try{URL.revokeObjectURL(u)}catch(e){}});state.objectUrls.clear();state.files=[];state.results=[];state.active=0;state.cancel=true;
+ settings=defaults();state.crop={x:0,y:0,w:1,h:1};state.rotation=0;state.flipH=false;state.flipV=false;state.cropScale=1;
+ $('mode').value='pixels';$('lockRatio').checked=true;$('fit').value='fit';$('format').value='same';$('quality').value=80;$('bg').value='#ffffff';$('dpi').value=150;$('filename').value='';$('allowUpscale').checked=false;$('smart').checked=true;$('ratioPreset').value='original';$('percentage').value=100;$('side').value=1920;
+ $('workspace').classList.add('hidden');$('beforeAfter').classList.add('hidden');$('globalMsg').innerHTML='';$('outputMsg').innerHTML='';$('fileInput').value='';updateModeUI();updateControls();window.scrollTo({top:0,behavior:'smooth'});
+};
+function clearOldPreview(){const old=$('outputPreview').dataset.url;if(old){try{URL.revokeObjectURL(old)}catch(e){}$('outputPreview').dataset.url='';}}
+async function previewCurrent(){
+ const x=state.files[state.active];if(!x||x.error)return;
+ try{
+  const r=await renderOutput(x);clearOldPreview();const u=URL.createObjectURL(r.blob);$('outputPreview').src=u;$('outputPreview').dataset.url=u;
+  $('outputInfo').innerHTML=`<b>${r.w} × ${r.h} px</b><br>${fmtBytes(r.blob.size)} · ${r.format.toUpperCase()}<br>${reduction(x.size,r.blob.size)}`;
+ }catch(e){$('outputInfo').textContent=e.message||'Preview unavailable.';}
+}
+let previewTimer;function schedulePreview(){clearTimeout(previewTimer);previewTimer=setTimeout(()=>previewCurrent(),450)}
+['mode','percentage','side','preset','fit','ratioPreset','ratioW','ratioH','allowUpscale','smart','format','quality','bg','dpi','pinW','pinH'].forEach(id=>$(id).addEventListener('change',()=>{updateControls();schedulePreview()}));
+$('width').addEventListener('change',schedulePreview);$('height').addEventListener('change',schedulePreview);$('quality').addEventListener('input',schedulePreview);
+window.addEventListener('resize',()=>updateCropBox());
+window.addEventListener('beforeunload',()=>{state.objectUrls.forEach(u=>{try{URL.revokeObjectURL(u)}catch(e){}})});
+
+updateModeUI();updateControls();
+})();
+</script>
 </body>
 </html>
